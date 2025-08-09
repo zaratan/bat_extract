@@ -13,6 +13,10 @@ export class ImageProcessor {
     options: ImageProcessingOptions = {}
   ): Promise<string> {
     try {
+      // S'assurer que le dossier de destination existe
+      const outputDir = path.dirname(outputPath);
+      await fs.mkdir(outputDir, { recursive: true });
+
       let pipeline = sharp(inputPath);
 
       // Redimensionnement si spécifié

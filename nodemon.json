@@ -1,0 +1,8 @@
+{
+  "ignore": ["temp_images/**/*", "*.json", "dist/**/*", "node_modules/**/*"],
+  "ext": "ts",
+  "watch": ["src/**/*"],
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

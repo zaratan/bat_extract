@@ -17,12 +17,23 @@ export class BatExtractor {
   }
 
   /**
+   * S'assure que le dossier temporaire existe
+   */
+  private async ensureTempDirExists(): Promise<void> {
+    try {
+      await fs.mkdir(this.tempDir, { recursive: true });
+    } catch {
+      // Ignore l'erreur si le dossier existe déjà
+    }
+  }
+
+  /**
    * Initialise l'extracteur (crée le dossier temporaire, initialise l'OCR)
    */
   async initialize(language: string = 'fra'): Promise<void> {
     try {
       // Crée le dossier temporaire s'il n'existe pas
-      await fs.mkdir(this.tempDir, { recursive: true });
+      await this.ensureTempDirExists();
 
       // Initialise le moteur OCR
       await this.ocrEngine.initialize(language);
@@ -59,6 +70,9 @@ export class BatExtractor {
 
       // Préprocessing de l'image si demandé
       if (options.preprocess) {
+        // S'assure que le dossier temporaire existe
+        await this.ensureTempDirExists();
+
         const fileName = path.basename(imagePath, path.extname(imagePath));
         const tempPath = path.join(this.tempDir, `${fileName}_processed.png`);
 

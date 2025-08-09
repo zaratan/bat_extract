@@ -1,0 +1,22 @@
+{
+  "foundDepartments": [
+    "Paris"
+  ],
+  "extractions": [
+    {
+      "method": "highResolution",
+      "confidence": 47,
+      "text": "Distribution de la Barbastelle dEurope\n50\n-\nee Legende\n Espce actuellement trs rarement inventorie\nae SNS ou exceptionnellement observe\nLE e moins de 5 donnees\nana IV APE  Espce actuellement rare ou assez rare\nsa  Espce peu commune ou localement commune\nvadre 9  Espce assez commune  trs commune\nEt  Espce prsente mais mal connue\n50 ww  Espce disparue ou non retrouvee sur la zone\n23 a 9  Espce absente nayant jamais te trouve\nSource Arthur L Lemaire M - 2021 - Les Chauves-souris de France Belgique Luxembourg et Suisse\nEditions Biotope Mze Museum national dHistoire naturelle Paris 3 dition 592 p"
+    },
+    {
+      "method": "scatteredText",
+      "confidence": 0,
+      "text": "z"
+    },
+    {
+      "method": "autoDetection",
+      "confidence": 57,
+      "text": "Distribution de la Barbastelle dEurope\n\nLegende\n\nEspce actuellement trs rarement inventorie\nou exceptionnellement observee\nmoins de  donnees\n\nEspce actuellement rare ou assez rare\n\nEspce peu commune ou localement commune\nEspce assez commune  trs commune\nEspce prsente mais mal connue\n\nEspce disparue ou non retrouvee sur la zone\n\nEspce absente nayant jamais t trouve\n\nSource Arthur L Lemaire M -  - Les Chauves-souris de France Belgique Luxembourg et Suisse\nEditions Biotope Mze Museum national dHistoire naturelle Paris  dition  p"
+    }
+  ]
+}

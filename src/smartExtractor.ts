@@ -1,7 +1,6 @@
-import { MapComparator } from './compareMaps';
-import sharp from 'sharp';
+import * as sharp from 'sharp';
 import { writeFile } from 'fs/promises';
-import path from 'path';
+import * as path from 'path';
 
 interface FrenchDepartment {
   code: string;
@@ -18,7 +17,6 @@ interface DepartmentColorMapping {
 }
 
 export class SmartDepartmentExtractor {
-  private comparator: MapComparator;
   private readonly imagePath: string;
   private readonly speciesName: string;
 
@@ -599,7 +597,6 @@ export class SmartDepartmentExtractor {
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png'
       );
     this.speciesName = speciesName || "Barbastelle d'Europe";
-    this.comparator = new MapComparator();
   }
 
   async extractDepartmentDistribution(): Promise<DepartmentColorMapping[]> {
@@ -666,7 +663,7 @@ export class SmartDepartmentExtractor {
     });
 
     console.log('\n📊 Répartition par statut de distribution:');
-    for (const [status, count] of statusStats.entries()) {
+    for (const [status, count] of Array.from(statusStats.entries())) {
       console.log(`  ${status}: ${count} départements`);
     }
 
@@ -720,7 +717,7 @@ export class SmartDepartmentExtractor {
       null;
     let maxCount = 0;
 
-    for (const [colorKey, count] of colorCounts.entries()) {
+    for (const [colorKey, count] of Array.from(colorCounts.entries())) {
       if (count > maxCount && count > 10) {
         // Minimum 10 pixels
         const components = colorKey.split(',').map(Number);
@@ -864,7 +861,7 @@ export class SmartDepartmentExtractor {
   }
 
   async cleanup(): Promise<void> {
-    await this.comparator.cleanup();
+    // Nettoyage si nécessaire
   }
 }
 

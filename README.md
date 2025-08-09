@@ -39,6 +39,7 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
     - [Correspondance officielle](#correspondance-officielle)
     - [Correspondance technique](#correspondance-technique)
   - [Scripts disponibles](#scripts-disponibles)
+  - [Tests](#-tests)
   - [Approche technique](#approche-technique)
     - [Analyse par couleurs (vs OCR)](#analyse-par-couleurs-vs-ocr)
     - [Gestion des erreurs](#gestion-des-erreurs)
@@ -520,6 +521,29 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 | **Linting**                    | `pnpm lint`              | Vérification du code                      |
 | **Correction**                 | `pnpm lint:fix`          | Correction automatique                    |
 | **Vérification TypeScript**    | `pnpm type-check`        | Vérification des types TypeScript         |
+| **Tests**                      | `pnpm test`              | Lancer tous les tests                     |
+| **Tests avec couverture**      | `pnpm test:coverage`     | Tests + rapport de couverture             |
+
+## 🧪 Tests
+
+Suite de tests complète avec **sécurité absolue** - aucun test ne peut appeler le vrai site web :
+
+- **Jest + TypeScript** : Configuration ESM moderne
+- **nock** : Mocking HTTP complet, tous les appels réseau sont bloqués
+- **4 suites de tests** : Tests unitaires, d'intégration, utilitaires et sécurité
+- **18 tests** : Couverture des fonctions principales d'extraction
+- **CI/CD intégré** : Tests automatiques sur chaque commit/push
+
+```bash
+# Lancer tous les tests
+pnpm test
+
+# Tests avec couverture de code
+pnpm test:coverage
+
+# Tests en mode watch
+pnpm test:watch
+```
 
 ## Approche technique
 

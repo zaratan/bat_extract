@@ -14,6 +14,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 - **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages
 - **ts-node** pour l'exécution directe
+- **Node.js 22** spécifiée dans `.nvmrc` pour la cohérence d'équipe
 
 ## Architecture du projet (2025)
 

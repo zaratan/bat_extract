@@ -1,0 +1,1552 @@
+{
+  "metadata": {
+    "extractionDate": "2025-08-09T11:18:56.645Z",
+    "totalDepartments": 94,
+    "detectedDepartments": 59,
+    "sourceMap": "Barbastelle d'Europe - Distribution Atlas"
+  },
+  "departments": [
+    {
+      "code": "01",
+      "name": "Ain",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.55
+      },
+      "color": {
+        "r": 15,
+        "g": 15,
+        "b": 15,
+        "hex": "#0f0f0f"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 27,
+      "confidence": "medium"
+    },
+    {
+      "code": "02",
+      "name": "Aisne",
+      "region": "Hauts-de-France",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.25
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 30,
+      "confidence": "medium"
+    },
+    {
+      "code": "03",
+      "name": "Allier",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.55
+      },
+      "color": {
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 600,
+      "confidence": "high"
+    },
+    {
+      "code": "04",
+      "name": "Alpes-de-Haute-Provence",
+      "region": "Provence-Alpes-Côte d'Azur",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.7
+      },
+      "color": {
+        "r": 233,
+        "g": 233,
+        "b": 233,
+        "hex": "#e9e9e9"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 16,
+      "confidence": "low"
+    },
+    {
+      "code": "05",
+      "name": "Hautes-Alpes",
+      "region": "Provence-Alpes-Côte d'Azur",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.65
+      },
+      "color": {
+        "r": 248,
+        "g": 248,
+        "b": 248,
+        "hex": "#f8f8f8"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 29,
+      "confidence": "medium"
+    },
+    {
+      "code": "06",
+      "name": "Alpes-Maritimes",
+      "region": "Provence-Alpes-Côte d'Azur",
+      "coordinates": {
+        "x": 0.8,
+        "y": 0.75
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "07",
+      "name": "Ardèche",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.65
+      },
+      "color": {
+        "r": 122,
+        "g": 122,
+        "b": 122,
+        "hex": "#7a7a7a"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 23,
+      "confidence": "medium"
+    },
+    {
+      "code": "08",
+      "name": "Ardennes",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.25
+      },
+      "color": {
+        "r": 2,
+        "g": 2,
+        "b": 2,
+        "hex": "#020202"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 40,
+      "confidence": "medium"
+    },
+    {
+      "code": "09",
+      "name": "Ariège",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.85
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 56,
+      "confidence": "high"
+    },
+    {
+      "code": "10",
+      "name": "Aube",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.6,
+        "y": 0.4
+      },
+      "color": {
+        "r": 215,
+        "g": 215,
+        "b": 215,
+        "hex": "#d7d7d7"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 15,
+      "confidence": "low"
+    },
+    {
+      "code": "11",
+      "name": "Aude",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.8
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "12",
+      "name": "Aveyron",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.7
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "13",
+      "name": "Bouches-du-Rhône",
+      "region": "Provence-Alpes-Côte d'Azur",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.8
+      },
+      "color": {
+        "r": 174,
+        "g": 174,
+        "b": 174,
+        "hex": "#aeaeae"
+      },
+      "distributionStatus": "présente mais mal connue",
+      "pixelCount": 14,
+      "confidence": "low"
+    },
+    {
+      "code": "14",
+      "name": "Calvados",
+      "region": "Normandie",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.2
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "15",
+      "name": "Cantal",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.6
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "16",
+      "name": "Charente",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.55
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 157,
+        "hex": "#96cb9d"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1158,
+      "confidence": "high"
+    },
+    {
+      "code": "17",
+      "name": "Charente-Maritime",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.25,
+        "y": 0.55
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 157,
+        "hex": "#96cb9d"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 2452,
+      "confidence": "high"
+    },
+    {
+      "code": "18",
+      "name": "Cher",
+      "region": "Centre-Val de Loire",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.45
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "19",
+      "name": "Corrèze",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.45,
+        "y": 0.6
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "21",
+      "name": "Côte-d'Or",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.45
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "22",
+      "name": "Côtes-d'Armor",
+      "region": "Bretagne",
+      "coordinates": {
+        "x": 0.15,
+        "y": 0.25
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "23",
+      "name": "Creuse",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.45,
+        "y": 0.55
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "24",
+      "name": "Dordogne",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.65
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 156,
+        "hex": "#96cb9c"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1875,
+      "confidence": "high"
+    },
+    {
+      "code": "25",
+      "name": "Doubs",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.45
+      },
+      "color": {
+        "r": 231,
+        "g": 231,
+        "b": 231,
+        "hex": "#e7e7e7"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 16,
+      "confidence": "low"
+    },
+    {
+      "code": "26",
+      "name": "Drôme",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.65
+      },
+      "color": {
+        "r": 42,
+        "g": 42,
+        "b": 42,
+        "hex": "#2a2a2a"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 21,
+      "confidence": "medium"
+    },
+    {
+      "code": "27",
+      "name": "Eure",
+      "region": "Normandie",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.25
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "28",
+      "name": "Eure-et-Loir",
+      "region": "Centre-Val de Loire",
+      "coordinates": {
+        "x": 0.45,
+        "y": 0.35
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "29",
+      "name": "Finistère",
+      "region": "Bretagne",
+      "coordinates": {
+        "x": 0.05,
+        "y": 0.3
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "30",
+      "name": "Gard",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.75
+      },
+      "color": {
+        "r": 244,
+        "g": 244,
+        "b": 244,
+        "hex": "#f4f4f4"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 15,
+      "confidence": "low"
+    },
+    {
+      "code": "31",
+      "name": "Haute-Garonne",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.8
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 148,
+      "confidence": "high"
+    },
+    {
+      "code": "32",
+      "name": "Gers",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.8
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 115,
+      "confidence": "high"
+    },
+    {
+      "code": "33",
+      "name": "Gironde",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.25,
+        "y": 0.65
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 156,
+        "hex": "#96cb9c"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1552,
+      "confidence": "high"
+    },
+    {
+      "code": "34",
+      "name": "Hérault",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.6,
+        "y": 0.8
+      },
+      "color": {
+        "r": 174,
+        "g": 174,
+        "b": 174,
+        "hex": "#aeaeae"
+      },
+      "distributionStatus": "présente mais mal connue",
+      "pixelCount": 20,
+      "confidence": "low"
+    },
+    {
+      "code": "35",
+      "name": "Ille-et-Vilaine",
+      "region": "Bretagne",
+      "coordinates": {
+        "x": 0.2,
+        "y": 0.3
+      },
+      "color": {
+        "r": 234,
+        "g": 83,
+        "b": 88,
+        "hex": "#ea5358"
+      },
+      "distributionStatus": "très rarement inventoriée",
+      "pixelCount": 1042,
+      "confidence": "high"
+    },
+    {
+      "code": "36",
+      "name": "Indre",
+      "region": "Centre-Val de Loire",
+      "coordinates": {
+        "x": 0.45,
+        "y": 0.5
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 64,
+      "confidence": "high"
+    },
+    {
+      "code": "37",
+      "name": "Indre-et-Loire",
+      "region": "Centre-Val de Loire",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.45
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1867,
+      "confidence": "high"
+    },
+    {
+      "code": "38",
+      "name": "Isère",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.6
+      },
+      "color": {
+        "r": 119,
+        "g": 119,
+        "b": 119,
+        "hex": "#777777"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 15,
+      "confidence": "low"
+    },
+    {
+      "code": "39",
+      "name": "Jura",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.5
+      },
+      "color": {
+        "r": 136,
+        "g": 136,
+        "b": 136,
+        "hex": "#888888"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 18,
+      "confidence": "low"
+    },
+    {
+      "code": "40",
+      "name": "Landes",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.25,
+        "y": 0.75
+      },
+      "color": {
+        "r": 247,
+        "g": 169,
+        "b": 38,
+        "hex": "#f7a926"
+      },
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 577,
+      "confidence": "high"
+    },
+    {
+      "code": "41",
+      "name": "Loir-et-Cher",
+      "region": "Centre-Val de Loire",
+      "coordinates": {
+        "x": 0.45,
+        "y": 0.4
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 44,
+      "confidence": "medium"
+    },
+    {
+      "code": "42",
+      "name": "Loire",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.6,
+        "y": 0.6
+      },
+      "color": {
+        "r": 32,
+        "g": 32,
+        "b": 32,
+        "hex": "#202020"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 24,
+      "confidence": "medium"
+    },
+    {
+      "code": "43",
+      "name": "Haute-Loire",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.65
+      },
+      "color": {
+        "r": 255,
+        "g": 239,
+        "b": 41,
+        "hex": "#ffef29"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 1050,
+      "confidence": "high"
+    },
+    {
+      "code": "44",
+      "name": "Loire-Atlantique",
+      "region": "Pays de la Loire",
+      "coordinates": {
+        "x": 0.25,
+        "y": 0.4
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 157,
+        "hex": "#96cb9d"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1894,
+      "confidence": "high"
+    },
+    {
+      "code": "45",
+      "name": "Loiret",
+      "region": "Centre-Val de Loire",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.4
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "46",
+      "name": "Lot",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.7
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 66,
+      "confidence": "high"
+    },
+    {
+      "code": "47",
+      "name": "Lot-et-Garonne",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.7
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1753,
+      "confidence": "high"
+    },
+    {
+      "code": "48",
+      "name": "Lozère",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.6,
+        "y": 0.7
+      },
+      "color": {
+        "r": 75,
+        "g": 75,
+        "b": 75,
+        "hex": "#4b4b4b"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 27,
+      "confidence": "medium"
+    },
+    {
+      "code": "49",
+      "name": "Maine-et-Loire",
+      "region": "Pays de la Loire",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.4
+      },
+      "color": {
+        "r": 234,
+        "g": 84,
+        "b": 89,
+        "hex": "#ea5459"
+      },
+      "distributionStatus": "très rarement inventoriée",
+      "pixelCount": 863,
+      "confidence": "high"
+    },
+    {
+      "code": "50",
+      "name": "Manche",
+      "region": "Normandie",
+      "coordinates": {
+        "x": 0.3,
+        "y": 0.2
+      },
+      "color": {
+        "r": 177,
+        "g": 178,
+        "b": 180,
+        "hex": "#b1b2b4"
+      },
+      "distributionStatus": "présente mais mal connue",
+      "pixelCount": 1523,
+      "confidence": "high"
+    },
+    {
+      "code": "51",
+      "name": "Marne",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.6,
+        "y": 0.35
+      },
+      "color": {
+        "r": 162,
+        "g": 162,
+        "b": 162,
+        "hex": "#a2a2a2"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 20,
+      "confidence": "low"
+    },
+    {
+      "code": "52",
+      "name": "Haute-Marne",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.4
+      },
+      "color": {
+        "r": 4,
+        "g": 4,
+        "b": 4,
+        "hex": "#040404"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 21,
+      "confidence": "medium"
+    },
+    {
+      "code": "53",
+      "name": "Mayenne",
+      "region": "Pays de la Loire",
+      "coordinates": {
+        "x": 0.3,
+        "y": 0.35
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1207,
+      "confidence": "high"
+    },
+    {
+      "code": "54",
+      "name": "Meurthe-et-Moselle",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.35
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 19,
+      "confidence": "low"
+    },
+    {
+      "code": "55",
+      "name": "Meuse",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.35
+      },
+      "color": {
+        "r": 2,
+        "g": 2,
+        "b": 2,
+        "hex": "#020202"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 20,
+      "confidence": "low"
+    },
+    {
+      "code": "56",
+      "name": "Morbihan",
+      "region": "Bretagne",
+      "coordinates": {
+        "x": 0.15,
+        "y": 0.35
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 157,
+        "hex": "#96cb9d"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1964,
+      "confidence": "high"
+    },
+    {
+      "code": "57",
+      "name": "Moselle",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.3
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "58",
+      "name": "Nièvre",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.5
+      },
+      "color": {
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 300,
+      "confidence": "high"
+    },
+    {
+      "code": "59",
+      "name": "Nord",
+      "region": "Hauts-de-France",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.15
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "60",
+      "name": "Oise",
+      "region": "Hauts-de-France",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.25
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "61",
+      "name": "Orne",
+      "region": "Normandie",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.3
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 543,
+      "confidence": "high"
+    },
+    {
+      "code": "62",
+      "name": "Pas-de-Calais",
+      "region": "Hauts-de-France",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.15
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "63",
+      "name": "Puy-de-Dôme",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.6
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 155,
+        "hex": "#96cb9b"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 960,
+      "confidence": "high"
+    },
+    {
+      "code": "64",
+      "name": "Pyrénées-Atlantiques",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.2,
+        "y": 0.85
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "65",
+      "name": "Hautes-Pyrénées",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.3,
+        "y": 0.85
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "66",
+      "name": "Pyrénées-Orientales",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.9
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "67",
+      "name": "Bas-Rhin",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.8,
+        "y": 0.35
+      },
+      "color": {
+        "r": 6,
+        "g": 6,
+        "b": 6,
+        "hex": "#060606"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 32,
+      "confidence": "medium"
+    },
+    {
+      "code": "68",
+      "name": "Haut-Rhin",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.8,
+        "y": 0.4
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "69",
+      "name": "Rhône",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.65,
+        "y": 0.6
+      },
+      "color": {
+        "r": 34,
+        "g": 34,
+        "b": 34,
+        "hex": "#222222"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 13,
+      "confidence": "low"
+    },
+    {
+      "code": "70",
+      "name": "Haute-Saône",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.45
+      },
+      "color": {
+        "r": 20,
+        "g": 20,
+        "b": 20,
+        "hex": "#141414"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 26,
+      "confidence": "medium"
+    },
+    {
+      "code": "71",
+      "name": "Saône-et-Loire",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.6,
+        "y": 0.5
+      },
+      "color": {
+        "r": 136,
+        "g": 136,
+        "b": 136,
+        "hex": "#888888"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 21,
+      "confidence": "medium"
+    },
+    {
+      "code": "72",
+      "name": "Sarthe",
+      "region": "Pays de la Loire",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.35
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "73",
+      "name": "Savoie",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.6
+      },
+      "color": {
+        "r": 119,
+        "g": 119,
+        "b": 119,
+        "hex": "#777777"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 29,
+      "confidence": "medium"
+    },
+    {
+      "code": "74",
+      "name": "Haute-Savoie",
+      "region": "Auvergne-Rhône-Alpes",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.55
+      },
+      "color": {
+        "r": 11,
+        "g": 11,
+        "b": 11,
+        "hex": "#0b0b0b"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 15,
+      "confidence": "low"
+    },
+    {
+      "code": "75",
+      "name": "Paris",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.3
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "76",
+      "name": "Seine-Maritime",
+      "region": "Normandie",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.2
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "77",
+      "name": "Seine-et-Marne",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.35
+      },
+      "color": {
+        "r": 234,
+        "g": 82,
+        "b": 87,
+        "hex": "#ea5257"
+      },
+      "distributionStatus": "très rarement inventoriée",
+      "pixelCount": 330,
+      "confidence": "high"
+    },
+    {
+      "code": "78",
+      "name": "Yvelines",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.45,
+        "y": 0.3
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "79",
+      "name": "Deux-Sèvres",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.3,
+        "y": 0.5
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 157,
+        "hex": "#96cb9d"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1805,
+      "confidence": "high"
+    },
+    {
+      "code": "80",
+      "name": "Somme",
+      "region": "Hauts-de-France",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.2
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "81",
+      "name": "Tarn",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.75
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "82",
+      "name": "Tarn-et-Garonne",
+      "region": "Occitanie",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.75
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 216,
+      "confidence": "high"
+    },
+    {
+      "code": "83",
+      "name": "Var",
+      "region": "Provence-Alpes-Côte d'Azur",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.8
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "84",
+      "name": "Vaucluse",
+      "region": "Provence-Alpes-Côte d'Azur",
+      "coordinates": {
+        "x": 0.7,
+        "y": 0.75
+      },
+      "color": {
+        "r": 60,
+        "g": 60,
+        "b": 60,
+        "hex": "#3c3c3c"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 11,
+      "confidence": "low"
+    },
+    {
+      "code": "85",
+      "name": "Vendée",
+      "region": "Pays de la Loire",
+      "coordinates": {
+        "x": 0.25,
+        "y": 0.45
+      },
+      "color": {
+        "r": 150,
+        "g": 203,
+        "b": 157,
+        "hex": "#96cb9d"
+      },
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 2454,
+      "confidence": "high"
+    },
+    {
+      "code": "86",
+      "name": "Vienne",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.35,
+        "y": 0.5
+      },
+      "color": {
+        "r": 220,
+        "g": 231,
+        "b": 177,
+        "hex": "#dce7b1"
+      },
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 803,
+      "confidence": "high"
+    },
+    {
+      "code": "87",
+      "name": "Haute-Vienne",
+      "region": "Nouvelle-Aquitaine",
+      "coordinates": {
+        "x": 0.4,
+        "y": 0.6
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "88",
+      "name": "Vosges",
+      "region": "Grand Est",
+      "coordinates": {
+        "x": 0.75,
+        "y": 0.4
+      },
+      "color": {
+        "r": 254,
+        "g": 254,
+        "b": 254,
+        "hex": "#fefefe"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 14,
+      "confidence": "low"
+    },
+    {
+      "code": "89",
+      "name": "Yonne",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.55,
+        "y": 0.45
+      },
+      "color": {
+        "r": 248,
+        "g": 169,
+        "b": 35,
+        "hex": "#f8a923"
+      },
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 780,
+      "confidence": "high"
+    },
+    {
+      "code": "90",
+      "name": "Territoire de Belfort",
+      "region": "Bourgogne-Franche-Comté",
+      "coordinates": {
+        "x": 0.8,
+        "y": 0.45
+      },
+      "color": {
+        "r": 44,
+        "g": 44,
+        "b": 44,
+        "hex": "#2c2c2c"
+      },
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 11,
+      "confidence": "low"
+    },
+    {
+      "code": "91",
+      "name": "Essonne",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.5,
+        "y": 0.35
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "92",
+      "name": "Hauts-de-Seine",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.48,
+        "y": 0.3
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "93",
+      "name": "Seine-Saint-Denis",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.52,
+        "y": 0.3
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "94",
+      "name": "Val-de-Marne",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.52,
+        "y": 0.35
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    },
+    {
+      "code": "95",
+      "name": "Val-d'Oise",
+      "region": "Île-de-France",
+      "coordinates": {
+        "x": 0.48,
+        "y": 0.28
+      },
+      "color": null,
+      "distributionStatus": "non détecté",
+      "pixelCount": 0,
+      "confidence": "low"
+    }
+  ],
+  "summary": {
+    "byStatus": {
+      "statut à déterminer": 33,
+      "peu commune ou localement commune": 9,
+      "non détecté": 35,
+      "présente mais mal connue": 3,
+      "assez commune à très commune": 9,
+      "très rarement inventoriée": 3,
+      "rare ou assez rare": 2
+    },
+    "byRegion": {
+      "Auvergne-Rhône-Alpes": 11,
+      "Hauts-de-France": 1,
+      "Provence-Alpes-Côte d'Azur": 4,
+      "Grand Est": 8,
+      "Occitanie": 8,
+      "Nouvelle-Aquitaine": 8,
+      "Bourgogne-Franche-Comté": 7,
+      "Bretagne": 2,
+      "Centre-Val de Loire": 3,
+      "Pays de la Loire": 4,
+      "Normandie": 2,
+      "Île-de-France": 1
+    }
+  }
+}

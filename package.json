@@ -11,6 +11,8 @@
     "dev:departments": "nodemon --exec ts-node src/extractDepartments.ts",
     "dev:analyze": "nodemon --exec ts-node src/analyzeCarte.ts",
     "dev:distribution": "nodemon --exec ts-node src/extractDistribution.ts",
+    "dev:compare": "nodemon --exec ts-node src/compareMaps.ts",
+    "dev:smart": "nodemon --exec ts-node src/smartExtractor.ts",
     "start": "node dist/index.js",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",

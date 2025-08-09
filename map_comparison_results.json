@@ -1,0 +1,215 @@
+{
+  "departmentMap": "./images/carte-des-departements-francais-noir-et-blanc-800-4213659499.jpg",
+  "distributionMap": "./images/plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png",
+  "departments": [],
+  "colorAnalysis": {
+    "dominantColors": [
+      {
+        "rgb": "RGB(150, 203, 157)",
+        "count": 104098,
+        "hex": "#96cb9d",
+        "color": {
+          "r": 150,
+          "g": 203,
+          "b": 157
+        }
+      },
+      {
+        "rgb": "RGB(220, 231, 177)",
+        "count": 50454,
+        "hex": "#dce7b1",
+        "color": {
+          "r": 220,
+          "g": 231,
+          "b": 177
+        }
+      },
+      {
+        "rgb": "RGB(247, 169, 38)",
+        "count": 17279,
+        "hex": "#f7a926",
+        "color": {
+          "r": 247,
+          "g": 169,
+          "b": 38
+        }
+      },
+      {
+        "rgb": "RGB(150, 203, 156)",
+        "count": 16128,
+        "hex": "#96cb9c",
+        "color": {
+          "r": 150,
+          "g": 203,
+          "b": 156
+        }
+      },
+      {
+        "rgb": "RGB(254, 254, 254)",
+        "count": 8498,
+        "hex": "#fefefe",
+        "color": {
+          "r": 254,
+          "g": 254,
+          "b": 254
+        }
+      },
+      {
+        "rgb": "RGB(149, 203, 157)",
+        "count": 7410,
+        "hex": "#95cb9d",
+        "color": {
+          "r": 149,
+          "g": 203,
+          "b": 157
+        }
+      },
+      {
+        "rgb": "RGB(149, 203, 156)",
+        "count": 6810,
+        "hex": "#95cb9c",
+        "color": {
+          "r": 149,
+          "g": 203,
+          "b": 156
+        }
+      },
+      {
+        "rgb": "RGB(150, 202, 157)",
+        "count": 6600,
+        "hex": "#96ca9d",
+        "color": {
+          "r": 150,
+          "g": 202,
+          "b": 157
+        }
+      },
+      {
+        "rgb": "RGB(220, 231, 176)",
+        "count": 6503,
+        "hex": "#dce7b0",
+        "color": {
+          "r": 220,
+          "g": 231,
+          "b": 176
+        }
+      },
+      {
+        "rgb": "RGB(177, 178, 180)",
+        "count": 6476,
+        "hex": "#b1b2b4",
+        "color": {
+          "r": 177,
+          "g": 178,
+          "b": 180
+        }
+      },
+      {
+        "rgb": "RGB(150, 202, 156)",
+        "count": 5314,
+        "hex": "#96ca9c",
+        "color": {
+          "r": 150,
+          "g": 202,
+          "b": 156
+        }
+      },
+      {
+        "rgb": "RGB(219, 231, 176)",
+        "count": 4137,
+        "hex": "#dbe7b0",
+        "color": {
+          "r": 219,
+          "g": 231,
+          "b": 176
+        }
+      },
+      {
+        "rgb": "RGB(247, 169, 36)",
+        "count": 3840,
+        "hex": "#f7a924",
+        "color": {
+          "r": 247,
+          "g": 169,
+          "b": 36
+        }
+      },
+      {
+        "rgb": "RGB(234, 83, 88)",
+        "count": 3622,
+        "hex": "#ea5358",
+        "color": {
+          "r": 234,
+          "g": 83,
+          "b": 88
+        }
+      },
+      {
+        "rgb": "RGB(150, 203, 155)",
+        "count": 3476,
+        "hex": "#96cb9b",
+        "color": {
+          "r": 150,
+          "g": 203,
+          "b": 155
+        }
+      },
+      {
+        "rgb": "RGB(253, 253, 253)",
+        "count": 3401,
+        "hex": "#fdfdfd",
+        "color": {
+          "r": 253,
+          "g": 253,
+          "b": 253
+        }
+      },
+      {
+        "rgb": "RGB(149, 202, 156)",
+        "count": 2918,
+        "hex": "#95ca9c",
+        "color": {
+          "r": 149,
+          "g": 202,
+          "b": 156
+        }
+      },
+      {
+        "rgb": "RGB(149, 202, 157)",
+        "count": 2914,
+        "hex": "#95ca9d",
+        "color": {
+          "r": 149,
+          "g": 202,
+          "b": 157
+        }
+      },
+      {
+        "rgb": "RGB(234, 84, 89)",
+        "count": 2896,
+        "hex": "#ea5459",
+        "color": {
+          "r": 234,
+          "g": 84,
+          "b": 89
+        }
+      },
+      {
+        "rgb": "RGB(219, 230, 177)",
+        "count": 2657,
+        "hex": "#dbe6b1",
+        "color": {
+          "r": 219,
+          "g": 230,
+          "b": 177
+        }
+      }
+    ],
+    "departmentColors": []
+  },
+  "analysis": {
+    "totalDepartments": 0,
+    "mappedDepartments": 0,
+    "unmappedDepartments": 0
+  }
+}

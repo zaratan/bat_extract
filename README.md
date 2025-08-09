@@ -10,10 +10,9 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
   - [Installation](#installation)
   - [Utilisation](#utilisation)
     - [Commandes principales](#commandes-principales)
-  - [Workflow complet](#workflow-complet)
-    - [1. Découverte des URLs réelles](#1-découverte-des-urls-réelles)
-    - [2. Téléchargement des cartes](#2-téléchargement-des-cartes)
-    - [3. Extraction des données](#3-extraction-des-données)
+  - [Workflow complet automatisé](#workflow-complet-automatisé)
+    - [Commande unifiée (recommandée)](#commande-unifiée-recommandée)
+    - [Étapes individuelles](#étapes-individuelles)
   - [Structure du projet](#structure-du-projet)
   - [Légende des couleurs](#légende-des-couleurs)
     - [Correspondance officielle](#correspondance-officielle)
@@ -33,11 +32,13 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
 
 - 🔍 **Extraction automatique** de données de distribution depuis des cartes d'espèces
 - 🗺️ **Identification des départements** et de leur statut de distribution par analyse de couleurs
-- 📦 **Traitement par lots** de plusieurs espèces (34 espèces supportées)
+- 📦 **Traitement par lots** de plusieurs espèces (workflow dynamique basé sur scraping web)
 - 📊 **Génération de rapports consolidés** avec statistiques détaillées
 - 🎨 **Analyse de couleurs robuste** utilisant Sharp et coordonnées pré-mappées
 - 📥 **Téléchargement automatique** des cartes depuis le Plan National d'Actions Chiroptères
-- 🧠 **Découverte intelligente** des URLs réelles des images
+- 🧠 **Découverte intelligente** des URLs réelles des images par scraping web
+- 🔄 **Données à jour** : Génération dynamique de la liste d'espèces depuis le site officiel
+- 📈 **Rapport Excel** : Matrice interactive espèces × départements avec formatage couleur
 
 ## Installation
 
@@ -54,25 +55,25 @@ pnpm install
 pnpm workflow      # Exécute automatiquement toutes les étapes avec rapport détaillé
 
 # OU étapes individuelles :
-# 0. Générer les données d'espèces depuis le site web
+# 1. Générer les données d'espèces depuis le site web
 pnpm generate-species
 
-# 1. Découvrir les vraies URLs d'images
+# 2. Découvrir les vraies URLs d'images
 pnpm discover-urls
 
-# 2. Télécharger toutes les cartes (36 espèces)
+# 3. Télécharger toutes les cartes
 pnpm download
 
-# 3. Télécharger uniquement les espèces prioritaires (17 espèces)
+# 4. Télécharger uniquement les espèces prioritaires
 pnpm download:priority
 
-# 4. Extraire les données de toutes les cartes
+# 5. Extraire les données de toutes les cartes
 pnpm extract
 
-# 5. Générer un rapport Excel avec matrice colorée
+# 6. Générer un rapport Excel avec matrice colorée
 pnpm excel
 
-# 6. Vérification du code
+# 7. Vérification du code
 pnpm lint          # Vérification
 pnpm lint:fix      # Correction automatique
 ```
@@ -87,24 +88,25 @@ pnpm workflow
 
 Cette commande exécute automatiquement toutes les étapes dans l'ordre avec un rapport détaillé :
 
-1. 🧬 **Génération des données d'espèces** → Scraping du site web pour extraire la liste des espèces
-2. 🔍 **Découverte des URLs** → Extraction des vraies URLs d'images
-3. 📥 **Téléchargement** → Récupération de toutes les cartes
-4. 🎨 **Extraction** → Analyse des couleurs et génération des données
-5. 📊 **Rapport Excel** → Création de la matrice finale
+1. 🧬 **Génération des données d'espèces** → Scraping du site web pour extraire la liste des espèces à jour
+2. 🔍 **Découverte des URLs** → Extraction des vraies URLs d'images par analyse des pages web
+3. 📥 **Téléchargement** → Récupération de toutes les cartes de distribution
+4. 🎨 **Extraction** → Analyse des couleurs et génération des données par département
+5. 📊 **Rapport Excel** → Création de la matrice finale avec formatage couleur
 
 **Avantages :**
 
 - ✅ **Automatisation complète** : Plus besoin de lancer chaque étape manuellement
+- ✅ **Données à jour** : Scraping dynamique du site officiel
 - ✅ **Rapport détaillé** : Statistiques et métriques pour chaque étape
 - ✅ **Gestion d'erreurs** : Continue même si une étape échoue partiellement
-- ✅ **Temps d'exécution** : Affichage de la durée de chaque étape
-- ✅ **Validation** : Vérification automatique des résultats
-- ✅ **Résumé final** : Aperçu complet du succès/échec de chaque étape
+- ✅ **Validation** : Vérification automatique de chaque étape
 
-## Workflow étape par étape (manuel)
+### Étapes individuelles
 
-### 0. Génération des données d'espèces
+Si vous préférez exécuter les étapes une par une :
+
+#### 1. Génération des données d'espèces
 
 ```bash
 pnpm generate-species
@@ -117,7 +119,7 @@ Cette étape scrape automatiquement le site <https://plan-actions-chiropteres.fr
 - ✅ **Scraping intelligent** : Analyse automatique de la page des espèces
 - ✅ **Données dynamiques** : Toujours à jour avec le site web
 - ✅ **Classification automatique** : Identification des espèces prioritaires
-- ✅ **Format JSON** : Sauvegarde dans `data/generated-species-data.json`
+- ✅ **Format JSON** : Sauvegarde dans `output/generated-species-data.json`
 - ✅ **Métadonnées** : Date de génération, source, statistiques
 
 **Avantages vs fichier statique :**
@@ -127,22 +129,23 @@ Cette étape scrape automatiquement le site <https://plan-actions-chiropteres.fr
 - 📊 Statistiques précises et actuelles
 - 🌐 Source unique de vérité (le site web officiel)
 
-### 1. Découverte des URLs réelles
+#### 2. Découverte des URLs réelles
 
 ```bash
 pnpm discover-urls
 ```
 
-Ce script analyse chaque page d'espèce pour extraire les vraies URLs des cartes de distribution et sauvegarde les résultats dans `data/discovered-image-urls.json`.
+Cette étape analyse chaque page d'espèce pour extraire l'URL réelle de l'image de carte de distribution.
 
 **Fonctionnalités :**
 
 - ✅ Scraping intelligent des pages d'espèces
 - ✅ Extraction des URLs d'images réelles
-- ✅ Sauvegarde JSON pour réutilisation
+- ✅ Sauvegarde JSON dans `output/discovered-image-urls.json`
 - ✅ Gestion d'erreurs robuste
+- ✅ Rapport détaillé des succès/échecs
 
-### 2. Téléchargement des cartes
+#### 3. Téléchargement des cartes
 
 ```bash
 # Toutes les espèces
@@ -167,7 +170,7 @@ pnpm download:priority
 plan-actions-chiropteres.fr-{slug}-carte-{slug}-2048x1271.png
 ```
 
-### 3. Extraction des données
+#### 4. Extraction des données
 
 ```bash
 pnpm extract
@@ -181,7 +184,7 @@ Cette commande :
 4. 🗺️ Mappe chaque département français avec son statut
 5. 💾 Génère un rapport JSON par espèce dans `/output`
 
-### 4. Génération du rapport Excel
+#### 5. Génération du rapport Excel
 
 ```bash
 pnpm excel
@@ -191,7 +194,7 @@ Cette commande génère un fichier Excel (`output/bat-distribution-matrix.xlsx`)
 
 **Page 1 - Matrice de distribution :**
 
-- ✅ **Lignes** : Espèces de chauves-souris (34 espèces)
+- ✅ **Lignes** : Espèces de chauves-souris (nombre variable selon scraping)
 - ✅ **Colonnes** : Départements français (01-95)
 - ✅ **Cellules colorées** : Selon le statut de distribution
 - ✅ **Codes courts** : TR (très rare), R (rare), PC (peu commune), AC (assez commune), etc.
@@ -207,26 +210,42 @@ Cette commande génère un fichier Excel (`output/bat-distribution-matrix.xlsx`)
 
 ```text
 src/
-  ├── index.ts                    # Point d'entrée principal
+  ├── extractSpeciesData.ts       # Point d'entrée pour l'extraction
   ├── multiSpeciesExtractor.ts    # Extracteur multi-espèces
   ├── smartExtractor.ts           # Logique d'extraction par analyse de couleurs
+  ├── generateSpeciesData.ts      # Génération dynamique des données d'espèces
   ├── discoverImageUrls.ts        # Découverte des URLs réelles
   ├── downloadMaps.ts             # Téléchargement automatique
   ├── generateExcelReport.ts      # Génération de rapports Excel
+  ├── runCompleteWorkflow.ts      # Orchestrateur du workflow complet
   └── types.ts                    # Définitions TypeScript
 
 data/
-  ├── bat-species-france.json     # Liste complète des espèces
-  ├── color-legend-mapping.ts     # Correspondance couleurs/statuts
-  ├── discovered-image-urls.json  # URLs découvertes
-  └── species-data.ts             # Métadonnées des espèces
+  └── color-legend-mapping.ts     # Correspondance couleurs/statuts (config)
 
 images/                           # Images téléchargées (ignoré par git)
-output/                           # Rapports générés (ignoré par git)
-  ├── *-distribution.json         # Données par espèce
-  ├── consolidated-species-report.json  # Rapport consolidé
+
+output/                           # Tous les fichiers générés (ignoré par git)
+  ├── generated-species-data.json      # Liste d'espèces scrapée
+  ├── discovered-image-urls.json       # URLs découvertes
+  ├── *-distribution.json              # Données par espèce
+  ├── consolidated-species-report.json # Rapport consolidé
   └── bat-distribution-matrix.xlsx     # Matrice Excel colorée
 ```
+
+**Organisation :**
+
+- 📁 `src/` : Code source, scripts exécutables
+- 📁 `data/` : Fichiers de configuration statiques
+- 📁 `output/` : Tous les fichiers générés (JSON, Excel)
+- 📁 `images/` : Cartes téléchargées
+
+**Avantages de cette structure :**
+
+- ✅ **Séparation claire** : Config vs données générées
+- ✅ **Git-friendly** : Fichiers générés non versionnés
+- ✅ **Maintenance facile** : Un seul dossier à nettoyer (`output/`)
+- ✅ **Workflow reproductible** : Génération complète depuis les sources
 
 ## Légende des couleurs
 
@@ -265,12 +284,13 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 
 | Script                         | Commande                 | Description                              |
 | ------------------------------ | ------------------------ | ---------------------------------------- |
-| **Découverte**                 | `pnpm discover-urls`     | Scrape les vraies URLs d'images          |
-| **Téléchargement**             | `pnpm download`          | Télécharge toutes les cartes (36)        |
-| **Téléchargement prioritaire** | `pnpm download:priority` | Télécharge les espèces prioritaires (17) |
+| **Workflow complet**           | `pnpm workflow`          | Exécute toutes les étapes automatiquement |
+| **Génération espèces**         | `pnpm generate-species`  | Scrape la liste des espèces             |
+| **Découverte URLs**            | `pnpm discover-urls`     | Scrape les vraies URLs d'images         |
+| **Téléchargement**             | `pnpm download`          | Télécharge toutes les cartes            |
+| **Téléchargement prioritaire** | `pnpm download:priority` | Télécharge les espèces prioritaires     |
 | **Extraction**                 | `pnpm extract`           | Extrait les données de toutes les cartes |
-| **Rapport Excel**              | `pnpm excel`             | Génère une matrice Excel colorée         |
-| **Build**                      | `pnpm dev`               | Build et run du projet                   |
+| **Rapport Excel**              | `pnpm excel`             | Génère une matrice Excel colorée        |
 | **Linting**                    | `pnpm lint`              | Vérification du code                     |
 | **Correction**                 | `pnpm lint:fix`          | Correction automatique                   |
 

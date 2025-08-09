@@ -7,50 +7,71 @@
 
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
-import { BAT_SPECIES, getSpeciesImageUrl } from './species-data';
 import { existsSync } from 'fs';
+import fetch from 'node-fetch';
+
+interface BatSpecies {
+  name: string;
+  slug: string;
+  pageUrl: string;
+  isPriority: boolean;
+}
+
+interface SpeciesDataFile {
+  metadata: {
+    generatedAt: string;
+    source: string;
+    totalSpecies: number;
+    prioritySpecies: number;
+  };
+  species: BatSpecies[];
+}
+
+interface DiscoveredUrls {
+  validImageUrls: { [slug: string]: string };
+}
 
 const IMAGES_DIR = join(process.cwd(), 'images');
 const DOWNLOAD_DELAY = 1000; // 1 seconde entre chaque téléchargement
-const DISCOVERED_URLS_FILE = join(
-  process.cwd(),
-  'data',
-  'discovered-image-urls.json'
-);
 
 /**
- * Cache des URLs découvertes
+ * Charge les données d'espèces depuis le fichier JSON généré
  */
-let discoveredUrls: Record<string, string> | null = null;
+async function loadSpeciesData(): Promise<BatSpecies[]> {
+  try {
+    const filePath = join(process.cwd(), 'data', 'generated-species-data.json');
+    const content = await readFile(filePath, 'utf-8');
+    const data: SpeciesDataFile = JSON.parse(content);
+    return data.species;
+  } catch (error) {
+    console.error("❌ Impossible de charger les données d'espèces:", error);
+    console.log("💡 Exécutez d'abord: pnpm generate-species");
+    process.exit(1);
+  }
+}
 
 /**
  * Charge les URLs découvertes depuis le fichier JSON
  */
-async function loadDiscoveredUrls(): Promise<Record<string, string>> {
-  if (discoveredUrls !== null) {
-    return discoveredUrls;
-  }
-
+async function loadDiscoveredUrls(): Promise<{ [slug: string]: string }> {
   try {
-    if (existsSync(DISCOVERED_URLS_FILE)) {
-      const content = await readFile(DISCOVERED_URLS_FILE, 'utf-8');
-      const data = JSON.parse(content);
-      discoveredUrls = data.validImageUrls || {};
-      console.log(
-        `📋 ${Object.keys(discoveredUrls).length} URLs découvertes chargées`
-      );
-    } else {
-      discoveredUrls = {};
-      console.log(
-        "⚠️  Aucun fichier d'URLs découvertes trouvé, utilisation du pattern par défaut"
-      );
-    }
-  } catch (error) {
-    console.error('❌ Erreur lors du chargement des URLs découvertes:', error);
-    discoveredUrls = {};
+    const filePath = join(process.cwd(), 'data', 'discovered-image-urls.json');
+    const content = await readFile(filePath, 'utf-8');
+    const data: DiscoveredUrls = JSON.parse(content);
+    return data.validImageUrls || {};
+  } catch {
+    console.warn(
+      '⚠️  Impossible de charger les URLs découvertes, utilisation du pattern de fallback'
+    );
+    return {};
   }
+}
 
-  return discoveredUrls;
+/**
+ * Génère l'URL de fallback pour une espèce (pattern observé)
+ */
+function getSpeciesImageUrl(slug: string): string {
+  return `https://plan-actions-chiropteres.fr/wp-content/uploads/2024/11/plan-actions-chiropteres.fr-${slug}-carte-${slug}-2048x1271.png`;
 }
 
 /**
@@ -62,38 +83,51 @@ async function getImageUrl(slug: string): Promise<string> {
 }
 
 /**
- * Télécharge une image depuis une URL en utilisant fetch natif
+ * Télécharge une image depuis une URL
  */
-async function downloadImage(url: string, filepath: string): Promise<void> {
+async function downloadImage(
+  url: string,
+  filename: string,
+  _speciesName: string
+): Promise<boolean> {
   try {
-    console.log(`Téléchargement: ${url}`);
-
-    // Utiliser le fetch natif de Node.js 18+
-    const response = await globalThis.fetch(url);
+    const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.log(
+        `   ❌ Erreur HTTP ${response.status}: ${response.statusText}`
+      );
+      return false;
     }
 
-    const buffer = await response.arrayBuffer();
-    await writeFile(filepath, Buffer.from(buffer));
+    if (!response.body) {
+      console.log('   ❌ Pas de contenu dans la réponse');
+      return false;
+    }
 
-    console.log(`✅ Sauvegardé: ${filepath}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const filePath = join(IMAGES_DIR, filename);
+
+    await writeFile(filePath, buffer);
+    console.log(
+      `   ✅ Téléchargée: ${filename} (${(buffer.length / 1024).toFixed(1)} KB)`
+    );
+    return true;
   } catch (error) {
-    console.error(`❌ Erreur pour ${url}:`, error);
-    throw error;
+    console.log(`   ❌ Erreur de téléchargement: ${error}`);
+    return false;
   }
 }
 
 /**
- * Génère le nom de fichier pour une espèce
+ * Génère le nom de fichier standardisé pour une espèce
  */
-function generateFilename(slug: string): string {
+function generateFileName(slug: string): string {
   return `plan-actions-chiropteres.fr-${slug}-carte-${slug}-2048x1271.png`;
 }
 
 /**
- * Pause l'exécution pendant un délai donné
+ * Affiche une pause avec décompte
  */
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => {
@@ -105,45 +139,51 @@ function delay(ms: number): Promise<void> {
  * Télécharge toutes les cartes de distribution
  */
 async function downloadAllMaps(): Promise<void> {
+  // Charger les données d'espèces
+  const species = await loadSpeciesData();
+
   console.log(
-    `🦇 Début du téléchargement de ${BAT_SPECIES.length} cartes de distribution\n`
+    `🦇 Début du téléchargement de ${species.length} cartes de distribution\n`
   );
 
   // Créer le dossier images s'il n'existe pas
-  try {
+  if (!existsSync(IMAGES_DIR)) {
     await mkdir(IMAGES_DIR, { recursive: true });
     console.log(`📁 Dossier créé: ${IMAGES_DIR}\n`);
-  } catch {
-    // Le dossier existe déjà
   }
 
   let successCount = 0;
   let errorCount = 0;
-  const errors: { species: string; error: string }[] = [];
 
-  for (let i = 0; i < BAT_SPECIES.length; i++) {
-    const species = BAT_SPECIES[i];
-    const imageUrl = await getImageUrl(species.slug);
-    const filename = generateFilename(species.slug);
-    const filepath = join(IMAGES_DIR, filename);
+  for (let i = 0; i < species.length; i++) {
+    const currentSpecies = species[i];
+    const filename = generateFileName(currentSpecies.slug);
+    const filePath = join(IMAGES_DIR, filename);
 
-    console.log(`[${i + 1}/${BAT_SPECIES.length}] ${species.name}`);
+    console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
 
-    try {
-      await downloadImage(imageUrl, filepath);
-      successCount++;
-    } catch (error) {
-      errorCount++;
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      errors.push({
-        species: species.name,
-        error: errorMessage,
-      });
+    // Vérifier si le fichier existe déjà
+    if (existsSync(filePath)) {
+      console.log('   ⏭️  Fichier déjà présent, passage au suivant');
+    } else {
+      // Télécharger l'image
+      const imageUrl = await getImageUrl(currentSpecies.slug);
+      console.log(`   🔗 URL: ${imageUrl}`);
+
+      const success = await downloadImage(
+        imageUrl,
+        filename,
+        currentSpecies.name
+      );
+      if (success) {
+        successCount++;
+      } else {
+        errorCount++;
+      }
     }
 
-    // Pause entre les téléchargements pour éviter de surcharger le serveur
-    if (i < BAT_SPECIES.length - 1) {
+    // Pause entre les téléchargements
+    if (i < species.length - 1) {
       await delay(DOWNLOAD_DELAY);
     }
 
@@ -151,70 +191,102 @@ async function downloadAllMaps(): Promise<void> {
   }
 
   // Rapport final
-  console.log('🎯 RAPPORT FINAL');
-  console.log('================');
+  console.log('🦇 ================================');
+  console.log('🦇 RAPPORT DE TÉLÉCHARGEMENT');
+  console.log('🦇 ================================');
+  console.log(`📊 Total: ${species.length}`);
   console.log(`✅ Succès: ${successCount}`);
   console.log(`❌ Erreurs: ${errorCount}`);
-  console.log(`📊 Total: ${BAT_SPECIES.length}`);
-
-  if (errors.length > 0) {
-    console.log('\n📋 DÉTAILS DES ERREURS:');
-    errors.forEach(({ species, error }) => {
-      console.log(`• ${species}: ${error}`);
-    });
-  }
-
-  console.log(`\n📁 Images sauvegardées dans: ${IMAGES_DIR}`);
+  console.log(`📁 Dossier: ${IMAGES_DIR}`);
 }
 
 /**
- * Télécharge uniquement les cartes des espèces prioritaires
+ * Télécharge uniquement les espèces prioritaires
  */
 async function downloadPriorityMaps(): Promise<void> {
-  const prioritySpecies = BAT_SPECIES.filter(species => species.isPriority);
+  // Charger les données d'espèces et filtrer les prioritaires
+  const allSpecies = await loadSpeciesData();
+  const prioritySpecies = allSpecies.filter(species => species.isPriority);
 
   console.log(
-    `🦇 Téléchargement des ${prioritySpecies.length} espèces prioritaires seulement\n`
+    `🎯 Téléchargement des espèces prioritaires (${prioritySpecies.length} sur ${allSpecies.length})\n`
   );
 
-  // Temporairement remplacer la liste complète
-  const originalSpecies = [...BAT_SPECIES];
-  BAT_SPECIES.length = 0;
-  BAT_SPECIES.push(...prioritySpecies);
-
-  try {
-    await downloadAllMaps();
-  } finally {
-    // Restaurer la liste complète
-    BAT_SPECIES.length = 0;
-    BAT_SPECIES.push(...originalSpecies);
+  // Créer le dossier images s'il n'existe pas
+  if (!existsSync(IMAGES_DIR)) {
+    await mkdir(IMAGES_DIR, { recursive: true });
+    console.log(`📁 Dossier créé: ${IMAGES_DIR}\n`);
   }
+
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (let i = 0; i < prioritySpecies.length; i++) {
+    const currentSpecies = prioritySpecies[i];
+    const filename = generateFileName(currentSpecies.slug);
+    const filePath = join(IMAGES_DIR, filename);
+
+    console.log(
+      `[${i + 1}/${prioritySpecies.length}] ${currentSpecies.name} 🎯`
+    );
+
+    // Vérifier si le fichier existe déjà
+    if (existsSync(filePath)) {
+      console.log('   ⏭️  Fichier déjà présent, passage au suivant');
+    } else {
+      // Télécharger l'image
+      const imageUrl = await getImageUrl(currentSpecies.slug);
+      console.log(`   🔗 URL: ${imageUrl}`);
+
+      const success = await downloadImage(
+        imageUrl,
+        filename,
+        currentSpecies.name
+      );
+      if (success) {
+        successCount++;
+      } else {
+        errorCount++;
+      }
+    }
+
+    // Pause entre les téléchargements
+    if (i < prioritySpecies.length - 1) {
+      await delay(DOWNLOAD_DELAY);
+    }
+
+    console.log(''); // Ligne vide pour la lisibilité
+  }
+
+  // Rapport final
+  console.log('🦇 ================================');
+  console.log('🦇 RAPPORT DE TÉLÉCHARGEMENT');
+  console.log('🦇 ================================');
+  console.log(`📊 Total: ${prioritySpecies.length}`);
+  console.log(`✅ Succès: ${successCount}`);
+  console.log(`❌ Erreurs: ${errorCount}`);
+  console.log(`📁 Dossier: ${IMAGES_DIR}`);
 }
 
-/**
- * Script principal
- */
+// Point d'entrée principal
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  const priorityOnly = args.includes('--priority') || args.includes('-p');
+  const isPriorityMode = args.includes('--priority');
 
   try {
-    if (priorityOnly) {
+    if (isPriorityMode) {
       await downloadPriorityMaps();
     } else {
       await downloadAllMaps();
     }
+
+    console.log('\n🎉 Téléchargement terminé!');
   } catch (error) {
-    console.error('❌ Erreur fatale:', error);
+    console.error('\n💥 Erreur fatale:', error);
     process.exit(1);
   }
 }
 
-// Exécuter le script si appelé directement
-const isMainModule =
-  process.argv[1] && process.argv[1].includes('downloadMaps');
-if (isMainModule) {
-  main().catch(console.error);
+if (require.main === module) {
+  main();
 }
-
-export { downloadAllMaps, downloadPriorityMaps, downloadImage };

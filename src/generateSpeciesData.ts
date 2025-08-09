@@ -261,25 +261,3 @@ export class SpeciesDataGenerator {
     }
   }
 }
-
-// Script principal
-async function main(): Promise<void> {
-  const generator = new SpeciesDataGenerator();
-
-  try {
-    await generator.generateSpeciesData();
-    console.log('');
-    console.log('🎉 Génération terminée avec succès!');
-    console.log('📄 Fichier créé: output/generated-species-data.json');
-    console.log('');
-    console.log('💡 Pour enrichir avec les noms latins (optionnel):');
-    console.log('   Modifiez le script pour appeler enrichWithLatinNames()');
-  } catch (error) {
-    console.error('💥 Erreur fatale:', error);
-    process.exit(1);
-  }
-}
-
-if (require.main === module) {
-  main();
-}

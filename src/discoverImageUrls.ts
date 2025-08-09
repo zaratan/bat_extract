@@ -254,23 +254,32 @@ async function generateReport(results: ImageInfo[]): Promise<void> {
 }
 
 /**
- * Script principal
+ * Classe wrapper pour la découverte d'URLs d'images
  */
-async function main(): Promise<void> {
-  try {
-    const results = await discoverImageUrls();
-    await generateReport(results);
-  } catch (error) {
-    console.error('❌ Erreur fatale:', error);
-    process.exit(1);
+export class ImageUrlDiscoverer {
+  async discoverImageUrls(): Promise<ImageInfo[]> {
+    return discoverImageUrls();
+  }
+
+  async generateReport(results: ImageInfo[]): Promise<void> {
+    return generateReport(results);
+  }
+
+  extractImageUrl(html: string, slug: string): string | null {
+    return extractImageUrl(html, slug);
+  }
+
+  async analyzeSpeciesPage(species: BatSpecies): Promise<ImageInfo> {
+    return analyzeSpeciesPage(species);
   }
 }
 
-// Exécuter le script si appelé directement
-const isMainModule =
-  process.argv[1] && process.argv[1].includes('discoverImageUrls');
-if (isMainModule) {
-  main().catch(console.error);
-}
+// Le script d'exécution est maintenant dans scripts/discoverImageUrls.ts
 
-export { discoverImageUrls, analyzeSpeciesPage, extractImageUrl };
+export {
+  discoverImageUrls,
+  analyzeSpeciesPage,
+  extractImageUrl,
+  ImageInfo,
+  BatSpecies,
+};

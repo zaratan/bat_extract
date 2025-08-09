@@ -550,18 +550,4 @@ export class BatExtractWorkflow {
   }
 }
 
-// Script principal
-async function main(): Promise<void> {
-  const workflow = new BatExtractWorkflow();
-
-  try {
-    await workflow.runCompleteWorkflow();
-  } catch (error) {
-    console.error('💥 Erreur fatale:', error);
-    process.exit(1);
-  }
-}
-
-if (require.main === module) {
-  main();
-}
+// Le script d'exécution est maintenant dans scripts/runCompleteWorkflow.ts

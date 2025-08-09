@@ -1,10 +1,13 @@
-import { MultiSpeciesExtractor } from './multiSpeciesExtractor';
+#!/usr/bin/env ts-node
 
 /**
  * Script d'extraction des données de distribution multi-espèces
  * Analyse les cartes de distribution dans le dossier /images
  * et génère des fichiers JSON de résultats dans /output
  */
+
+import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor';
+
 async function main(): Promise<void> {
   try {
     console.log("🦇 Démarrage de l'extraction multi-espèces...");
@@ -28,9 +31,5 @@ async function main(): Promise<void> {
   }
 }
 
-// Exécuter uniquement si ce fichier est directement appelé
-if (require.main === module) {
-  main();
-}
-
-export { main };
+// Exécuter le script
+main();

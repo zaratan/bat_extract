@@ -276,17 +276,25 @@ async function downloadPriorityMaps(): Promise<void> {
   console.log(`📁 Dossier: ${IMAGES_DIR}`);
 }
 
-/**
- * Classe wrapper pour le téléchargement de cartes
- */
-export class MapDownloader {
-  async downloadAllMaps(): Promise<void> {
-    return downloadAllMaps();
-  }
+// Point d'entrée principal
+async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const isPriorityMode = args.includes('--priority');
 
-  async downloadPriorityMaps(): Promise<void> {
-    return downloadPriorityMaps();
+  try {
+    if (isPriorityMode) {
+      await downloadPriorityMaps();
+    } else {
+      await downloadAllMaps();
+    }
+
+    console.log('\n🎉 Téléchargement terminé!');
+  } catch (error) {
+    console.error('\n💥 Erreur fatale:', error);
+    process.exit(1);
   }
 }
 
-// Le script d'exécution est maintenant dans scripts/downloadMaps.ts
+if (require.main === module) {
+  main();
+}

@@ -12,7 +12,7 @@ export default [
       parser: typescriptParser,
       parserOptions: {
         ecmaVersion: 2022,
-        sourceType: 'module',
+        sourceType: 'script',
         project: './tsconfig.json'
       },
       globals: {

@@ -6,15 +6,26 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 
 ## Technologies utilisées
 
-- **TypeScript** avec configuration stricte
+- **TypeScript** avec configuration stricte et **module CommonJS** pour la stabilité
 - **Sharp** pour le traitement et l'analyse d'images
 - **ExcelJS** pour la génération de rapports Excel
-- **node-fetch** pour le scraping web
+- **node-fetch** pour le scraping web (avec fallback sur fetch natif Node.js 22)
+- **Jest + nock** pour les tests avec protection HTTP complète
 - **ESLint** et **Prettier** pour la qualité du code
 - **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages
-- **ts-node** pour l'exécution directe
+- **ts-node** pour l'exécution directe des scripts TypeScript
 - **Node.js 22** spécifiée dans `.nvmrc` pour la cohérence d'équipe
+
+## Architecture du projet (2025)
+
+### Séparation logique/CLI
+
+- **`src/`** : Code fonctionnel pur - Classes et fonctions métier réutilisables
+- **`scripts/`** : Points d'entrée CLI - Scripts d'interface en ligne de commande
+- **Imports** : Les scripts dans `scripts/` importent les classes de `src/`
+- **Tests** : Testent uniquement le code de `src/`, pas les CLI
+- **Module système** : CommonJS (`require/module.exports`) pour la compatibilité
 
 ## Architecture du projet (2025)
 
@@ -26,12 +37,12 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 
 ### Scripts cohérents
 
-- `pnpm generate-species` → `src/generateSpeciesData.ts`
-- `pnpm discover-urls` → `src/discoverImageUrls.ts`
-- `pnpm download` → `src/downloadMaps.ts`
-- `pnpm extract` → `src/extractSpeciesData.ts` (remplace l'ancien index.ts)
-- `pnpm excel` → `src/generateExcelReport.ts`
-- `pnpm workflow` → `src/runCompleteWorkflow.ts`
+- `pnpm generate-species` → `scripts/generateSpeciesData.ts` (→ `src/speciesDataGenerator.ts`)
+- `pnpm discover-urls` → `scripts/discoverImageUrls.ts` (→ `src/imageUrlDiscoverer.ts`)
+- `pnpm download` → `scripts/downloadMaps.ts` (→ `src/mapDownloader.ts`)
+- `pnpm extract` → `scripts/extractSpeciesData.ts` (→ `src/multiSpeciesExtractor.ts`)
+- `pnpm excel` → `scripts/generateExcelReport.ts` (→ `src/excelReportGenerator.ts`)
+- `pnpm workflow` → `scripts/runCompleteWorkflow.ts` (→ `src/batExtractWorkflow.ts`)
 
 ### Organisation des données
 
@@ -42,12 +53,14 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 ## Conventions de code
 
 - Utiliser TypeScript strict avec typage explicite
+- **Module CommonJS** : `require/module.exports`, pas d'extensions `.js` dans les imports
 - Préférer les fonctions async/await aux promesses
 - Gérer les erreurs avec try/catch et messages explicites
 - Utiliser des interfaces TypeScript pour les types de données
 - Commenter les fonctions publiques avec JSDoc
 - **Messages de log avec émojis** : 🧬 génération, 🔍 découverte, 📥 téléchargement, 🎨 extraction, 📊 rapport
 - **Chemins absolus** : Toujours utiliser `path.join(process.cwd(), ...)`
+- **Imports cohérents** : `const { Class } = require('./module')` pour CommonJS
 
 ## Qualité de code
 
@@ -60,12 +73,18 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
   - TypeScript/JavaScript : `eslint --fix` (inclut formatage Prettier)
   - JSON/Markdown : `prettier --write`
 - **Scripts de vérification** : `pnpm lint`, `pnpm lint:fix`, `pnpm type-check`
+- **Tests sécurisés** : Jest + nock, aucun appel HTTP réel possible
+- **CommonJS stable** : Migration depuis ESM pour la compatibilité
 
 ## Structure des classes principales
 
 - `BatExtractWorkflow` : Orchestrateur du workflow complet avec rapport détaillé
 - `MultiSpeciesExtractor` : Classe principale qui orchestre l'extraction multi-espèces
 - `SmartDepartmentExtractor` : Extraction intelligente par analyse de couleurs et coordonnées
+- `SpeciesDataGenerator` : Génération dynamique des données d'espèces par scraping
+- `ImageUrlDiscoverer` : Découverte des URLs réelles d'images
+- `MapDownloader` : Téléchargement automatique des cartes
+- `ExcelReportGenerator` : Génération de rapports Excel avec formatage couleur
 - `types.ts` : Définitions des interfaces TypeScript
 
 ## Approche technique
@@ -116,5 +135,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 1. **Préférer le workflow** : Recommander `pnpm workflow` plutôt que les scripts individuels
 2. **Pas de données statiques** : Ne plus maintenir de listes d'espèces en dur, tout est dynamique
 3. **Outputs dans output/** : Tous les fichiers générés vont dans `output/`, jamais dans `data/`
-4. **Noms cohérents** : Suivre le pattern `{action}SpeciesData.ts` pour les nouveaux scripts
-5. **Validation du workflow** : Toujours tester `pnpm workflow` après des modifications importantes
+4. **Architecture src/scripts** : Code métier dans `src/`, CLI dans `scripts/`
+5. **CommonJS strict** : Utiliser `require/module.exports`, pas d'extensions `.js`
+6. **Tests sûrs** : Toujours mocker les appels HTTP avec nock
+7. **Validation du workflow** : Toujours tester `pnpm workflow` après des modifications importantes

@@ -438,16 +438,23 @@ Cette commande génère un fichier Excel (`output/bat-distribution-matrix.xlsx`)
 ## Structure du projet
 
 ```text
-src/
-  ├── extractSpeciesData.ts       # Point d'entrée pour l'extraction
-  ├── multiSpeciesExtractor.ts    # Extracteur multi-espèces
+src/                              # Code fonctionnel (logique métier)
+  ├── multiSpeciesExtractor.ts    # Extracteur multi-espèces principal
   ├── smartExtractor.ts           # Logique d'extraction par analyse de couleurs
-  ├── generateSpeciesData.ts      # Génération dynamique des données d'espèces
-  ├── discoverImageUrls.ts        # Découverte des URLs réelles
-  ├── downloadMaps.ts             # Téléchargement automatique
-  ├── generateExcelReport.ts      # Génération de rapports Excel
-  ├── runCompleteWorkflow.ts      # Orchestrateur du workflow complet
+  ├── speciesDataGenerator.ts     # Générateur de données d'espèces
+  ├── imageUrlDiscoverer.ts       # Découvreur d'URLs d'images
+  ├── mapDownloader.ts            # Téléchargeur de cartes
+  ├── excelReportGenerator.ts     # Générateur de rapports Excel
+  ├── batExtractWorkflow.ts       # Orchestrateur du workflow complet
   └── types.ts                    # Définitions TypeScript
+
+scripts/                          # Points d'entrée CLI (scripts exécutables)
+  ├── extractSpeciesData.ts       # CLI: Lance l'extraction multi-espèces
+  ├── generateSpeciesData.ts      # CLI: Génère les données d'espèces
+  ├── discoverImageUrls.ts        # CLI: Découvre les URLs d'images
+  ├── downloadMaps.ts             # CLI: Télécharge les cartes
+  ├── generateExcelReport.ts      # CLI: Génère le rapport Excel
+  └── runCompleteWorkflow.ts      # CLI: Lance le workflow complet
 
 data/
   └── color-legend-mapping.ts     # Correspondance couleurs/statuts (config)
@@ -460,21 +467,30 @@ output/                           # Tous les fichiers générés (ignoré par gi
   ├── *-distribution.json              # Données par espèce
   ├── consolidated-species-report.json # Rapport consolidé
   └── bat-distribution-matrix.xlsx     # Matrice Excel colorée
+
+tests/                            # Suite de tests complète
+  ├── config.test.ts              # Tests de configuration et sécurité
+  ├── colorUtils.test.ts          # Tests des utilitaires de couleur
+  └── multiSpeciesExtractor.test.ts # Tests de l'extracteur principal
 ```
 
-**Organisation :**
+**Architecture :**
 
-- 📁 `src/` : Code source, scripts exécutables
+- 📁 `src/` : **Code fonctionnel pur** - Classes et fonctions métier réutilisables
+- 📁 `scripts/` : **Points d'entrée CLI** - Scripts d'interface en ligne de commande
 - 📁 `data/` : Fichiers de configuration statiques
 - 📁 `output/` : Tous les fichiers générés (JSON, Excel)
 - 📁 `images/` : Cartes téléchargées
+- 📁 `tests/` : Suite de tests avec protection HTTP
 
-**Avantages de cette structure :**
+**Avantages de cette architecture :**
 
-- ✅ **Séparation claire** : Config vs données générées
+- ✅ **Séparation claire** : Logique métier (`src/`) vs interface CLI (`scripts/`)
+- ✅ **Réutilisabilité** : Classes dans `src/` peuvent être importées par d'autres projets
+- ✅ **Tests propres** : Code testable séparé des points d'entrée
+- ✅ **Maintenabilité** : Interface CLI simple, logique complexe isolée
+- ✅ **Module ES/CommonJS** : Compatible avec différents environnements
 - ✅ **Git-friendly** : Fichiers générés non versionnés
-- ✅ **Maintenance facile** : Un seul dossier à nettoyer (`output/`)
-- ✅ **Workflow reproductible** : Génération complète depuis les sources
 
 ## Légende des couleurs
 
@@ -530,11 +546,12 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 
 Suite de tests complète avec **sécurité absolue** - aucun test ne peut appeler le vrai site web :
 
-- **Jest + TypeScript** : Configuration ESM moderne
+- **Jest + TypeScript** : Configuration CommonJS stable et robuste
 - **nock** : Mocking HTTP complet, tous les appels réseau sont bloqués
 - **3 suites de tests** : Configuration/sécurité, utilitaires couleur, extracteur multi-espèces
 - **17 tests** : Couverture des fonctions principales et protection HTTP
 - **CI/CD intégré** : Tests automatiques sur chaque commit/push
+- **Architecture propre** : Tests séparés du code fonctionnel
 
 ```bash
 # Lancer tous les tests
@@ -546,6 +563,13 @@ pnpm test:coverage
 # Tests en mode watch
 pnpm test:watch
 ```
+
+**Sécurité :**
+
+- ✅ **Protection HTTP** : `beforeAll()` bloque tout appel réseau non mocké
+- ✅ **Tests isolés** : Chaque test utilise des données mockées
+- ✅ **CI validé** : Aucun appel externe possible même en CI/CD
+- ✅ **Architecture robuste** : Logique métier testable séparément des CLI
 
 ## Approche technique
 
@@ -576,11 +600,15 @@ Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus
 ## Technologies
 
 - **TypeScript** avec configuration stricte et typage explicite
+- **CommonJS** pour la compatibilité et stabilité (migration depuis ESM)
 - **Node.js** 22 (spécifiée dans `.nvmrc`) avec fetch natif pour les téléchargements
 - **Sharp** pour l'analyse d'images et le traitement de couleurs
+- **ExcelJS** pour la génération de rapports Excel avec formatage couleur
+- **Jest + nock** pour les tests avec protection HTTP complète
 - **ESLint** et **Prettier** pour la qualité du code
 - **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages rapide
+- **ts-node** pour l'exécution directe des scripts TypeScript
 - **Coordonnées pré-mappées** des 101 départements français
 
 ## Résultats

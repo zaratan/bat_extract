@@ -11,6 +11,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 - **ExcelJS** pour la génération de rapports Excel
 - **node-fetch** pour le scraping web
 - **ESLint** et **Prettier** pour la qualité du code
+- **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages
 - **ts-node** pour l'exécution directe
 
@@ -46,6 +47,15 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 - Commenter les fonctions publiques avec JSDoc
 - **Messages de log avec émojis** : 🧬 génération, 🔍 découverte, 📥 téléchargement, 🎨 extraction, 📊 rapport
 - **Chemins absolus** : Toujours utiliser `path.join(process.cwd(), ...)`
+
+## Qualité de code
+
+- **Hooks Git automatiques** : Husky + lint-staged pour vérifications avant commit
+- **Configuration ESLint** : Inclut Prettier via `'prettier/prettier': 'error'`
+- **lint-staged optimisé** :
+  - TypeScript/JavaScript : `eslint --fix` (inclut formatage Prettier)
+  - JSON/Markdown : `prettier --write`
+- **Scripts de vérification** : `pnpm lint` et `pnpm lint:fix`
 
 ## Structure des classes principales
 

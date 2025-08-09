@@ -60,6 +60,43 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
 - 🧠 **Découverte intelligente** des URLs réelles des images par scraping web
 - 🔄 **Données à jour** : Génération dynamique de la liste d'espèces depuis le site officiel
 - 📈 **Rapport Excel** : Matrice interactive espèces × départements avec formatage couleur
+- 🛡️ **Qualité de code** : Hooks Git automatiques avec Husky et lint-staged pour garantir la qualité
+
+## Qualité de code
+
+Le projet utilise des outils automatisés pour garantir la qualité et la cohérence du code :
+
+### 🛡️ Hooks Git automatiques
+
+- **Husky** : Hooks Git pour intercepter les commits
+- **lint-staged** : Vérifications automatiques uniquement sur les fichiers modifiés
+- **ESLint + Prettier** : Formatage et vérification automatiques avant chaque commit
+
+### 🔧 Vérifications automatiques
+
+Lors de chaque `git commit`, les outils suivants s'exécutent automatiquement :
+
+- **Fichiers TypeScript/JavaScript** : ESLint avec correction automatique (inclut Prettier)
+- **Fichiers JSON/Markdown** : Formatage Prettier automatique
+
+**Avantages :**
+
+- ✅ **Code cohérent** : Même style de code pour tous les contributeurs
+- ✅ **Pas d'oubli** : Impossible de committer du code non formaté
+- ✅ **Productivité** : Correction automatique des erreurs simples
+- ✅ **Performance** : Vérification uniquement des fichiers modifiés
+
+### 🚀 Commandes manuelles
+
+Si vous voulez vérifier ou corriger le code manuellement :
+
+```bash
+# Vérification complète
+pnpm lint
+
+# Correction automatique
+pnpm lint:fix
+```
 
 ## Installation
 

@@ -74,7 +74,7 @@ export class MultiSpeciesExtractor {
   private async ensureOutputDir(): Promise<void> {
     try {
       await fs.mkdir(this.outputPath, { recursive: true });
-    } catch (error) {
+    } catch {
       // Le dossier existe déjà, c'est ok
     }
   }
@@ -130,7 +130,13 @@ export class MultiSpeciesExtractor {
           totalSpecies: distributionFiles.length,
           source: 'Multi-species extraction from plan-actions-chiropteres.fr',
         },
-        species: [] as any[],
+        species: [] as Array<{
+          name: string;
+          filename: string;
+          totalDepartments: number;
+          detectedDepartments: number;
+          summary: Record<string, number>;
+        }>,
       };
 
       for (const file of distributionFiles) {

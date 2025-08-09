@@ -2,13 +2,42 @@
 
 Un extracteur de données de cartes de distribution utilisant l'analyse de couleurs pour analyser la distribution des espèces de chauves-souris sur des cartes géographiques françaises.
 
+## Table des matières
+
+- [BatExtract](#batextract)
+  - [Table des matières](#table-des-matières)
+  - [Fonctionnalités](#fonctionnalités)
+  - [Installation](#installation)
+  - [Utilisation](#utilisation)
+    - [Commandes principales](#commandes-principales)
+  - [Workflow complet](#workflow-complet)
+    - [1. Découverte des URLs réelles](#1-découverte-des-urls-réelles)
+    - [2. Téléchargement des cartes](#2-téléchargement-des-cartes)
+    - [3. Extraction des données](#3-extraction-des-données)
+  - [Structure du projet](#structure-du-projet)
+  - [Légende des couleurs](#légende-des-couleurs)
+    - [Correspondance officielle](#correspondance-officielle)
+    - [Correspondance technique](#correspondance-technique)
+  - [Scripts disponibles](#scripts-disponibles)
+  - [Approche technique](#approche-technique)
+    - [Analyse par couleurs (vs OCR)](#analyse-par-couleurs-vs-ocr)
+    - [Gestion des erreurs](#gestion-des-erreurs)
+    - [Performance](#performance)
+  - [Technologies](#technologies)
+  - [Résultats](#résultats)
+    - [Format des données extraites](#format-des-données-extraites)
+    - [Format des images](#format-des-images)
+  - [Source des données](#source-des-données)
+
 ## Fonctionnalités
 
-- Extraction automatique de données de distribution depuis des cartes d'espèces
-- Identification des départements et de leur statut de distribution par analyse de couleurs
-- Traitement par lots de plusieurs espèces
-- Génération de rapports consolidés
-- Utilisation de Sharp pour l'analyse d'images et de coordonnées pré-mappées
+- 🔍 **Extraction automatique** de données de distribution depuis des cartes d'espèces
+- 🗺️ **Identification des départements** et de leur statut de distribution par analyse de couleurs
+- 📦 **Traitement par lots** de plusieurs espèces (34 espèces supportées)
+- 📊 **Génération de rapports consolidés** avec statistiques détaillées
+- 🎨 **Analyse de couleurs robuste** utilisant Sharp et coordonnées pré-mappées
+- 📥 **Téléchargement automatique** des cartes depuis le Plan National d'Actions Chiroptères
+- 🧠 **Découverte intelligente** des URLs réelles des images
 
 ## Installation
 
@@ -18,7 +47,69 @@ pnpm install
 
 ## Utilisation
 
-### Extraction
+### Commandes principales
+
+```bash
+# 1. Découvrir les vraies URLs d'images
+pnpm discover-urls
+
+# 2. Télécharger toutes les cartes (36 espèces)
+pnpm download
+
+# 3. Télécharger uniquement les espèces prioritaires (17 espèces)
+pnpm download:priority
+
+# 4. Extraire les données de toutes les cartes
+pnpm extract
+
+# 5. Vérification du code
+pnpm lint          # Vérification
+pnpm lint:fix      # Correction automatique
+```
+
+## Workflow complet
+
+### 1. Découverte des URLs réelles
+
+```bash
+pnpm discover-urls
+```
+
+Ce script analyse chaque page d'espèce pour extraire les vraies URLs des cartes de distribution et sauvegarde les résultats dans `data/discovered-image-urls.json`.
+
+**Fonctionnalités :**
+
+- ✅ Scraping intelligent des pages d'espèces
+- ✅ Extraction des URLs d'images réelles
+- ✅ Sauvegarde JSON pour réutilisation
+- ✅ Gestion d'erreurs robuste
+
+### 2. Téléchargement des cartes
+
+```bash
+# Toutes les espèces
+pnpm download
+
+# Espèces prioritaires uniquement
+pnpm download:priority
+```
+
+**Fonctionnalités :**
+
+- ✅ Téléchargement automatique depuis les URLs découvertes
+- ✅ Fallback sur pattern d'URL si découverte échouée
+- ✅ Gestion d'erreurs avec rapports détaillés
+- ✅ Délai entre téléchargements (1 seconde) pour respecter le serveur
+- ✅ Création automatique du dossier `/images`
+- ✅ Noms de fichiers standardisés
+
+**Format des noms :**
+
+```
+plan-actions-chiropteres.fr-{slug}-carte-{slug}-2048x1271.png
+```
+
+### 3. Extraction des données
 
 ```bash
 pnpm extract
@@ -26,17 +117,12 @@ pnpm extract
 
 Cette commande :
 
-1. Analyse toutes les images dans le dossier `/images`
-2. Extrait le nom de l'espèce depuis le nom du fichier
-3. Génère un rapport par espèce dans `/output`
-4. Crée un rapport consolidé
-
-### Vérification du code
-
-```bash
-pnpm lint          # Vérification
-pnpm lint:fix      # Correction automatique
-```
+1. 📸 Analyse toutes les images dans le dossier `/images`
+2. 🦇 Extrait le nom de l'espèce depuis le nom du fichier
+3. 🎨 Analyse les couleurs pour déterminer le statut de distribution
+4. 🗺️ Mappe chaque département français avec son statut
+5. 💾 Génère un rapport JSON par espèce dans `/output`
+6. 📊 Crée un rapport consolidé multi-espèces
 
 ## Structure du projet
 
@@ -45,41 +131,156 @@ src/
   ├── index.ts                    # Point d'entrée principal
   ├── multiSpeciesExtractor.ts    # Extracteur multi-espèces
   ├── smartExtractor.ts           # Logique d'extraction par analyse de couleurs
+  ├── discoverImageUrls.ts        # Découverte des URLs réelles
+  ├── downloadMaps.ts             # Téléchargement automatique
   └── types.ts                    # Définitions TypeScript
 
-images/                           # Images à analyser
+data/
+  ├── bat-species-france.json     # Liste complète des espèces
+  ├── color-legend-mapping.ts     # Correspondance couleurs/statuts
+  ├── discovered-image-urls.json  # URLs découvertes
+  └── species-data.ts             # Métadonnées des espèces
+
+images/                           # Images téléchargées (ignoré par git)
 output/                           # Rapports générés (ignoré par git)
 ```
 
-## Format des images
+## Légende des couleurs
 
-Les images doivent être nommées avec le nom de l'espèce :
+### Correspondance officielle
 
-- `espece-nom.png` → espèce extraite : "espece-nom"
-- `plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png` → espèce : "barbastelle-deurope"
+Basée sur le Plan National d'Actions Chiroptères 2016-2025.
 
-## Résultats
+| Couleur       | Code Hex             | Statut d'extraction                 | Description officielle                                                       |
+| ------------- | -------------------- | ----------------------------------- | ---------------------------------------------------------------------------- |
+| 🔴 Rouge      | `#ea5257`            | `très rarement inventoriée`         | Espèce actuellement très rarement inventoriée ou exceptionnellement observée |
+| 🟠 Orange     | `#f7a923`            | `rare ou assez rare`                | Espèce actuellement rare ou assez rare                                       |
+| 🟢 Vert clair | `#dbe7b0`            | `peu commune ou localement commune` | Espèce peu commune ou localement commune                                     |
+| 🟢 Vert foncé | `#95cb9b`            | `assez commune à très commune`      | Espèce assez commune à très commune                                          |
+| 🟡 Jaune      | `#ffef23`            | `présente mais mal connue`          | Espèce présente mais mal connue                                              |
+| ⚫ Gris       | `#b0b1b3`            | `disparue ou non retrouvée`         | Espèce disparue ou non retrouvée sur la zone                                 |
+| ⚪ Blanc/Écru | `#fffdea`, `#fefefe` | `absente`                           | Espèce absente, n'ayant jamais été trouvée                                   |
 
-Chaque extraction génère :
+### Correspondance technique
 
-- Un fichier JSON par espèce avec les détails de distribution
-- Un rapport consolidé avec toutes les espèces analysées
+Le fichier `data/color-legend-mapping.ts` contient :
 
-Les résultats sont automatiquement sauvegardés dans le dossier `/output` qui est ignoré par git pour éviter de committer les données extraites.
+- **Interface `ColorLegendEntry`** : Structure complète pour chaque entrée
+- **Plages RGB de tolérance** : Gestion des variations de compression
+- **Utilitaires `ColorLegendUtils`** : Méthodes pour la détection automatique
+- **Documentation complète** : Correspondance officielle ↔ technique
+
+```typescript
+// Exemple d'utilisation
+import { ColorLegendUtils } from './data/color-legend-mapping';
+
+const status = ColorLegendUtils.getDistributionStatus(r, g, b);
+const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
+```
+
+## Scripts disponibles
+
+| Script                         | Commande                 | Description                              |
+| ------------------------------ | ------------------------ | ---------------------------------------- |
+| **Découverte**                 | `pnpm discover-urls`     | Scrape les vraies URLs d'images          |
+| **Téléchargement**             | `pnpm download`          | Télécharge toutes les cartes (36)        |
+| **Téléchargement prioritaire** | `pnpm download:priority` | Télécharge les espèces prioritaires (17) |
+| **Extraction**                 | `pnpm extract`           | Extrait les données de toutes les cartes |
+| **Build**                      | `pnpm dev`               | Build et run du projet                   |
+| **Linting**                    | `pnpm lint`              | Vérification du code                     |
+| **Correction**                 | `pnpm lint:fix`          | Correction automatique                   |
 
 ## Approche technique
 
-Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR :
+### Analyse par couleurs (vs OCR)
 
-1. **Coordonnées pré-mappées** : Chaque département français a des coordonnées précises sur les cartes
-2. **Échantillonnage de couleurs** : Analyse des pixels dans un rayon de 30px autour de chaque département
-3. **Classification automatique** : Mapping des couleurs vers les statuts de distribution (commune, rare, etc.)
-4. **Traitement par lots** : Extraction automatique de toutes les cartes du dossier `/images`
+Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus de robustesse :
+
+1. **🗺️ Coordonnées pré-mappées** : Chaque département français a des coordonnées relatives précises sur les cartes
+2. **🎨 Échantillonnage de couleurs** : Analyse des pixels dans un rayon de 30px autour de chaque département
+3. **🤖 Classification automatique** : Mapping automatique des couleurs vers les statuts de distribution
+4. **📦 Traitement par lots** : Extraction automatique de toutes les cartes du dossier `/images`
+5. **📊 Rapports consolidés** : Génération de statistiques multi-espèces pour analyse comparative
+
+### Gestion des erreurs
+
+- ✅ **Continuation** : Le traitement continue même en cas d'erreur sur une image
+- ✅ **Rapports détaillés** : Identification des départements sans couleur détectée
+- ✅ **Tolérance** : Plages RGB avec tolérance pour les variations d'image
+- ✅ **Fallbacks** : URLs de secours pour le téléchargement
+
+### Performance
+
+- ⚡ **Traitement direct** avec Sharp (pas de fichiers temporaires)
+- 🎯 **Analyse ciblée** par zone (rayon de 30px)
+- 🔄 **Traitement par lots** optimisé
+- 💾 **Sauvegarde incrémentale** des résultats
 
 ## Technologies
 
-- TypeScript avec configuration stricte
-- Sharp pour l'analyse d'images et de couleurs
-- Coordonnées pré-mappées des départements français
-- ESLint et Prettier pour la qualité du code
-- pnpm comme gestionnaire de packages
+- **TypeScript** avec configuration stricte et typage explicite
+- **Sharp** pour l'analyse d'images et le traitement de couleurs
+- **Node.js** ≥18 avec fetch natif pour les téléchargements
+- **ESLint** et **Prettier** pour la qualité du code
+- **pnpm** comme gestionnaire de packages rapide
+- **Coordonnées pré-mappées** des 101 départements français
+
+## Résultats
+
+### Format des données extraites
+
+Chaque extraction génère :
+
+**Par espèce** (`output/{espece}-distribution.json`) :
+
+```json
+{
+  "metadata": {
+    "extractionDate": "2025-08-09T...",
+    "totalDepartments": 101,
+    "detectedDepartments": 91,
+    "sourceMap": "Espèce - Distribution Atlas"
+  },
+  "departments": [
+    {
+      "code": "01",
+      "name": "Ain",
+      "region": "Auvergne-Rhône-Alpes",
+      "color": { "r": 149, "g": 203, "b": 155, "hex": "#95cb9b" },
+      "distributionStatus": "assez commune à très commune",
+      "confidence": "high"
+    }
+  ],
+  "summary": {
+    "byStatus": { "assez commune à très commune": 57 },
+    "byRegion": { "Auvergne-Rhône-Alpes": 8 }
+  }
+}
+```
+
+**Rapport consolidé** (`output/consolidated-species-report.json`) :
+
+- 📊 Statistiques par espèce
+- 🗺️ Répartition géographique
+- 📈 Comparaisons inter-espèces
+- 🎯 Métriques de qualité
+
+### Format des images
+
+Les images doivent suivre le pattern :
+
+```
+plan-actions-chiropteres.fr-{espece}-carte-{espece}-2048x1271.png
+```
+
+**Exemples :**
+
+- `plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png`
+- `plan-actions-chiropteres.fr-grand-murin-carte-grand-murin-2048x1271.png`
+
+## Source des données
+
+**Plan National d'Actions en faveur des Chiroptères 2016-2025**  
+Référence : <https://plan-actions-chiropteres.fr/>
+
+Les cartes de distribution sont téléchargées directement depuis le site officiel et analysées automatiquement pour extraire les données de présence par département.

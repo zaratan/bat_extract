@@ -8,7 +8,6 @@
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import fetch from 'node-fetch';
 
 interface BatSpecies {
   name: string;

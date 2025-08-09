@@ -4,7 +4,6 @@
  */
 
 import { writeFile } from 'fs/promises';
-import fetch from 'node-fetch';
 import { join } from 'path';
 
 interface BatSpecies {

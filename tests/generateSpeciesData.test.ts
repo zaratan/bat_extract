@@ -1,6 +1,5 @@
 import { SpeciesDataGenerator } from '../src/generateSpeciesData.js';
 import { writeFile } from 'fs/promises';
-import nock from 'nock';
 
 // Mock fs/promises
 jest.mock('fs/promises', () => ({
@@ -9,17 +8,26 @@ jest.mock('fs/promises', () => ({
 
 const mockWriteFile = writeFile as jest.MockedFunction<typeof writeFile>;
 
+// Mock globalThis.fetch
+const mockFetch = jest.fn() as jest.MockedFunction<typeof globalThis.fetch>;
+
 describe('SpeciesDataGenerator', () => {
   let generator: SpeciesDataGenerator;
+  let originalFetch: typeof globalThis.fetch;
 
   beforeEach(() => {
     generator = new SpeciesDataGenerator();
     mockWriteFile.mockClear();
-    nock.cleanAll();
+    
+    // Sauvegarder et mocker fetch
+    originalFetch = globalThis.fetch;
+    globalThis.fetch = mockFetch;
+    mockFetch.mockClear();
   });
 
   afterEach(() => {
-    nock.cleanAll();
+    // Restaurer fetch original
+    globalThis.fetch = originalFetch;
   });
 
   describe('generateSpeciesData', () => {
@@ -43,18 +51,23 @@ describe('SpeciesDataGenerator', () => {
         </div>
       `;
 
-      // Mock des appels HTTP
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/les-chauves-souris/les-especes/')
-        .reply(200, mockHtml);
-
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/les-chauves-souris/les-especes/barbastelle-deurope/')
-        .reply(200, mockDetailHtml);
-
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/les-chauves-souris/les-especes/grand-murin/')
-        .reply(200, '<div class="entry-content"><p>Pas de nom latin</p></div>');
+      // Mock des appels HTTP avec fetch
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve(mockHtml),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve(mockDetailHtml),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve('<div class="entry-content"><p>Pas de nom latin</p></div>'),
+        } as Response);
 
       await generator.generateSpeciesData();
 
@@ -78,9 +91,12 @@ describe('SpeciesDataGenerator', () => {
 
     it('should handle HTTP errors gracefully', async () => {
       // Mock d'une erreur HTTP
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/les-chauves-souris/les-especes/')
-        .reply(500, 'Server Error');
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Server Error',
+        text: () => Promise.resolve('Server Error'),
+      } as Response);
 
       await expect(generator.generateSpeciesData()).rejects.toThrow();
     });
@@ -89,9 +105,11 @@ describe('SpeciesDataGenerator', () => {
       // Mock d'un HTML sans espèces
       const mockHtml = '<div class="content"></div>';
 
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/les-chauves-souris/les-especes/')
-        .reply(200, mockHtml);
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(mockHtml),
+      } as Response);
 
       await generator.generateSpeciesData();
 
@@ -170,9 +188,11 @@ describe('SpeciesDataGenerator', () => {
         </div>
       `;
 
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/test-page/')
-        .reply(200, htmlWithLatinName);
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(htmlWithLatinName),
+      } as Response);
 
       const latinName = await (generator as any).extractLatinName('https://plan-actions-chiropteres.fr/test-page/');
       expect(latinName).toBe('Barbastella barbastellus');
@@ -185,18 +205,23 @@ describe('SpeciesDataGenerator', () => {
         </div>
       `;
 
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/test-page/')
-        .reply(200, htmlWithoutLatinName);
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(htmlWithoutLatinName),
+      } as Response);
 
       const latinName = await (generator as any).extractLatinName('https://plan-actions-chiropteres.fr/test-page/');
       expect(latinName).toBeUndefined();
     });
 
     it('should handle HTTP errors when fetching latin name', async () => {
-      nock('https://plan-actions-chiropteres.fr')
-        .get('/test-page/')
-        .reply(404, 'Not Found');
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+        text: () => Promise.resolve('Not Found'),
+      } as Response);
 
       const latinName = await (generator as any).extractLatinName('https://plan-actions-chiropteres.fr/test-page/');
       expect(latinName).toBeUndefined();

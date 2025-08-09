@@ -1,7 +1,6 @@
 import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor.js';
 import * as fs from 'fs/promises';
 import { join, isAbsolute } from 'path';
-import nock from 'nock';
 
 // Mock fs
 jest.mock('fs/promises');

@@ -2,12 +2,6 @@ import { MapDownloader } from '../src/downloadMaps.js';
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 
-// Mock node-fetch to avoid ESM issues
-jest.mock('node-fetch', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
-
 // Mock fs modules
 jest.mock('fs/promises', () => ({
   writeFile: jest.fn(),
@@ -24,17 +18,21 @@ const mockMkdir = mkdir as jest.MockedFunction<typeof mkdir>;
 const mockReadFile = readFile as jest.MockedFunction<typeof readFile>;
 const mockExistsSync = existsSync as jest.MockedFunction<typeof existsSync>;
 
-// Import mockFetch after the mock is set up
-import mockFetch from 'node-fetch';
-const mockedFetch = mockFetch as jest.MockedFunction<typeof mockFetch>;
+// Mock globalThis.fetch
+const mockFetch = jest.fn() as jest.MockedFunction<typeof globalThis.fetch>;
 
 describe('MapDownloader', () => {
   let downloader: MapDownloader;
   let mockExit: jest.SpyInstance;
+  let originalFetch: typeof globalThis.fetch;
 
   beforeEach(() => {
     downloader = new MapDownloader();
     jest.clearAllMocks();
+    
+    // Sauvegarder et mocker fetch
+    originalFetch = globalThis.fetch;
+    globalThis.fetch = mockFetch;
     
     // Mock process.exit pour tous les tests
     mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
@@ -42,7 +40,7 @@ describe('MapDownloader', () => {
     });
     
     // Mock fetch to return successful responses
-    mockedFetch.mockImplementation(() => {
+    mockFetch.mockImplementation(() => {
       const mockImageBuffer = Buffer.from('fake-image-data');
       return Promise.resolve({
         ok: true,
@@ -56,6 +54,8 @@ describe('MapDownloader', () => {
 
   afterEach(() => {
     mockExit.mockRestore();
+    // Restaurer fetch original
+    globalThis.fetch = originalFetch;
   });
 
   describe('downloadAllMaps', () => {
@@ -184,7 +184,7 @@ describe('MapDownloader', () => {
       mockMkdir.mockResolvedValue(undefined);
 
       // Mock fetch pour simuler une erreur HTTP pour la première image
-      mockedFetch.mockImplementationOnce(() => 
+      mockFetch.mockImplementationOnce(() => 
         Promise.resolve({
           ok: false,
           status: 404,
@@ -246,7 +246,7 @@ describe('MapDownloader', () => {
 
       // Vérifier que le téléchargement a bien eu lieu avec l'URL de fallback
       expect(mockWriteFile).toHaveBeenCalledTimes(1);
-      expect(mockedFetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('test-species-carte-test-species')
       );
     });

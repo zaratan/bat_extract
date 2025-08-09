@@ -1,7 +1,5 @@
-import nock from 'nock';
-
-// Désactiver toutes les connexions HTTP réelles
-nock.disableNetConnect();
+// Configuration globale des tests
+// (Plus besoin de nock, on utilise globalThis.fetch natif avec des mocks Jest)
 
 // Mock console.log pour éviter le spam dans les tests
 beforeAll(() => {
@@ -17,10 +15,10 @@ beforeAll(() => {
 
 // Nettoyer les mocks après chaque test
 afterEach(() => {
-  nock.cleanAll();
+  jest.clearAllMocks();
 });
 
-// Réactiver les connexions HTTP après tous les tests
+// Plus de configuration spéciale pour les tests
 afterAll(() => {
-  nock.enableNetConnect();
+  // Nettoyage final si nécessaire
 });

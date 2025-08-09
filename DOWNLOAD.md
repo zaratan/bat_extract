@@ -38,17 +38,20 @@ Le script de téléchargement utilise automatiquement les URLs découvertes si e
 ## Format des noms de fichiers
 
 Les images téléchargées suivent le pattern :
+
 ```
 plan-actions-chiropteres.fr-{slug}-carte-{slug}-2048x1271.png
 ```
 
 Exemples :
+
 - `plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png`
 - `plan-actions-chiropteres.fr-grand-murin-carte-grand-murin-2048x1271.png`
 
 ## Gestion des erreurs
 
 Le script continue l'exécution même si certaines images échouent au téléchargement et produit un rapport final avec :
+
 - Nombre de succès
 - Nombre d'erreurs
 - Liste détaillée des erreurs avec le nom de l'espèce et la raison

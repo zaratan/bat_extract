@@ -1,6 +1,7 @@
 import { MapComparator } from './compareMaps';
 import sharp from 'sharp';
 import { writeFile } from 'fs/promises';
+import path from 'path';
 
 interface FrenchDepartment {
   code: string;
@@ -18,6 +19,8 @@ interface DepartmentColorMapping {
 
 export class SmartDepartmentExtractor {
   private comparator: MapComparator;
+  private readonly imagePath: string;
+  private readonly speciesName: string;
 
   // Liste des départements français avec coordonnées précises taggées manuellement
   private departments: FrenchDepartment[] = [
@@ -587,21 +590,27 @@ export class SmartDepartmentExtractor {
     },
   ];
 
-  constructor() {
+  constructor(imagePath?: string, speciesName?: string) {
+    this.imagePath =
+      imagePath ||
+      path.join(
+        process.cwd(),
+        'images',
+        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png'
+      );
+    this.speciesName = speciesName || "Barbastelle d'Europe";
     this.comparator = new MapComparator();
   }
 
   async extractDepartmentDistribution(): Promise<DepartmentColorMapping[]> {
     console.log(
-      '🗺️  Extraction intelligente des départements avec distribution'
+      `🗺️  Extraction intelligente des départements avec distribution`
     );
+    console.log(`🦇 Espèce: ${this.speciesName}`);
     console.log('==========================================================');
 
-    const distributionMapPath =
-      './images/plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png';
-
     console.log('📊 Analyse de la carte de distribution...');
-    const image = sharp(distributionMapPath);
+    const image = sharp(this.imagePath);
     const { data, info } = await image
       .raw()
       .toBuffer({ resolveWithObject: true });
@@ -821,13 +830,13 @@ export class SmartDepartmentExtractor {
       },
     };
 
-    await writeFile(
-      'smart_department_extraction.json',
-      JSON.stringify(results, null, 2)
-    );
-    console.log(
-      '💾 Résultats détaillés sauvegardés dans: smart_department_extraction.json'
-    );
+    const outputFilename = `${this.speciesName
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}-department-extraction.json`;
+
+    await writeFile(outputFilename, JSON.stringify(results, null, 2));
+    console.log(`💾 Résultats détaillés sauvegardés dans: ${outputFilename}`);
   }
 
   private groupByStatus(

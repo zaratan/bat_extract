@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "extractionDate": "2025-08-09T11:56:08.927Z",
+    "extractionDate": "2025-08-09T11:57:56.564Z",
     "totalDepartments": 94,
     "detectedDepartments": 91,
     "sourceMap": "Barbastelle d'Europe - Distribution Atlas"
@@ -15,13 +15,13 @@
         "y": 0.526956
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1766,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1442,
       "confidence": "high"
     },
     {
@@ -35,11 +35,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 2236,
+      "pixelCount": 2205,
       "confidence": "high"
     },
     {
@@ -51,13 +51,13 @@
         "y": 0.517525
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2328,
+      "pixelCount": 2071,
       "confidence": "high"
     },
     {
@@ -69,13 +69,13 @@
         "y": 0.668421
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 156,
-        "hex": "#96cb9c"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2358,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1151,
       "confidence": "high"
     },
     {
@@ -87,13 +87,13 @@
         "y": 0.619919
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 156,
-        "hex": "#96cb9c"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1325,
+      "pixelCount": 1359,
       "confidence": "high"
     },
     {
@@ -105,13 +105,13 @@
         "y": 0.669768
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1001,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1012,
       "confidence": "high"
     },
     {
@@ -123,13 +123,13 @@
         "y": 0.633392
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1889,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 955,
       "confidence": "high"
     },
     {
@@ -141,13 +141,13 @@
         "y": 0.283098
       },
       "color": {
-        "r": 220,
+        "r": 219,
         "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "b": 176,
+        "hex": "#dbe7b0"
       },
       "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1888,
+      "pixelCount": 1393,
       "confidence": "high"
     },
     {
@@ -159,13 +159,13 @@
         "y": 0.76812
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1542,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1967,
       "confidence": "high"
     },
     {
@@ -177,13 +177,13 @@
         "y": 0.377408
       },
       "color": {
-        "r": 220,
+        "r": 219,
         "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "b": 176,
+        "hex": "#dbe7b0"
       },
       "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2168,
+      "pixelCount": 1439,
       "confidence": "high"
     },
     {
@@ -197,11 +197,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 1913,
+      "pixelCount": 1128,
       "confidence": "high"
     },
     {
@@ -213,13 +213,13 @@
         "y": 0.671116
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2788,
+      "pixelCount": 2474,
       "confidence": "high"
     },
     {
@@ -231,13 +231,13 @@
         "y": 0.706145
       },
       "color": {
-        "r": 234,
-        "g": 84,
-        "b": 89,
-        "hex": "#ea5459"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 797,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1271,
       "confidence": "high"
     },
     {
@@ -249,13 +249,13 @@
         "y": 0.3316
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1506,
+      "pixelCount": 1283,
       "confidence": "high"
     },
     {
@@ -267,13 +267,13 @@
         "y": 0.607793
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1759,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1231,
       "confidence": "high"
     },
     {
@@ -285,13 +285,13 @@
         "y": 0.570069
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2057,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 2028,
       "confidence": "high"
     },
     {
@@ -303,13 +303,13 @@
         "y": 0.561986
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1497,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1522,
       "confidence": "high"
     },
     {
@@ -321,13 +321,13 @@
         "y": 0.467676
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2299,
+      "pixelCount": 2277,
       "confidence": "high"
     },
     {
@@ -339,13 +339,13 @@
         "y": 0.595668
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2172,
+      "pixelCount": 2047,
       "confidence": "high"
     },
     {
@@ -357,13 +357,13 @@
         "y": 0.766773
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 255,
+        "g": 253,
+        "b": 234,
+        "hex": "#fffdea"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1427,
+      "distributionStatus": "statut à déterminer",
+      "pixelCount": 770,
       "confidence": "high"
     },
     {
@@ -375,13 +375,13 @@
         "y": 0.378755
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1586,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1572,
       "confidence": "high"
     },
     {
@@ -393,13 +393,13 @@
         "y": 0.543124
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2187,
+      "pixelCount": 2017,
       "confidence": "high"
     },
     {
@@ -411,13 +411,13 @@
         "y": 0.611835
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 3030,
+      "pixelCount": 1949,
       "confidence": "high"
     },
     {
@@ -429,13 +429,13 @@
         "y": 0.446119
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1665,
+      "pixelCount": 1557,
       "confidence": "high"
     },
     {
@@ -447,13 +447,13 @@
         "y": 0.628002
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2239,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 2228,
       "confidence": "high"
     },
     {
@@ -465,13 +465,13 @@
         "y": 0.332947
       },
       "color": {
-        "r": 247,
-        "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "rare ou assez rare",
-      "pixelCount": 2233,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1540,
       "confidence": "high"
     },
     {
@@ -483,13 +483,13 @@
         "y": 0.378755
       },
       "color": {
-        "r": 247,
-        "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "rare ou assez rare",
-      "pixelCount": 1984,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1906,
       "confidence": "high"
     },
     {
@@ -501,13 +501,13 @@
         "y": 0.392228
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 234,
+        "g": 82,
+        "b": 87,
+        "hex": "#ea5257"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1437,
+      "distributionStatus": "très rarement inventoriée",
+      "pixelCount": 1060,
       "confidence": "high"
     },
     {
@@ -519,13 +519,13 @@
         "y": 0.681894
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1442,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1520,
       "confidence": "high"
     },
     {
@@ -537,13 +537,13 @@
         "y": 0.725007
       },
       "color": {
-        "r": 220,
+        "r": 219,
         "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "b": 176,
+        "hex": "#dbe7b0"
       },
       "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1325,
+      "pixelCount": 1261,
       "confidence": "high"
     },
     {
@@ -555,13 +555,13 @@
         "y": 0.711534
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 156,
-        "hex": "#96cb9c"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2037,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1898,
       "confidence": "high"
     },
     {
@@ -573,13 +573,13 @@
         "y": 0.64417
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2537,
+      "pixelCount": 2501,
       "confidence": "high"
     },
     {
@@ -591,13 +591,13 @@
         "y": 0.714229
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1785,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1025,
       "confidence": "high"
     },
     {
@@ -609,13 +609,13 @@
         "y": 0.400312
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2293,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1955,
       "confidence": "high"
     },
     {
@@ -627,13 +627,13 @@
         "y": 0.493274
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2454,
+      "pixelCount": 2170,
       "confidence": "high"
     },
     {
@@ -645,13 +645,13 @@
         "y": 0.460939
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2322,
+      "pixelCount": 2060,
       "confidence": "high"
     },
     {
@@ -663,13 +663,13 @@
         "y": 0.576806
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2076,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1168,
       "confidence": "high"
     },
     {
@@ -681,13 +681,13 @@
         "y": 0.483843
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1546,
+      "pixelCount": 1691,
       "confidence": "high"
     },
     {
@@ -699,13 +699,13 @@
         "y": 0.696714
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 3014,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1901,
       "confidence": "high"
     },
     {
@@ -717,13 +717,13 @@
         "y": 0.44073
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1814,
+      "pixelCount": 2178,
       "confidence": "high"
     },
     {
@@ -735,13 +735,13 @@
         "y": 0.563333
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1602,
+      "pixelCount": 1141,
       "confidence": "high"
     },
     {
@@ -753,13 +753,13 @@
         "y": 0.606446
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1567,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1384,
       "confidence": "high"
     },
     {
@@ -771,13 +771,13 @@
         "y": 0.448814
       },
       "color": {
-        "r": 220,
+        "r": 219,
         "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "b": 176,
+        "hex": "#dbe7b0"
       },
       "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1513,
+      "pixelCount": 1825,
       "confidence": "high"
     },
     {
@@ -789,13 +789,13 @@
         "y": 0.412437
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2072,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1942,
       "confidence": "high"
     },
     {
@@ -807,13 +807,13 @@
         "y": 0.64417
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1710,
+      "pixelCount": 1961,
       "confidence": "high"
     },
     {
@@ -825,13 +825,13 @@
         "y": 0.668421
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1997,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1471,
       "confidence": "high"
     },
     {
@@ -843,13 +843,13 @@
         "y": 0.646864
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 156,
-        "hex": "#96cb9c"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1856,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1136,
       "confidence": "high"
     },
     {
@@ -861,13 +861,13 @@
         "y": 0.456897
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2467,
+      "pixelCount": 2092,
       "confidence": "high"
     },
     {
@@ -879,13 +879,13 @@
         "y": 0.334295
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1054,
+      "pixelCount": 1118,
       "confidence": "high"
     },
     {
@@ -897,13 +897,13 @@
         "y": 0.332947
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2759,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1945,
       "confidence": "high"
     },
     {
@@ -915,13 +915,13 @@
         "y": 0.390881
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1987,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1796,
       "confidence": "high"
     },
     {
@@ -933,13 +933,13 @@
         "y": 0.400312
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1897,
+      "pixelCount": 1562,
       "confidence": "high"
     },
     {
@@ -951,13 +951,13 @@
         "y": 0.347768
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1499,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1757,
       "confidence": "high"
     },
     {
@@ -969,13 +969,13 @@
         "y": 0.327558
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2066,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1341,
       "confidence": "high"
     },
     {
@@ -987,13 +987,13 @@
         "y": 0.423215
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1814,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1511,
       "confidence": "high"
     },
     {
@@ -1005,13 +1005,13 @@
         "y": 0.310044
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1725,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1111,
       "confidence": "high"
     },
     {
@@ -1023,13 +1023,13 @@
         "y": 0.467676
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2676,
+      "pixelCount": 2365,
       "confidence": "high"
     },
     {
@@ -1041,13 +1041,13 @@
         "y": 0.242679
       },
       "color": {
-        "r": 177,
-        "g": 178,
-        "b": 180,
-        "hex": "#b1b2b4"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "présente mais mal connue",
-      "pixelCount": 1323,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1233,
       "confidence": "high"
     },
     {
@@ -1059,13 +1059,13 @@
         "y": 0.304654
       },
       "color": {
-        "r": 234,
-        "g": 83,
-        "b": 88,
-        "hex": "#ea5358"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 1987,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1650,
       "confidence": "high"
     },
     {
@@ -1077,13 +1077,13 @@
         "y": 0.365282
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1659,
+      "pixelCount": 1603,
       "confidence": "high"
     },
     {
@@ -1097,11 +1097,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 1413,
+      "pixelCount": 1356,
       "confidence": "high"
     },
     {
@@ -1113,13 +1113,13 @@
         "y": 0.566027
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2695,
+      "pixelCount": 2236,
       "confidence": "high"
     },
     {
@@ -1131,13 +1131,13 @@
         "y": 0.743869
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2286,
+      "pixelCount": 1579,
       "confidence": "high"
     },
     {
@@ -1149,13 +1149,13 @@
         "y": 0.762731
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1298,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1082,
       "confidence": "high"
     },
     {
@@ -1169,11 +1169,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 36,
-        "hex": "#f7a924"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 955,
+      "pixelCount": 2068,
       "confidence": "high"
     },
     {
@@ -1185,13 +1185,13 @@
         "y": 0.336989
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1471,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1099,
       "confidence": "high"
     },
     {
@@ -1203,13 +1203,13 @@
         "y": 0.392228
       },
       "color": {
-        "r": 234,
-        "g": 84,
-        "b": 89,
-        "hex": "#ea5459"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 1029,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 2075,
       "confidence": "high"
     },
     {
@@ -1221,13 +1221,13 @@
         "y": 0.552555
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1279,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1675,
       "confidence": "high"
     },
     {
@@ -1239,13 +1239,13 @@
         "y": 0.408395
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 1539,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1069,
       "confidence": "high"
     },
     {
@@ -1257,13 +1257,13 @@
         "y": 0.495969
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2391,
+      "pixelCount": 2183,
       "confidence": "high"
     },
     {
@@ -1275,13 +1275,13 @@
         "y": 0.407048
       },
       "color": {
-        "r": 220,
+        "r": 219,
         "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "b": 176,
+        "hex": "#dbe7b0"
       },
       "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2429,
+      "pixelCount": 2018,
       "confidence": "high"
     },
     {
@@ -1293,13 +1293,13 @@
         "y": 0.567375
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1791,
+      "pixelCount": 1186,
       "confidence": "high"
     },
     {
@@ -1311,13 +1311,13 @@
         "y": 0.521567
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 156,
-        "hex": "#96cb9c"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1193,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1148,
       "confidence": "high"
     },
     {
@@ -1329,13 +1329,13 @@
         "y": 0.343726
       },
       "color": {
-        "r": 247,
-        "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "r": 234,
+        "g": 82,
+        "b": 87,
+        "hex": "#ea5257"
       },
-      "distributionStatus": "rare ou assez rare",
-      "pixelCount": 342,
+      "distributionStatus": "très rarement inventoriée",
+      "pixelCount": 808,
       "confidence": "high"
     },
     {
@@ -1347,13 +1347,13 @@
         "y": 0.28714
       },
       "color": {
-        "r": 247,
-        "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "rare ou assez rare",
-      "pixelCount": 1704,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 1648,
       "confidence": "high"
     },
     {
@@ -1367,11 +1367,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 1583,
+      "pixelCount": 1325,
       "confidence": "high"
     },
     {
@@ -1383,13 +1383,13 @@
         "y": 0.350462
       },
       "color": {
-        "r": 234,
-        "g": 84,
-        "b": 89,
-        "hex": "#ea5459"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 571,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 585,
       "confidence": "high"
     },
     {
@@ -1401,13 +1401,13 @@
         "y": 0.521567
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1942,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 2505,
       "confidence": "high"
     },
     {
@@ -1421,11 +1421,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 38,
-        "hex": "#f7a926"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 1512,
+      "pixelCount": 882,
       "confidence": "high"
     },
     {
@@ -1437,13 +1437,13 @@
         "y": 0.704798
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1998,
+      "pixelCount": 1646,
       "confidence": "high"
     },
     {
@@ -1455,13 +1455,13 @@
         "y": 0.685936
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 156,
-        "hex": "#96cb9c"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 822,
+      "pixelCount": 1362,
       "confidence": "high"
     },
     {
@@ -1473,13 +1473,13 @@
         "y": 0.712881
       },
       "color": {
-        "r": 220,
-        "g": 231,
-        "b": 177,
-        "hex": "#dce7b1"
+        "r": 234,
+        "g": 82,
+        "b": 87,
+        "hex": "#ea5257"
       },
-      "distributionStatus": "peu commune ou localement commune",
-      "pixelCount": 2072,
+      "distributionStatus": "très rarement inventoriée",
+      "pixelCount": 1279,
       "confidence": "high"
     },
     {
@@ -1493,11 +1493,11 @@
       "color": {
         "r": 247,
         "g": 169,
-        "b": 36,
-        "hex": "#f7a924"
+        "b": 35,
+        "hex": "#f7a923"
       },
       "distributionStatus": "rare ou assez rare",
-      "pixelCount": 826,
+      "pixelCount": 880,
       "confidence": "high"
     },
     {
@@ -1509,13 +1509,13 @@
         "y": 0.508094
       },
       "color": {
-        "r": 150,
-        "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "r": 219,
+        "g": 231,
+        "b": 176,
+        "hex": "#dbe7b0"
       },
-      "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2095,
+      "distributionStatus": "peu commune ou localement commune",
+      "pixelCount": 2387,
       "confidence": "high"
     },
     {
@@ -1527,13 +1527,13 @@
         "y": 0.52022
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2257,
+      "pixelCount": 2214,
       "confidence": "high"
     },
     {
@@ -1545,13 +1545,13 @@
         "y": 0.56468
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1808,
+      "pixelCount": 1636,
       "confidence": "high"
     },
     {
@@ -1563,13 +1563,13 @@
         "y": 0.374713
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 1306,
+      "pixelCount": 1610,
       "confidence": "high"
     },
     {
@@ -1581,13 +1581,13 @@
         "y": 0.417826
       },
       "color": {
-        "r": 150,
+        "r": 149,
         "g": 203,
-        "b": 157,
-        "hex": "#96cb9d"
+        "b": 155,
+        "hex": "#95cb9b"
       },
       "distributionStatus": "assez commune à très commune",
-      "pixelCount": 2199,
+      "pixelCount": 2128,
       "confidence": "high"
     },
     {
@@ -1599,13 +1599,13 @@
         "y": 0.413784
       },
       "color": {
-        "r": 234,
-        "g": 84,
-        "b": 89,
-        "hex": "#ea5459"
+        "r": 149,
+        "g": 203,
+        "b": 155,
+        "hex": "#95cb9b"
       },
-      "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 702,
+      "distributionStatus": "assez commune à très commune",
+      "pixelCount": 1474,
       "confidence": "high"
     },
     {
@@ -1618,12 +1618,12 @@
       },
       "color": {
         "r": 234,
-        "g": 84,
-        "b": 89,
-        "hex": "#ea5459"
+        "g": 82,
+        "b": 87,
+        "hex": "#ea5257"
       },
       "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 366,
+      "pixelCount": 1171,
       "confidence": "high"
     },
     {
@@ -1674,23 +1674,23 @@
         "y": 0.320822
       },
       "color": {
-        "r": 234,
-        "g": 83,
-        "b": 88,
-        "hex": "#ea5358"
+        "r": 247,
+        "g": 169,
+        "b": 35,
+        "hex": "#f7a923"
       },
-      "distributionStatus": "très rarement inventoriée",
-      "pixelCount": 1006,
+      "distributionStatus": "rare ou assez rare",
+      "pixelCount": 1723,
       "confidence": "high"
     }
   ],
   "summary": {
     "byStatus": {
-      "assez commune à très commune": 52,
-      "rare ou assez rare": 11,
-      "peu commune ou localement commune": 20,
-      "très rarement inventoriée": 7,
-      "présente mais mal connue": 1,
+      "peu commune ou localement commune": 23,
+      "rare ou assez rare": 19,
+      "assez commune à très commune": 44,
+      "statut à déterminer": 1,
+      "très rarement inventoriée": 4,
       "non détecté": 3
     },
     "byRegion": {

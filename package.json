@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Extracteur de données de cartes de distribution utilisant l'analyse de couleurs avec TypeScript",
   "scripts": {
-    "extract": "ts-node src/index.ts",
+    "extract": "ts-node src/extractSpeciesData.ts",
     "download": "ts-node src/downloadMaps.ts",
     "download:priority": "ts-node src/downloadMaps.ts --priority",
     "discover-urls": "ts-node src/discoverImageUrls.ts",

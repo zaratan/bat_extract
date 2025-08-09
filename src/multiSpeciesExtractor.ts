@@ -144,12 +144,25 @@ export class MultiSpeciesExtractor {
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
 
+          // Les fichiers -distribution.json sont des tableaux de départements
+          const departmentsArray = Array.isArray(data) ? data : [];
+          const detectedDepartments = departmentsArray.filter(
+            d => d.distributionStatus !== 'non détecté'
+          ).length;
+
+          // Calculer le résumé par statut
+          const summary: { [key: string]: number } = {};
+          departmentsArray.forEach(dept => {
+            const status = dept.distributionStatus || 'non détecté';
+            summary[status] = (summary[status] || 0) + 1;
+          });
+
           consolidatedData.species.push({
             name: speciesName,
             filename: file,
-            totalDepartments: data.metadata?.totalDepartments || 0,
-            detectedDepartments: data.metadata?.detectedDepartments || 0,
-            summary: data.summary || {},
+            totalDepartments: departmentsArray.length,
+            detectedDepartments: detectedDepartments,
+            summary: summary,
           });
         } catch (error) {
           console.warn(`⚠️  Impossible de lire ${file}:`, error);
@@ -176,12 +189,10 @@ export class MultiSpeciesExtractor {
         console.log(
           `  📊 Départements détectés: ${species.detectedDepartments}/${species.totalDepartments}`
         );
-        if (species.summary.byStatus) {
-          Object.entries(species.summary.byStatus).forEach(
-            ([status, count]) => {
-              console.log(`  ${status}: ${count} départements`);
-            }
-          );
+        if (species.summary && Object.keys(species.summary).length > 0) {
+          Object.entries(species.summary).forEach(([status, count]) => {
+            console.log(`  ${status}: ${count} départements`);
+          });
         }
         console.log('');
       });

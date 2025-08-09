@@ -84,6 +84,7 @@ Lors de chaque `git push`, une vérification complète du code s'exécute :
 
 - **Linting complet** : Vérification de tous les fichiers TypeScript
 - **Types TypeScript** : Validation des types avec `tsc --noEmit`
+- **Tests complets** : Exécution de toute la suite de tests
 
 ### 🤖 GitHub Actions
 
@@ -92,6 +93,7 @@ Le projet utilise une GitHub Action qui s'exécute automatiquement sur chaque pu
 - **✅ Linting** : Vérification ESLint complète
 - **✅ Formatage** : Contrôle du formatage Prettier
 - **✅ Types** : Vérification TypeScript
+- **✅ Tests** : Exécution complète de la suite de tests
 - **✅ Multi-environnement** : Tests sur Ubuntu avec Node.js 20 et 22
 
 **Avantages :**
@@ -530,8 +532,8 @@ Suite de tests complète avec **sécurité absolue** - aucun test ne peut appele
 
 - **Jest + TypeScript** : Configuration ESM moderne
 - **nock** : Mocking HTTP complet, tous les appels réseau sont bloqués
-- **4 suites de tests** : Tests unitaires, d'intégration, utilitaires et sécurité
-- **18 tests** : Couverture des fonctions principales d'extraction
+- **3 suites de tests** : Configuration/sécurité, utilitaires couleur, extracteur multi-espèces
+- **17 tests** : Couverture des fonctions principales et protection HTTP
 - **CI/CD intégré** : Tests automatiques sur chaque commit/push
 
 ```bash

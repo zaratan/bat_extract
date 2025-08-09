@@ -1,1 +1,3 @@
-pnpm lint
+pnpm lint || exit 1
+pnpm test || exit 1
+pnpm type-check || exit 1

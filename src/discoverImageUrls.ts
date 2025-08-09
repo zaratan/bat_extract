@@ -137,7 +137,11 @@ function delay(ms: number): Promise<void> {
  */
 async function loadSpeciesData(): Promise<BatSpecies[]> {
   try {
-    const filePath = join(process.cwd(), 'data', 'generated-species-data.json');
+    const filePath = join(
+      process.cwd(),
+      'output',
+      'generated-species-data.json'
+    );
     const content = await readFile(filePath, 'utf-8');
     const data: SpeciesDataFile = JSON.parse(content);
     return data.species;
@@ -194,7 +198,11 @@ async function generateReport(results: ImageInfo[]): Promise<void> {
   console.log(`📊 Total analysé: ${results.length}`);
 
   // Sauvegarde des résultats
-  const outputPath = join(process.cwd(), 'data', 'discovered-image-urls.json');
+  const outputPath = join(
+    process.cwd(),
+    'output',
+    'discovered-image-urls.json'
+  );
   const reportData = {
     metadata: {
       generatedAt: new Date().toISOString(),

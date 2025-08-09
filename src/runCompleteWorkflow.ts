@@ -183,7 +183,7 @@ export class BatExtractWorkflow {
     try {
       const filePath = path.join(
         process.cwd(),
-        'data',
+        'output',
         'generated-species-data.json'
       );
       await access(filePath);
@@ -233,7 +233,7 @@ export class BatExtractWorkflow {
     try {
       const filePath = path.join(
         process.cwd(),
-        'data',
+        'output',
         'discovered-image-urls.json'
       );
       await access(filePath);

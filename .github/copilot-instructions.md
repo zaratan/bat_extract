@@ -17,11 +17,13 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 ## Architecture du projet (2025)
 
 ### Workflow automatisé principal
+
 - **Commande principale** : `pnpm workflow` (exécute tout automatiquement)
 - **Orchestrateur** : `src/runCompleteWorkflow.ts`
 - **5 étapes** : génération espèces → découverte URLs → téléchargement → extraction → rapport Excel
 
 ### Scripts cohérents
+
 - `pnpm generate-species` → `src/generateSpeciesData.ts`
 - `pnpm discover-urls` → `src/discoverImageUrls.ts`
 - `pnpm download` → `src/downloadMaps.ts`
@@ -30,6 +32,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 - `pnpm workflow` → `src/runCompleteWorkflow.ts`
 
 ### Organisation des données
+
 - **`data/`** : Configuration statique uniquement (`color-legend-mapping.ts`)
 - **`output/`** : Tous les fichiers générés (JSON, Excel) - gitignored
 - **`images/`** : Cartes téléchargées - gitignored

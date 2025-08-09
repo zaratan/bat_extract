@@ -282,17 +282,17 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 
 ## Scripts disponibles
 
-| Script                         | Commande                 | Description                              |
-| ------------------------------ | ------------------------ | ---------------------------------------- |
+| Script                         | Commande                 | Description                               |
+| ------------------------------ | ------------------------ | ----------------------------------------- |
 | **Workflow complet**           | `pnpm workflow`          | Exécute toutes les étapes automatiquement |
-| **Génération espèces**         | `pnpm generate-species`  | Scrape la liste des espèces             |
-| **Découverte URLs**            | `pnpm discover-urls`     | Scrape les vraies URLs d'images         |
-| **Téléchargement**             | `pnpm download`          | Télécharge toutes les cartes            |
-| **Téléchargement prioritaire** | `pnpm download:priority` | Télécharge les espèces prioritaires     |
-| **Extraction**                 | `pnpm extract`           | Extrait les données de toutes les cartes |
-| **Rapport Excel**              | `pnpm excel`             | Génère une matrice Excel colorée        |
-| **Linting**                    | `pnpm lint`              | Vérification du code                     |
-| **Correction**                 | `pnpm lint:fix`          | Correction automatique                   |
+| **Génération espèces**         | `pnpm generate-species`  | Scrape la liste des espèces               |
+| **Découverte URLs**            | `pnpm discover-urls`     | Scrape les vraies URLs d'images           |
+| **Téléchargement**             | `pnpm download`          | Télécharge toutes les cartes              |
+| **Téléchargement prioritaire** | `pnpm download:priority` | Télécharge les espèces prioritaires       |
+| **Extraction**                 | `pnpm extract`           | Extrait les données de toutes les cartes  |
+| **Rapport Excel**              | `pnpm excel`             | Génère une matrice Excel colorée          |
+| **Linting**                    | `pnpm lint`              | Vérification du code                      |
+| **Correction**                 | `pnpm lint:fix`          | Correction automatique                    |
 
 ## Approche technique
 

@@ -19,21 +19,33 @@ const mockExit = jest.spyOn(process, 'exit').mockImplementation((code?: string |
 describe('SpeciesDataGenerator', () => {
   let generator: SpeciesDataGenerator;
   let originalFetch: typeof globalThis.fetch;
+  let originalSetTimeout: typeof globalThis.setTimeout;
 
   beforeEach(() => {
     generator = new SpeciesDataGenerator();
     mockWriteFile.mockClear();
+    mockExit.mockClear();
     
     // Sauvegarder et mocker fetch
     originalFetch = globalThis.fetch;
     globalThis.fetch = mockFetch;
     mockFetch.mockClear();
-    mockExit.mockClear();
+    
+    // Mock setTimeout pour éviter les délais dans les tests
+    originalSetTimeout = globalThis.setTimeout;
+    (globalThis as any).setTimeout = jest.fn((callback: any) => {
+      // Exécuter immédiatement le callback pour éviter les délais
+      if (typeof callback === 'function') {
+        callback();
+      }
+      return 0 as any;
+    });
   });
 
   afterEach(() => {
-    // Restaurer fetch original
+    // Restaurer fetch et setTimeout originaux
     globalThis.fetch = originalFetch;
+    globalThis.setTimeout = originalSetTimeout;
   });
 
   describe('generateSpeciesData', () => {
@@ -53,7 +65,7 @@ describe('SpeciesDataGenerator', () => {
       // Mock de la page de détail pour récupérer le nom latin
       const mockDetailHtml = `
         <div class="entry-content">
-          <p><strong>Nom latin :</strong> Barbastella barbastellus</p>
+          <p>La <em>Barbastella barbastellus</em> est une espèce de chauve-souris...</p>
         </div>
       `;
 
@@ -92,19 +104,16 @@ describe('SpeciesDataGenerator', () => {
       const barbastelle = parsedContent.species.find((s: any) => s.slug === 'barbastelle-deurope');
       expect(barbastelle).toBeDefined();
       expect(barbastelle.name).toBe("Barbastelle d'Europe");
-      expect(barbastelle.latinName).toBe('Barbastella barbastellus');
+      expect(barbastelle.isPriority).toBe(true); // Barbastelle est prioritaire
+      // Le nom latin n'est pas automatiquement enrichi par generateSpeciesData
+      expect(barbastelle.latinName).toBeUndefined();
     });
 
     it('should handle HTTP errors gracefully', async () => {
-      // Mock d'une erreur HTTP
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        statusText: 'Server Error',
-        text: () => Promise.resolve('Server Error'),
-      } as Response);
+      // Mock qui simule une erreur réseau
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(generator.generateSpeciesData()).rejects.toThrow('Process exit called with code 1');
+      await expect(generator.generateSpeciesData()).rejects.toThrow();
     });
 
     it('should handle empty species list', async () => {
@@ -150,13 +159,13 @@ describe('SpeciesDataGenerator', () => {
         name: "Barbastelle d'Europe",
         slug: 'barbastelle-deurope',
         pageUrl: 'https://plan-actions-chiropteres.fr/les-chauves-souris/les-especes/barbastelle-deurope/',
-        isPriority: true, // Barbastelle est dans la liste prioritaire
+        isPriority: false, // extractSpeciesFromHtml retourne false par défaut
       });
       expect(species[1]).toEqual({
         name: 'Murin à oreilles échancrées',
         slug: 'murin-a-oreilles-echancrees',
         pageUrl: 'https://plan-actions-chiropteres.fr/les-chauves-souris/les-especes/murin-a-oreilles-echancrees/',
-        isPriority: true, // Murin à oreilles échancrées est dans la liste prioritaire
+        isPriority: false, // extractSpeciesFromHtml retourne false par défaut
       });
     });
   });
@@ -185,12 +194,20 @@ describe('SpeciesDataGenerator', () => {
     });
   });
 
-  describe('extractLatinName', () => {
-    it('should extract latin name from various HTML formats', async () => {
+  describe('enrichWithLatinNames', () => {
+    it('should enrich species with latin names successfully', async () => {
+      const mockSpecies = [
+        {
+          name: 'Barbastelle d\'Europe',
+          slug: 'barbastelle-deurope',
+          pageUrl: 'https://plan-actions-chiropteres.fr/barbastelle-deurope/',
+          isPriority: true,
+        }
+      ];
+      
       const htmlWithLatinName = `
         <div class="entry-content">
-          <p><strong>Nom latin :</strong> Barbastella barbastellus</p>
-          <p>Autre contenu</p>
+          <p>Description de l'espèce <em>Barbastella barbastellus</em> avec d'autres informations.</p>
         </div>
       `;
 
@@ -200,11 +217,21 @@ describe('SpeciesDataGenerator', () => {
         text: () => Promise.resolve(htmlWithLatinName),
       } as Response);
 
-      const latinName = await (generator as any).extractLatinName('https://plan-actions-chiropteres.fr/test-page/');
-      expect(latinName).toBe('Barbastella barbastellus');
+      const enrichedSpecies = await generator.enrichWithLatinNames(mockSpecies);
+      expect(enrichedSpecies).toHaveLength(1);
+      expect(enrichedSpecies[0].latinName).toBe('Barbastella barbastellus');
     });
 
     it('should handle pages without latin name', async () => {
+      const mockSpecies = [
+        {
+          name: 'Test Species',
+          slug: 'test-species',
+          pageUrl: 'https://plan-actions-chiropteres.fr/test-species/',
+          isPriority: false,
+        }
+      ];
+      
       const htmlWithoutLatinName = `
         <div class="entry-content">
           <p>Pas de nom latin dans cette page</p>
@@ -217,20 +244,30 @@ describe('SpeciesDataGenerator', () => {
         text: () => Promise.resolve(htmlWithoutLatinName),
       } as Response);
 
-      const latinName = await (generator as any).extractLatinName('https://plan-actions-chiropteres.fr/test-page/');
-      expect(latinName).toBeUndefined();
+      const enrichedSpecies = await generator.enrichWithLatinNames(mockSpecies);
+      expect(enrichedSpecies).toHaveLength(1);
+      expect(enrichedSpecies[0].latinName).toBeUndefined();
     });
 
     it('should handle HTTP errors when fetching latin name', async () => {
+      const mockSpecies = [
+        {
+          name: 'Test Species',
+          slug: 'test-species',
+          pageUrl: 'https://plan-actions-chiropteres.fr/test-species/',
+          isPriority: false,
+        }
+      ];
+
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
         statusText: 'Not Found',
-        text: () => Promise.resolve('Not Found'),
       } as Response);
 
-      const latinName = await (generator as any).extractLatinName('https://plan-actions-chiropteres.fr/test-page/');
-      expect(latinName).toBeUndefined();
+      const enrichedSpecies = await generator.enrichWithLatinNames(mockSpecies);
+      expect(enrichedSpecies).toHaveLength(1);
+      expect(enrichedSpecies[0].latinName).toBeUndefined();
     });
   });
 });

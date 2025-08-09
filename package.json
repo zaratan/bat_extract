@@ -7,6 +7,7 @@
     "download": "ts-node src/downloadMaps.ts",
     "download:priority": "ts-node src/downloadMaps.ts --priority",
     "discover-urls": "ts-node src/discoverImageUrls.ts",
+    "generate-species": "ts-node src/generateSpeciesData.ts",
     "excel": "ts-node src/generateExcelReport.ts",
     "workflow": "ts-node src/runCompleteWorkflow.ts",
     "lint": "eslint src/**/*.ts",
@@ -36,7 +37,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@types/node-fetch": "^2.6.13",
     "exceljs": "^4.4.0",
+    "node-fetch": "^3.3.2",
     "sharp": "^0.34.3"
   }
 }

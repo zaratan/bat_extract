@@ -5,9 +5,25 @@
  * en analysant les pages de détail de chaque espèce
  */
 
-import { writeFile } from 'fs/promises';
+import { writeFile, readFile } from 'fs/promises';
 import { join } from 'path';
-import { BAT_SPECIES } from './species-data';
+
+interface BatSpecies {
+  name: string;
+  slug: string;
+  pageUrl: string;
+  isPriority: boolean;
+}
+
+interface SpeciesDataFile {
+  metadata: {
+    generatedAt: string;
+    source: string;
+    totalSpecies: number;
+    prioritySpecies: number;
+  };
+  species: BatSpecies[];
+}
 
 /**
  * Interface pour stocker les informations d'image trouvées
@@ -73,9 +89,7 @@ function extractImageUrl(html: string, slug: string): string | null {
 /**
  * Analyse une page d'espèce pour trouver l'URL de la carte
  */
-async function analyzeSpeciesPage(
-  species: (typeof BAT_SPECIES)[0]
-): Promise<ImageInfo> {
+async function analyzeSpeciesPage(species: BatSpecies): Promise<ImageInfo> {
   const info: ImageInfo = {
     species: species.name,
     slug: species.slug,
@@ -119,25 +133,44 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
+ * Charge les données d'espèces depuis le fichier JSON généré
+ */
+async function loadSpeciesData(): Promise<BatSpecies[]> {
+  try {
+    const filePath = join(process.cwd(), 'data', 'generated-species-data.json');
+    const content = await readFile(filePath, 'utf-8');
+    const data: SpeciesDataFile = JSON.parse(content);
+    return data.species;
+  } catch (error) {
+    console.error("❌ Impossible de charger les données d'espèces:", error);
+    console.log("💡 Exécutez d'abord: pnpm generate-species");
+    process.exit(1);
+  }
+}
+
+/**
  * Découvre toutes les URLs d'images réelles
  */
 async function discoverImageUrls(): Promise<ImageInfo[]> {
+  // Charger les données d'espèces
+  const species = await loadSpeciesData();
+
   console.log(
-    `🦇 Découverte des URLs d'images pour ${BAT_SPECIES.length} espèces\n`
+    `🦇 Découverte des URLs d'images pour ${species.length} espèces\n`
   );
 
   const results: ImageInfo[] = [];
   const DELAY = 1500; // 1.5 secondes entre chaque requête
 
-  for (let i = 0; i < BAT_SPECIES.length; i++) {
-    const species = BAT_SPECIES[i];
-    console.log(`[${i + 1}/${BAT_SPECIES.length}] ${species.name}`);
+  for (let i = 0; i < species.length; i++) {
+    const currentSpecies = species[i];
+    console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
 
-    const info = await analyzeSpeciesPage(species);
+    const info = await analyzeSpeciesPage(currentSpecies);
     results.push(info);
 
     // Pause entre les requêtes
-    if (i < BAT_SPECIES.length - 1) {
+    if (i < species.length - 1) {
       await delay(DELAY);
     }
 

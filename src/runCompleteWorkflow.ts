@@ -55,6 +55,14 @@ export class BatExtractWorkflow {
     console.log('');
 
     try {
+      // Étape 0: Génération des données d'espèces
+      await this.runStep(
+        "Génération des données d'espèces",
+        '🧬',
+        'pnpm generate-species',
+        async () => this.checkGeneratedSpeciesData()
+      );
+
       // Étape 1: Découverte des URLs
       await this.runStep(
         'Découverte des URLs',
@@ -166,6 +174,56 @@ export class BatExtractWorkflow {
     this.report.steps.push(result);
     this.updateSummary(result.status);
     console.log('');
+  }
+
+  private async checkGeneratedSpeciesData(): Promise<{
+    stats: { [key: string]: number };
+    details: string[];
+  }> {
+    try {
+      const filePath = path.join(
+        process.cwd(),
+        'data',
+        'generated-species-data.json'
+      );
+      await access(filePath);
+
+      const content = await readFile(filePath, 'utf-8');
+      const data = JSON.parse(content);
+
+      if (data.metadata) {
+        const { totalSpecies, prioritySpecies } = data.metadata;
+        const nonPrioritySpecies = totalSpecies - prioritySpecies;
+        const priorityRate = Math.round((prioritySpecies / totalSpecies) * 100);
+
+        return {
+          stats: {
+            'Espèces total': totalSpecies,
+            'Espèces prioritaires': prioritySpecies,
+            'Espèces non-prioritaires': nonPrioritySpecies,
+            'Taux prioritaire (%)': priorityRate,
+          },
+          details: [
+            `${totalSpecies} espèces scrapées depuis le site web`,
+            `${prioritySpecies} espèces prioritaires identifiées`,
+            'Données générées dynamiquement',
+          ],
+        };
+      }
+
+      // Fallback si pas de métadonnées
+      const speciesCount = (data.species || []).length;
+      return {
+        stats: {
+          'Espèces trouvées': speciesCount,
+        },
+        details: [`${speciesCount} espèces dans le fichier généré`],
+      };
+    } catch (error) {
+      throw new Error(
+        `Impossible de vérifier les données d'espèces générées: ${error}`
+      );
+    }
   }
 
   private async checkDiscoveredUrls(): Promise<{

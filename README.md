@@ -54,6 +54,9 @@ pnpm install
 pnpm workflow      # Exécute automatiquement toutes les étapes avec rapport détaillé
 
 # OU étapes individuelles :
+# 0. Générer les données d'espèces depuis le site web
+pnpm generate-species
+
 # 1. Découvrir les vraies URLs d'images
 pnpm discover-urls
 
@@ -84,10 +87,11 @@ pnpm workflow
 
 Cette commande exécute automatiquement toutes les étapes dans l'ordre avec un rapport détaillé :
 
-1. 🔍 **Découverte des URLs** → Extraction des vraies URLs d'images
-2. 📥 **Téléchargement** → Récupération de toutes les cartes
-3. 🎨 **Extraction** → Analyse des couleurs et génération des données
-4. 📊 **Rapport Excel** → Création de la matrice finale
+1. 🧬 **Génération des données d'espèces** → Scraping du site web pour extraire la liste des espèces
+2. 🔍 **Découverte des URLs** → Extraction des vraies URLs d'images
+3. 📥 **Téléchargement** → Récupération de toutes les cartes
+4. 🎨 **Extraction** → Analyse des couleurs et génération des données
+5. 📊 **Rapport Excel** → Création de la matrice finale
 
 **Avantages :**
 
@@ -99,6 +103,29 @@ Cette commande exécute automatiquement toutes les étapes dans l'ordre avec un 
 - ✅ **Résumé final** : Aperçu complet du succès/échec de chaque étape
 
 ## Workflow étape par étape (manuel)
+
+### 0. Génération des données d'espèces
+
+```bash
+pnpm generate-species
+```
+
+Cette étape scrape automatiquement le site <https://plan-actions-chiropteres.fr> pour extraire la liste complète et à jour des espèces de chauves-souris.
+
+**Fonctionnalités :**
+
+- ✅ **Scraping intelligent** : Analyse automatique de la page des espèces
+- ✅ **Données dynamiques** : Toujours à jour avec le site web
+- ✅ **Classification automatique** : Identification des espèces prioritaires
+- ✅ **Format JSON** : Sauvegarde dans `data/generated-species-data.json`
+- ✅ **Métadonnées** : Date de génération, source, statistiques
+
+**Avantages vs fichier statique :**
+
+- 🔄 Pas besoin de maintenance manuelle
+- 🆕 Détection automatique des nouvelles espèces
+- 📊 Statistiques précises et actuelles
+- 🌐 Source unique de vérité (le site web officiel)
 
 ### 1. Découverte des URLs réelles
 

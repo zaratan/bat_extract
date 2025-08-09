@@ -11,18 +11,18 @@ async function demo(): Promise<void> {
     console.log('📋 Initialisation...');
     await extractor.initialize('fra');
 
-    // Si vous avez une image de test, décommentez et modifiez le chemin :
-    /*
-    const imagePath = 'path/to/your/test/image.jpg';
-    
+    // Test avec l'image des chauves-souris
+    const imagePath =
+      './images/plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png';
+
     console.log(`🔍 Extraction du texte de: ${imagePath}`);
-    
+
     // Test sans préprocessing
     console.log('📄 Extraction simple...');
     const simpleResult = await extractor.extractFromImage(imagePath);
     console.log('Texte extrait:', simpleResult.text);
     console.log('Confiance:', `${simpleResult.confidence.toFixed(2)}%`);
-    
+
     // Test avec préprocessing
     console.log('🎨 Extraction avec préprocessing...');
     const enhancedResult = await extractor.extractFromImage(imagePath, {
@@ -30,22 +30,23 @@ async function demo(): Promise<void> {
       imageOptions: {
         enhance: true,
         grayscale: true,
-        resize: { width: 800 }
-      }
+        resize: { width: 800 },
+      },
     });
     console.log('Texte extrait (amélioré):', enhancedResult.text);
-    console.log('Confiance (amélioré):', `${enhancedResult.confidence.toFixed(2)}%`);
-    
+    console.log(
+      'Confiance (amélioré):',
+      `${enhancedResult.confidence.toFixed(2)}%`
+    );
+
     // Sauvegarde des résultats
-    await extractor.saveResults([simpleResult, enhancedResult], 'demo_results.json');
-    */
+    await extractor.saveResults(
+      [simpleResult, enhancedResult],
+      'demo_results.json'
+    );
 
     console.log('✅ Démo terminée !');
-    console.log('💡 Pour tester avec une vraie image :');
-    console.log('   1. Ajoutez une image dans le dossier du projet');
-    console.log('   2. Décommentez le code ci-dessus');
-    console.log("   3. Modifiez le chemin de l'image");
-    console.log('   4. Relancez avec: pnpm dev:demo');
+    console.log('� Résultats sauvegardés dans demo_results.json');
   } catch (error) {
     console.error(
       '❌ Erreur:',

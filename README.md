@@ -79,12 +79,27 @@ Lors de chaque `git commit`, les outils suivants s'exécutent automatiquement :
 - **Fichiers TypeScript/JavaScript** : ESLint avec correction automatique (inclut Prettier)
 - **Fichiers JSON/Markdown** : Formatage Prettier automatique
 
+Lors de chaque `git push`, une vérification complète du code s'exécute :
+
+- **Linting complet** : Vérification de tous les fichiers TypeScript
+- **Types TypeScript** : Validation des types avec `tsc --noEmit`
+
+### 🤖 GitHub Actions
+
+Le projet utilise une GitHub Action qui s'exécute automatiquement sur chaque push et pull request :
+
+- **✅ Linting** : Vérification ESLint complète
+- **✅ Formatage** : Contrôle du formatage Prettier
+- **✅ Types** : Vérification TypeScript
+- **✅ Multi-environnement** : Tests sur Ubuntu avec Node.js 20
+
 **Avantages :**
 
 - ✅ **Code cohérent** : Même style de code pour tous les contributeurs
-- ✅ **Pas d'oubli** : Impossible de committer du code non formaté
+- ✅ **Pas d'oubli** : Impossible de committer ou pusher du code non conforme
 - ✅ **Productivité** : Correction automatique des erreurs simples
-- ✅ **Performance** : Vérification uniquement des fichiers modifiés
+- ✅ **Performance** : Vérification uniquement des fichiers modifiés au commit
+- ✅ **CI/CD** : Validation automatique dans le cloud
 
 ### 🚀 Commandes manuelles
 
@@ -96,6 +111,9 @@ pnpm lint
 
 # Correction automatique
 pnpm lint:fix
+
+# Vérification des types TypeScript
+pnpm type-check
 ```
 
 ## Installation
@@ -483,6 +501,7 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 | **Rapport Excel**              | `pnpm excel`             | Génère une matrice Excel colorée          |
 | **Linting**                    | `pnpm lint`              | Vérification du code                      |
 | **Correction**                 | `pnpm lint:fix`          | Correction automatique                    |
+| **Vérification TypeScript**    | `pnpm type-check`        | Vérification des types TypeScript         |
 
 ## Approche technique
 

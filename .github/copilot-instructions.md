@@ -50,12 +50,15 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 
 ## Qualité de code
 
-- **Hooks Git automatiques** : Husky + lint-staged pour vérifications avant commit
+- **Hooks Git automatiques** : Husky + lint-staged pour vérifications avant commit et push
+  - Hook pre-commit : `pnpm lint-staged` (vérification des fichiers modifiés)
+  - Hook pre-push : `pnpm lint` (vérification complète du code)
+- **GitHub Actions** : CI/CD automatique avec vérification du code sur chaque push/PR
 - **Configuration ESLint** : Inclut Prettier via `'prettier/prettier': 'error'`
 - **lint-staged optimisé** :
   - TypeScript/JavaScript : `eslint --fix` (inclut formatage Prettier)
   - JSON/Markdown : `prettier --write`
-- **Scripts de vérification** : `pnpm lint` et `pnpm lint:fix`
+- **Scripts de vérification** : `pnpm lint`, `pnpm lint:fix`, `pnpm type-check`
 
 ## Structure des classes principales
 

@@ -1,6 +1,7 @@
 {
   "name": "bat_extract",
   "version": "1.0.0",
+  "type": "module",
   "description": "Extracteur de données de cartes de distribution utilisant l'analyse de couleurs avec TypeScript",
   "scripts": {
     "extract": "ts-node src/extractSpeciesData.ts",
@@ -12,6 +13,7 @@
     "workflow": "ts-node src/runCompleteWorkflow.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
+    "type-check": "tsc --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {

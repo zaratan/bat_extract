@@ -8,7 +8,7 @@ import { SmartDepartmentExtractor } from './smartExtractor';
  */
 export class MultiSpeciesExtractor {
   private readonly imagesPath = path.join(process.cwd(), 'images');
-  private readonly outputPath = path.join(process.cwd(), 'results');
+  private readonly outputPath = path.join(process.cwd(), 'output');
 
   /**
    * Extrait le nom de l'espèce depuis le nom du fichier

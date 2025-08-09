@@ -48,6 +48,18 @@ temp/
 temp_images/
 processed_images/
 
+# Results and outputs
+output/
+results/
+extractions/
+*.json
+*extract.json
+*-extraction.json
+*-distribution.json
+!package.json
+!tsconfig.json
+!eslint.config.js
+
 # Test images (keep README.md but ignore actual images)
 images/*
 !images/README.md

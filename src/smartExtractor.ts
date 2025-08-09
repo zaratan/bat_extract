@@ -827,10 +827,14 @@ export class SmartDepartmentExtractor {
       },
     };
 
-    const outputFilename = `${this.speciesName
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')}-department-extraction.json`;
+    const outputFilename = path.join(
+      process.cwd(),
+      'output',
+      `${this.speciesName
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')}-department-extraction.json`
+    );
 
     await writeFile(outputFilename, JSON.stringify(results, null, 2));
     console.log(`💾 Résultats détaillés sauvegardés dans: ${outputFilename}`);

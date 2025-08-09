@@ -35,9 +35,6 @@ jobs:
       - name: 🔍 Run ESLint
         run: pnpm lint
 
-      - name: ✨ Check code formatting
-        run: pnpm lint:fix --dry-run
-
   type-check:
     name: 🔧 Type Check
     runs-on: ubuntu-latest

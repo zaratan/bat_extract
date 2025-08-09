@@ -11,6 +11,11 @@ const mockWriteFile = writeFile as jest.MockedFunction<typeof writeFile>;
 // Mock globalThis.fetch
 const mockFetch = jest.fn() as jest.MockedFunction<typeof globalThis.fetch>;
 
+// Mock process.exit to prevent test termination
+const mockExit = jest.spyOn(process, 'exit').mockImplementation((code?: string | number) => {
+  throw new Error(`Process exit called with code ${code}`);
+});
+
 describe('SpeciesDataGenerator', () => {
   let generator: SpeciesDataGenerator;
   let originalFetch: typeof globalThis.fetch;
@@ -23,6 +28,7 @@ describe('SpeciesDataGenerator', () => {
     originalFetch = globalThis.fetch;
     globalThis.fetch = mockFetch;
     mockFetch.mockClear();
+    mockExit.mockClear();
   });
 
   afterEach(() => {
@@ -98,7 +104,7 @@ describe('SpeciesDataGenerator', () => {
         text: () => Promise.resolve('Server Error'),
       } as Response);
 
-      await expect(generator.generateSpeciesData()).rejects.toThrow();
+      await expect(generator.generateSpeciesData()).rejects.toThrow('Process exit called with code 1');
     });
 
     it('should handle empty species list', async () => {

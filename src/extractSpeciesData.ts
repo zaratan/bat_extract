@@ -11,10 +11,10 @@ async function main(): Promise<void> {
     console.log('📁 Source: dossier /images');
     console.log('📁 Destination: dossier /output');
     console.log('');
-    
+
     const extractor = new MultiSpeciesExtractor();
     await extractor.extractAllSpecies();
-    
+
     console.log('');
     console.log('✅ Extraction terminée avec succès!');
     console.log('📊 Les fichiers de résultats ont été générés dans /output');

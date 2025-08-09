@@ -1,11 +1,11 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 /**
  * Script d'exécution du workflow complet BatExtract
  * Orchestre toutes les étapes : génération → découverte → téléchargement → extraction → rapport
  */
 
-import { BatExtractWorkflow } from '../src/runCompleteWorkflow';
+import { BatExtractWorkflow } from '../src/runCompleteWorkflow.js';
 
 async function main(): Promise<void> {
   const workflow = new BatExtractWorkflow();

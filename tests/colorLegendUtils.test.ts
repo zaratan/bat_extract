@@ -1,4 +1,4 @@
-import { ColorLegendUtils, COLOR_LEGEND_MAPPING } from '../data/color-legend-mapping';
+import { ColorLegendUtils, COLOR_LEGEND_MAPPING } from '../data/color-legend-mapping.js';
 
 describe('ColorLegendUtils', () => {
   describe('getDistributionStatus', () => {

@@ -1,4 +1,4 @@
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 /**
  * Génère une image de test simple avec des couleurs spécifiques pour les tests

@@ -1,10 +1,10 @@
-import * as ExcelJS from 'exceljs';
+import ExcelJS from 'exceljs';
 import { readdir, readFile } from 'fs/promises';
-import * as path from 'path';
+import { join } from 'path';
 import {
   COLOR_LEGEND_MAPPING,
   ColorLegendEntry,
-} from '../data/color-legend-mapping';
+} from '../data/color-legend-mapping.js';
 
 interface SpeciesData {
   speciesName: string;
@@ -22,8 +22,8 @@ export class ExcelReportGenerator {
   private readonly reportPath: string;
 
   constructor(outputDir?: string) {
-    this.outputDir = outputDir || path.join(process.cwd(), 'output');
-    this.reportPath = path.join(this.outputDir, 'bat-distribution-matrix.xlsx');
+    this.outputDir = outputDir || join(process.cwd(), 'output');
+    this.reportPath = join(this.outputDir, 'bat-distribution-matrix.xlsx');
   }
 
   async generateReport(): Promise<void> {
@@ -64,7 +64,7 @@ export class ExcelReportGenerator {
 
     for (const file of jsonFiles) {
       try {
-        const filePath = path.join(this.outputDir, file);
+        const filePath = join(this.outputDir, file);
         const content = await readFile(filePath, 'utf-8');
         const data = JSON.parse(content);
 

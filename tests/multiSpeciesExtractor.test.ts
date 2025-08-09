@@ -1,7 +1,7 @@
-import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor';
+import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor.js';
 import * as fs from 'fs/promises';
-import * as path from 'path';
-import * as nock from 'nock';
+import { join, isAbsolute } from 'path';
+import nock from 'nock';
 
 // Mock fs
 jest.mock('fs/promises');
@@ -86,24 +86,24 @@ describe('MultiSpeciesExtractor', () => {
 
       // Act - On ne peut pas tester ensureOutputDir directement
       // Mais on peut vérifier que mkdir serait appelé avec les bons paramètres
-      const outputPath = path.join(process.cwd(), 'output');
+      const outputPath = join(process.cwd(), 'output');
 
       // Assert - Vérifier que le chemin est correct
       expect(outputPath).toContain('output');
-      expect(path.isAbsolute(outputPath)).toBe(true);
+      expect(isAbsolute(outputPath)).toBe(true);
     });
   });
 
   describe('Configuration des chemins', () => {
     test('devrait avoir les bons chemins par défaut', () => {
       // Test que les chemins sont corrects
-      const imagesPath = path.join(process.cwd(), 'images');
-      const outputPath = path.join(process.cwd(), 'output');
+      const imagesPath = join(process.cwd(), 'images');
+      const outputPath = join(process.cwd(), 'output');
 
       expect(imagesPath).toContain('images');
       expect(outputPath).toContain('output');
-      expect(path.isAbsolute(imagesPath)).toBe(true);
-      expect(path.isAbsolute(outputPath)).toBe(true);
+      expect(isAbsolute(imagesPath)).toBe(true);
+      expect(isAbsolute(outputPath)).toBe(true);
     });
   });
 

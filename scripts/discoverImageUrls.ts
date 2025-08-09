@@ -1,11 +1,11 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 /**
  * Script pour découvrir les vraies URLs des images de cartes de distribution
  * en analysant les pages de détail de chaque espèce
  */
 
-import { ImageUrlDiscoverer } from '../src/discoverImageUrls';
+import { ImageUrlDiscoverer } from '../src/discoverImageUrls.js';
 
 async function main(): Promise<void> {
   try {

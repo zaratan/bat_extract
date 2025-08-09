@@ -1,11 +1,11 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 /**
  * Script de génération de rapport Excel
  * Crée une matrice espèces × départements avec statuts de distribution
  */
 
-import { ExcelReportGenerator } from '../src/generateExcelReport';
+import { ExcelReportGenerator } from '../src/generateExcelReport.js';
 
 async function main(): Promise<void> {
   const generator = new ExcelReportGenerator();

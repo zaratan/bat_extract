@@ -1,11 +1,11 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 /**
  * Script pour télécharger automatiquement les cartes de distribution
  * de toutes les espèces de chauves-souris françaises
  */
 
-import { MapDownloader } from '../src/downloadMaps';
+import { MapDownloader } from '../src/downloadMaps.js';
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);

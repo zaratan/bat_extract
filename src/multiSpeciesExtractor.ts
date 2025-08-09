@@ -1,14 +1,14 @@
 import { promises as fs } from 'fs';
-import * as path from 'path';
-import { SmartDepartmentExtractor } from './smartExtractor';
+import { join } from 'path';
+import { SmartDepartmentExtractor } from './smartExtractor.js';
 
 /**
  * Extracteur multi-espèces qui traite automatiquement toutes les cartes
  * dans le dossier /images et extrait les données de distribution par département
  */
 export class MultiSpeciesExtractor {
-  private readonly imagesPath = path.join(process.cwd(), 'images');
-  private readonly outputPath = path.join(process.cwd(), 'output');
+  private readonly imagesPath = join(process.cwd(), 'images');
+  private readonly outputPath = join(process.cwd(), 'output');
 
   /**
    * Extrait le nom de l'espèce depuis le nom du fichier
@@ -84,7 +84,7 @@ export class MultiSpeciesExtractor {
    */
   private async processSpecies(filename: string): Promise<void> {
     const speciesName = this.extractSpeciesName(filename);
-    const imagePath = path.join(this.imagesPath, filename);
+    const imagePath = join(this.imagesPath, filename);
 
     console.log(`\n🦇 Traitement de l'espèce: ${speciesName}`);
     console.log(`📁 Image: ${filename}`);
@@ -98,7 +98,7 @@ export class MultiSpeciesExtractor {
       const results = await extractor.extractDepartmentDistribution();
 
       // Sauvegarder les résultats spécifiques à cette espèce
-      const outputFile = path.join(
+      const outputFile = join(
         this.outputPath,
         `${speciesName.toLowerCase().replace(/\s+/g, '-')}-distribution.json`
       );
@@ -141,7 +141,7 @@ export class MultiSpeciesExtractor {
 
       for (const file of distributionFiles) {
         try {
-          const filePath = path.join(this.outputPath, file);
+          const filePath = join(this.outputPath, file);
           const data = JSON.parse(await fs.readFile(filePath, 'utf8'));
 
           const speciesName = file
@@ -175,7 +175,7 @@ export class MultiSpeciesExtractor {
         }
       }
 
-      const reportPath = path.join(
+      const reportPath = join(
         this.outputPath,
         'consolidated-species-report.json'
       );
@@ -243,14 +243,4 @@ export class MultiSpeciesExtractor {
     console.log('\n🎉 Extraction multi-espèces terminée !');
     console.log(`📁 Tous les résultats sont dans: ${this.outputPath}`);
   }
-}
-
-// Script principal
-async function main(): Promise<void> {
-  const extractor = new MultiSpeciesExtractor();
-  await extractor.extractAllSpecies();
-}
-
-if (require.main === module) {
-  main().catch(console.error);
 }

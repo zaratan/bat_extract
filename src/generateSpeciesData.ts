@@ -5,7 +5,7 @@
 
 import { writeFile } from 'fs/promises';
 import fetch from 'node-fetch';
-import * as path from 'path';
+import { join } from 'path';
 
 interface BatSpecies {
   /** Nom français de l'espèce */
@@ -60,7 +60,7 @@ export class SpeciesDataGenerator {
       };
 
       // Sauvegarder le fichier JSON
-      const outputPath = path.join(
+      const outputPath = join(
         process.cwd(),
         'output',
         'generated-species-data.json'

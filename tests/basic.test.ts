@@ -1,4 +1,4 @@
-import * as nock from 'nock';
+import nock from 'nock';
 
 describe('Configuration et Sécurité des Tests', () => {
   afterEach(() => {

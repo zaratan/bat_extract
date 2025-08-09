@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 /**
  * Script d'extraction des données de distribution multi-espèces
@@ -6,7 +6,7 @@
  * et génère des fichiers JSON de résultats dans /output
  */
 
-import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor';
+import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor.js';
 
 async function main(): Promise<void> {
   try {

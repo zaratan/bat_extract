@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { readFile, access } from 'fs/promises';
 import { readdirSync, statSync } from 'fs';
-import * as path from 'path';
+import { join } from 'path';
 
 interface StepResult {
   name: string;
@@ -31,8 +31,8 @@ export class BatExtractWorkflow {
   private readonly imagesDir: string;
 
   constructor() {
-    this.outputDir = path.join(process.cwd(), 'output');
-    this.imagesDir = path.join(process.cwd(), 'images');
+    this.outputDir = join(process.cwd(), 'output');
+    this.imagesDir = join(process.cwd(), 'images');
     this.report = {
       startTime: new Date(),
       steps: [],
@@ -181,7 +181,7 @@ export class BatExtractWorkflow {
     details: string[];
   }> {
     try {
-      const filePath = path.join(
+      const filePath = join(
         process.cwd(),
         'output',
         'generated-species-data.json'
@@ -231,7 +231,7 @@ export class BatExtractWorkflow {
     details: string[];
   }> {
     try {
-      const filePath = path.join(
+      const filePath = join(
         process.cwd(),
         'output',
         'discovered-image-urls.json'
@@ -329,7 +329,7 @@ export class BatExtractWorkflow {
 
       if (consolidatedExists) {
         try {
-          const consolidatedPath = path.join(
+          const consolidatedPath = join(
             this.outputDir,
             'consolidated-species-report.json'
           );
@@ -380,10 +380,7 @@ export class BatExtractWorkflow {
     details: string[];
   }> {
     try {
-      const excelPath = path.join(
-        this.outputDir,
-        'bat-distribution-matrix.xlsx'
-      );
+      const excelPath = join(this.outputDir, 'bat-distribution-matrix.xlsx');
       await access(excelPath);
 
       const stats = statSync(excelPath);
@@ -411,7 +408,7 @@ export class BatExtractWorkflow {
     try {
       const files = readdirSync(dirPath);
       files.forEach((file: string) => {
-        const filePath = path.join(dirPath, file);
+        const filePath = join(dirPath, file);
         const stats = statSync(filePath);
         if (stats.isFile()) {
           totalSize += stats.size;
@@ -544,7 +541,7 @@ export class BatExtractWorkflow {
     if (this.report.overallStatus === 'success') {
       console.log('🎉 Toutes les étapes ont été exécutées avec succès!');
       console.log(
-        `📊 Vous pouvez maintenant ouvrir: ${path.join(this.outputDir, 'bat-distribution-matrix.xlsx')}`
+        `📊 Vous pouvez maintenant ouvrir: ${join(this.outputDir, 'bat-distribution-matrix.xlsx')}`
       );
     }
   }

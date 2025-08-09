@@ -1,7 +1,7 @@
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 import { writeFile } from 'fs/promises';
-import * as path from 'path';
-import { ColorLegendUtils } from '../data/color-legend-mapping';
+import { join } from 'path';
+import { ColorLegendUtils } from '../data/color-legend-mapping.js';
 
 interface FrenchDepartment {
   code: string;
@@ -592,7 +592,7 @@ export class SmartDepartmentExtractor {
   constructor(imagePath?: string, speciesName?: string) {
     this.imagePath =
       imagePath ||
-      path.join(
+      join(
         process.cwd(),
         'images',
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png'
@@ -803,7 +803,7 @@ export class SmartDepartmentExtractor {
       },
     };
 
-    const outputFilename = path.join(
+    const outputFilename = join(
       process.cwd(),
       'output',
       `${this.speciesName
@@ -843,22 +843,4 @@ export class SmartDepartmentExtractor {
   async cleanup(): Promise<void> {
     // Nettoyage si nécessaire
   }
-}
-
-// Script principal
-async function main(): Promise<void> {
-  const extractor = new SmartDepartmentExtractor();
-
-  try {
-    await extractor.extractDepartmentDistribution();
-  } catch (error) {
-    console.error("❌ Erreur lors de l'extraction:", error);
-  } finally {
-    await extractor.cleanup();
-    console.log('🧹 Nettoyage terminé');
-  }
-}
-
-if (require.main === module) {
-  main();
 }

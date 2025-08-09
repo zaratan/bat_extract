@@ -1,11 +1,11 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env tsx
 
 /**
  * Script de génération automatique des données d'espèces de chauves-souris
  * Scrape le site https://plan-actions-chiropteres.fr pour extraire toutes les espèces
  */
 
-import { SpeciesDataGenerator } from '../src/generateSpeciesData';
+import { SpeciesDataGenerator } from '../src/generateSpeciesData.js';
 
 async function main(): Promise<void> {
   const generator = new SpeciesDataGenerator();

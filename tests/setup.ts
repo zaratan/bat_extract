@@ -1,4 +1,4 @@
-import * as nock from 'nock';
+import nock from 'nock';
 
 // Désactiver toutes les connexions HTTP réelles
 nock.disableNetConnect();
@@ -10,7 +10,7 @@ beforeAll(() => {
   // Gardons console.error pour les vraies erreurs
   
   // Si on veut voir les logs pendant le développement des tests
-  if (process.env.DEBUG_TESTS) {
+  if (process.env['DEBUG_TESTS']) {
     console.log = originalLog;
   }
 });

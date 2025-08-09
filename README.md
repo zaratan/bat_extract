@@ -8,8 +8,8 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
   - [Table des matières](#table-des-matières)
   - [Fonctionnalités](#fonctionnalités)
   - [Installation](#installation)
-    - [� Prérequis système](#-prérequis-système)
-    - [�🚀 Installation pour débutants (Mac)](#-installation-pour-débutants-mac)
+    - [🔧 Prérequis système](#-prérequis-système)
+    - [🚀 Installation pour débutants (Mac)](#-installation-pour-débutants-mac)
       - [1. Installer Homebrew (gestionnaire de paquets pour Mac)](#1-installer-homebrew-gestionnaire-de-paquets-pour-mac)
       - [2. Installer Node.js (environnement d'exécution JavaScript)](#2-installer-nodejs-environnement-dexécution-javascript)
       - [3. Installer pnpm (gestionnaire de paquets moderne)](#3-installer-pnpm-gestionnaire-de-paquets-moderne)
@@ -125,7 +125,7 @@ pnpm type-check
 - **Espace disque** : Au moins 500 MB libres
 - **Connexion Internet** : Nécessaire pour télécharger les dépendances et les cartes
 
-### �🚀 Installation pour débutants (Mac)
+### 🚀 Installation pour débutants (Mac)
 
 Si vous avez un Mac tout neuf et que vous n'avez jamais fait de développement, suivez ces étapes détaillées :
 

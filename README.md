@@ -600,7 +600,7 @@ Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus
 ## Technologies
 
 - **TypeScript** avec configuration stricte et typage explicite
-- **CommonJS** pour la compatibilité et stabilité (migration depuis ESM)
+- **ESM (ECMAScript Modules)** pour une architecture moderne et standardisée
 - **Node.js** 22 (spécifiée dans `.nvmrc`) avec fetch natif pour les téléchargements
 - **Sharp** pour l'analyse d'images et le traitement de couleurs
 - **ExcelJS** pour la génération de rapports Excel avec formatage couleur
@@ -608,8 +608,36 @@ Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus
 - **ESLint** et **Prettier** pour la qualité du code
 - **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages rapide
-- **ts-node** pour l'exécution directe des scripts TypeScript
+- **tsx** pour l'exécution directe des scripts TypeScript ESM
 - **Coordonnées pré-mappées** des 101 départements français
+
+### 🔄 Architecture ESM (ECMAScript Modules)
+
+Le projet utilise **ESM (ECMAScript Modules)** pour une architecture moderne et standardisée :
+
+**Avantages ESM :**
+
+- ✅ **Standard moderne** : Syntaxe `import/export` native JavaScript/TypeScript
+- ✅ **Tree-shaking** : Optimisation automatique du bundling
+- ✅ **Interopérabilité** : Compatibilité avec les outils modernes
+- ✅ **Performance** : Chargement asynchrone et mise en cache des modules
+- ✅ **Sécurité** : Imports explicites et résolution de modules stricte
+
+**Configuration :**
+
+- `package.json` : `"type": "module"` pour ESM natif
+- `tsconfig.json` : Configuration TypeScript optimisée pour ESM
+- `tsx` : Remplacement de `ts-node` pour l'exécution ESM
+- Extensions `.js` : Imports relatifs avec extensions explicites
+- Jest : Preset ESM pour les tests (`ts-jest/presets/default-esm`)
+
+**Migration depuis CommonJS :**
+
+- Tous les `require()` → `import`
+- Tous les `module.exports` → `export`
+- Extensions `.js` ajoutées aux imports relatifs
+- Scripts mis à jour pour utiliser `tsx` au lieu de `ts-node`
+- Tests configurés pour ESM avec support TypeScript
 
 ## Résultats
 

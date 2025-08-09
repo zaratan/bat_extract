@@ -6,7 +6,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 
 ## Technologies utilisées
 
-- **TypeScript** avec configuration stricte et **module CommonJS** pour la stabilité
+- **TypeScript** avec configuration stricte et **ESM (ECMAScript Modules)** pour la modernité
 - **Sharp** pour le traitement et l'analyse d'images
 - **ExcelJS** pour la génération de rapports Excel
 - **node-fetch** pour le scraping web (avec fallback sur fetch natif Node.js 22)
@@ -14,7 +14,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 - **ESLint** et **Prettier** pour la qualité du code
 - **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages
-- **ts-node** pour l'exécution directe des scripts TypeScript
+- **tsx** pour l'exécution directe des scripts TypeScript ESM
 - **Node.js 22** spécifiée dans `.nvmrc` pour la cohérence d'équipe
 
 ## Architecture du projet (2025)
@@ -25,7 +25,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 - **`scripts/`** : Points d'entrée CLI - Scripts d'interface en ligne de commande
 - **Imports** : Les scripts dans `scripts/` importent les classes de `src/`
 - **Tests** : Testent uniquement le code de `src/`, pas les CLI
-- **Module système** : CommonJS (`require/module.exports`) pour la compatibilité
+- **Module système** : ESM (`import/export`) pour la compatibilité moderne
 
 ## Architecture du projet (2025)
 
@@ -74,7 +74,7 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
   - JSON/Markdown : `prettier --write`
 - **Scripts de vérification** : `pnpm lint`, `pnpm lint:fix`, `pnpm type-check`
 - **Tests sécurisés** : Jest + nock, aucun appel HTTP réel possible
-- **CommonJS stable** : Migration depuis ESM pour la compatibilité
+- **ESM moderne** : Migration vers ESM pour la compatibilité et performance
 
 ## Structure des classes principales
 
@@ -136,6 +136,8 @@ Ce projet est un extracteur automatisé de données de cartes de distribution ut
 2. **Pas de données statiques** : Ne plus maintenir de listes d'espèces en dur, tout est dynamique
 3. **Outputs dans output/** : Tous les fichiers générés vont dans `output/`, jamais dans `data/`
 4. **Architecture src/scripts** : Code métier dans `src/`, CLI dans `scripts/`
-5. **CommonJS strict** : Utiliser `require/module.exports`, pas d'extensions `.js`
+5. **ESM strict** : Utiliser `import/export`, extensions `.js` dans les imports relatifs
 6. **Tests sûrs** : Toujours mocker les appels HTTP avec nock
 7. **Validation du workflow** : Toujours tester `pnpm workflow` après des modifications importantes
+8. **tsx pour scripts** : Utiliser `tsx` au lieu de `ts-node` pour l'exécution TypeScript ESM
+9. **Imports ESM** : Syntaxe `import` native, pas de `require()` ou `module.exports`

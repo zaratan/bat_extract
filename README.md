@@ -118,9 +118,10 @@ pnpm type-check
 
 ## Installation
 
-### � Prérequis système
+### 🔧 Prérequis système
 
 - **macOS** : 10.15 (Catalina) ou plus récent
+- **Node.js** : Version 22 recommandée (spécifiée dans `.nvmrc`)
 - **Espace disque** : Au moins 500 MB libres
 - **Connexion Internet** : Nécessaire pour télécharger les dépendances et les cartes
 
@@ -235,6 +236,23 @@ Si vous avez déjà Node.js et pnpm installés :
 ```bash
 pnpm install
 ```
+
+#### 🎯 Avec nvm (Node Version Manager)
+
+Si vous utilisez nvm pour gérer vos versions de Node.js :
+
+```bash
+# Utilisez la version Node.js spécifiée dans .nvmrc
+nvm use
+
+# Ou installez et utilisez automatiquement
+nvm install && nvm use
+
+# Puis installez les dépendances
+pnpm install
+```
+
+**Note :** Le projet spécifie Node.js 22 dans le fichier `.nvmrc` pour garantir la cohérence entre tous les développeurs.
 
 ### 🔧 Dépannage
 
@@ -532,9 +550,10 @@ Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus
 ## Technologies
 
 - **TypeScript** avec configuration stricte et typage explicite
+- **Node.js** 22 (spécifiée dans `.nvmrc`) avec fetch natif pour les téléchargements
 - **Sharp** pour l'analyse d'images et le traitement de couleurs
-- **Node.js** ≥18 avec fetch natif pour les téléchargements
 - **ESLint** et **Prettier** pour la qualité du code
+- **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages rapide
 - **Coordonnées pré-mappées** des 101 départements français
 

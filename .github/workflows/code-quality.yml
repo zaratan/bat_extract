@@ -2,9 +2,9 @@ name: Code Quality
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   lint:
@@ -13,28 +13,28 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22]
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-          
+
       - name: 🚀 Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          
+
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: 🔍 Run ESLint
         run: pnpm lint
-        
+
       - name: ✨ Check code formatting
         run: pnpm lint:fix --dry-run
 
@@ -44,24 +44,24 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22]
-    
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
-        
+
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
-          
+
       - name: 🚀 Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          
+
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: 🔧 TypeScript type check
         run: pnpm type-check

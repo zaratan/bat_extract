@@ -2,15 +2,15 @@
 
 # Instructions Copilot pour BatExtract
 
-Ce projet est un extracteur OCR d'images utilisant TypeScript. Voici les conventions et pratiques à suivre :
+Ce projet est un extracteur de données de cartes de distribution utilisant l'analyse de couleurs avec TypeScript. Voici les conventions et pratiques à suivre :
 
 ## Technologies utilisées
 
 - **TypeScript** avec configuration stricte
-- **Tesseract.js** pour l'OCR
-- **Sharp** pour le traitement d'images
+- **Sharp** pour le traitement et l'analyse d'images
 - **ESLint** et **Prettier** pour la qualité du code
 - **pnpm** comme gestionnaire de packages
+- **ts-node** pour l'exécution directe
 
 ## Conventions de code
 
@@ -22,25 +22,38 @@ Ce projet est un extracteur OCR d'images utilisant TypeScript. Voici les convent
 
 ## Structure des classes
 
-- `BatExtractor` : Classe principale qui orchestre l'extraction
-- `ImageProcessor` : Traitement et préprocessing des images
-- `OCREngine` : Interface avec Tesseract.js
+- `MultiSpeciesExtractor` : Classe principale qui orchestre l'extraction multi-espèces
+- `SmartDepartmentExtractor` : Extraction intelligente par analyse de couleurs et coordonnées
 - `types.ts` : Définitions des interfaces TypeScript
+
+## Approche technique
+
+- **Analyse de couleurs** : Échantillonnage de pixels aux coordonnées des départements français
+- **Coordonnées pré-mappées** : Positions relatives précises de chaque département sur les cartes
+- **Classification automatique** : Mapping couleur → statut de distribution (commune, rare, etc.)
+- **Traitement par lots** : Extraction automatique de toutes les images du dossier `/images`
 
 ## Gestion des erreurs
 
 - Toujours wrapper les erreurs avec des messages explicites
 - Utiliser `console.error` pour les erreurs et `console.log` pour les informations
 - Permettre la continuation du traitement même en cas d'erreur sur une image
+- Rapporter les départements sans couleur détectée
 
 ## Performance
 
-- Initialiser le worker Tesseract une seule fois
-- Nettoyer les ressources (worker, fichiers temporaires)
-- Permettre le traitement par lots d'images
+- Traitement direct avec Sharp (pas de fichiers temporaires)
+- Analyse ciblée par zone (rayon de 30px autour des coordonnées)
+- Génération de rapports consolidés pour analyse comparative
 
-## Tests et validation
+## Scripts disponibles
 
-- Valider les fichiers d'entrée avant traitement
-- Vérifier les extensions de fichiers supportées
-- Retourner des résultats cohérents même en cas d'échec partiel
+- `pnpm extract` : Lance l'extraction multi-espèces
+- `pnpm lint` : Vérification de la qualité du code
+- `pnpm lint:fix` : Correction automatique des erreurs de style
+
+## Structure des données
+
+- **Entrée** : Images PNG de cartes de distribution dans `/images`
+- **Sortie** : Fichiers JSON dans `/output` (ignoré par git)
+- **Formats** : Extraction détaillée par espèce + rapport consolidé multi-espèces

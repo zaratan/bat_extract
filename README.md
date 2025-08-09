@@ -1,14 +1,14 @@
 # BatExtract
 
-Un extracteur OCR d'images pour analyser la distribution des espèces de chauves-souris sur des cartes géographiques françaises.
+Un extracteur de données de cartes de distribution utilisant l'analyse de couleurs pour analyser la distribution des espèces de chauves-souris sur des cartes géographiques françaises.
 
 ## Fonctionnalités
 
 - Extraction automatique de données de distribution depuis des cartes d'espèces
-- Identification des départements et de leur statut de distribution
+- Identification des départements et de leur statut de distribution par analyse de couleurs
 - Traitement par lots de plusieurs espèces
 - Génération de rapports consolidés
-- Utilisation de Tesseract.js pour l'OCR et Sharp pour le traitement d'images
+- Utilisation de Sharp pour l'analyse d'images et de coordonnées pré-mappées
 
 ## Installation
 
@@ -18,7 +18,7 @@ pnpm install
 
 ## Utilisation
 
-### Extraction rapide
+### Extraction
 
 ```bash
 pnpm extract
@@ -31,25 +31,24 @@ Cette commande :
 3. Génère un rapport par espèce dans `/output`
 4. Crée un rapport consolidé
 
-### Développement
+### Vérification du code
 
 ```bash
-pnpm dev
+pnpm lint          # Vérification
+pnpm lint:fix      # Correction automatique
 ```
 
 ## Structure du projet
 
-```
+```text
 src/
-  ├── index.ts              # Point d'entrée principal
-  ├── multiSpeciesExtractor.ts  # Extracteur multi-espèces
-  ├── smartExtractor.ts     # Logique d'extraction principale
-  ├── imageProcessor.ts     # Traitement d'images
-  ├── ocrEngine.ts         # Interface OCR
-  └── types.ts             # Définitions TypeScript
+  ├── index.ts                    # Point d'entrée principal
+  ├── multiSpeciesExtractor.ts    # Extracteur multi-espèces
+  ├── smartExtractor.ts           # Logique d'extraction par analyse de couleurs
+  └── types.ts                    # Définitions TypeScript
 
-images/                    # Images à analyser
-output/                    # Rapports générés (ignoré par git)
+images/                           # Images à analyser
+output/                           # Rapports générés (ignoré par git)
 ```
 
 ## Format des images
@@ -68,10 +67,19 @@ Chaque extraction génère :
 
 Les résultats sont automatiquement sauvegardés dans le dossier `/output` qui est ignoré par git pour éviter de committer les données extraites.
 
+## Approche technique
+
+Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR :
+
+1. **Coordonnées pré-mappées** : Chaque département français a des coordonnées précises sur les cartes
+2. **Échantillonnage de couleurs** : Analyse des pixels dans un rayon de 30px autour de chaque département
+3. **Classification automatique** : Mapping des couleurs vers les statuts de distribution (commune, rare, etc.)
+4. **Traitement par lots** : Extraction automatique de toutes les cartes du dossier `/images`
+
 ## Technologies
 
 - TypeScript avec configuration stricte
-- Tesseract.js pour l'OCR
-- Sharp pour le traitement d'images
+- Sharp pour l'analyse d'images et de couleurs
+- Coordonnées pré-mappées des départements français
 - ESLint et Prettier pour la qualité du code
 - pnpm comme gestionnaire de packages

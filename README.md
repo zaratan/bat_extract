@@ -8,11 +8,32 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
   - [Table des matières](#table-des-matières)
   - [Fonctionnalités](#fonctionnalités)
   - [Installation](#installation)
+    - [� Prérequis système](#-prérequis-système)
+    - [�🚀 Installation pour débutants (Mac)](#-installation-pour-débutants-mac)
+      - [1. Installer Homebrew (gestionnaire de paquets pour Mac)](#1-installer-homebrew-gestionnaire-de-paquets-pour-mac)
+      - [2. Installer Node.js (environnement d'exécution JavaScript)](#2-installer-nodejs-environnement-dexécution-javascript)
+      - [3. Installer pnpm (gestionnaire de paquets moderne)](#3-installer-pnpm-gestionnaire-de-paquets-moderne)
+      - [4. Installer Git (système de contrôle de version)](#4-installer-git-système-de-contrôle-de-version)
+      - [5. Télécharger le projet](#5-télécharger-le-projet)
+      - [6. Installer les dépendances du projet](#6-installer-les-dépendances-du-projet)
+      - [7. Vérification de l'installation](#7-vérification-de-linstallation)
+      - [8. Premier lancement](#8-premier-lancement)
+    - [⚡ Installation rapide (pour développeurs)](#-installation-rapide-pour-développeurs)
+    - [🔧 Dépannage](#-dépannage)
+      - ["command not found: brew"](#command-not-found-brew)
+      - ["command not found: pnpm"](#command-not-found-pnpm)
+      - [Permissions refusées](#permissions-refusées)
+      - ["git clone" échoue](#git-clone-échoue)
   - [Utilisation](#utilisation)
     - [Commandes principales](#commandes-principales)
   - [Workflow complet automatisé](#workflow-complet-automatisé)
     - [Commande unifiée (recommandée)](#commande-unifiée-recommandée)
     - [Étapes individuelles](#étapes-individuelles)
+      - [1. Génération des données d'espèces](#1-génération-des-données-despèces)
+      - [2. Découverte des URLs réelles](#2-découverte-des-urls-réelles)
+      - [3. Téléchargement des cartes](#3-téléchargement-des-cartes)
+      - [4. Extraction des données](#4-extraction-des-données)
+      - [5. Génération du rapport Excel](#5-génération-du-rapport-excel)
   - [Structure du projet](#structure-du-projet)
   - [Légende des couleurs](#légende-des-couleurs)
     - [Correspondance officielle](#correspondance-officielle)
@@ -42,9 +63,141 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
 
 ## Installation
 
+### � Prérequis système
+
+- **macOS** : 10.15 (Catalina) ou plus récent
+- **Espace disque** : Au moins 500 MB libres
+- **Connexion Internet** : Nécessaire pour télécharger les dépendances et les cartes
+
+### �🚀 Installation pour débutants (Mac)
+
+Si vous avez un Mac tout neuf et que vous n'avez jamais fait de développement, suivez ces étapes détaillées :
+
+#### 1. Installer Homebrew (gestionnaire de paquets pour Mac)
+
+Homebrew permet d'installer facilement des outils de développement sur Mac.
+
+```bash
+# Ouvrez le Terminal (Applications > Utilitaires > Terminal) et copiez-collez cette commande :
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+**Explication :** Cette commande télécharge et installe Homebrew. Vous devrez peut-être entrer votre mot de passe administrateur.
+
+#### 2. Installer Node.js (environnement d'exécution JavaScript)
+
+Node.js est nécessaire pour faire fonctionner le projet.
+
+```bash
+# Installez Node.js avec Homebrew :
+brew install node
+```
+
+**Vérification :** Tapez `node --version` dans le Terminal. Vous devriez voir un numéro de version comme `v20.x.x`.
+
+#### 3. Installer pnpm (gestionnaire de paquets moderne)
+
+pnpm est plus rapide et efficace que npm pour gérer les dépendances.
+
+```bash
+# Installez pnpm globalement :
+npm install -g pnpm
+```
+
+**Vérification :** Tapez `pnpm --version` dans le Terminal. Vous devriez voir un numéro de version.
+
+#### 4. Installer Git (système de contrôle de version)
+
+Git permet de télécharger le code du projet depuis GitHub.
+
+```bash
+# Installez Git avec Homebrew :
+brew install git
+```
+
+**Vérification :** Tapez `git --version` dans le Terminal. Vous devriez voir un numéro de version.
+
+#### 5. Télécharger le projet
+
+```bash
+# Clonez le projet dans votre dossier utilisateur :
+cd ~
+git clone https://github.com/zaratan/bat_extract.git
+cd bat_extract
+```
+
+**Explication :** Cette commande télécharge le code source du projet dans un dossier nommé `bat_extract` dans votre dossier utilisateur.
+
+#### 6. Installer les dépendances du projet
+
+```bash
+# Dans le dossier du projet, installez toutes les dépendances :
+pnpm install
+```
+
+**Explication :** Cette commande lit le fichier `package.json` et installe automatiquement toutes les bibliothèques nécessaires.
+
+#### 7. Vérification de l'installation
+
+```bash
+# Testez que tout fonctionne :
+pnpm lint
+```
+
+**Résultat attendu :** Si tout est correctement installé, cette commande devrait s'exécuter sans erreur.
+
+#### 8. Premier lancement
+
+Une fois l'installation terminée, vous pouvez lancer le workflow complet :
+
+```bash
+# Exécutez le workflow automatisé :
+pnpm workflow
+```
+
+**Ce qui va se passer :**
+
+1. 🧬 Le programme va scraper le site web pour récupérer la liste des espèces
+2. 🔍 Il va découvrir les URLs des cartes de distribution
+3. 📥 Il va télécharger toutes les cartes (peut prendre quelques minutes)
+4. 🎨 Il va analyser les cartes pour extraire les données de distribution
+5. 📊 Il va générer un fichier Excel avec tous les résultats
+
+**Durée estimée :** 5-10 minutes pour le workflow complet.
+
+**Où trouver les résultats :**
+
+- 📊 **Fichier Excel principal** : `output/bat-distribution-matrix.xlsx`
+- 📁 **Données JSON détaillées** : Dossier `output/`
+- 🖼️ **Cartes téléchargées** : Dossier `images/`
+
+**Pour ouvrir le fichier Excel :** Double-cliquez sur `bat-distribution-matrix.xlsx` dans le dossier `output/`.
+
+### ⚡ Installation rapide (pour développeurs)
+
+Si vous avez déjà Node.js et pnpm installés :
+
 ```bash
 pnpm install
 ```
+
+### 🔧 Dépannage
+
+#### "command not found: brew"
+
+- Solution : Redémarrez votre Terminal après l'installation de Homebrew
+
+#### "command not found: pnpm"
+
+- Solution : Utilisez `npm install -g pnpm` ou redémarrez votre Terminal
+
+#### Permissions refusées
+
+- Solution : Assurez-vous d'avoir les droits administrateur sur votre Mac
+
+#### "git clone" échoue
+
+- Solution : Vérifiez l'URL du repository GitHub ou utilisez SSH au lieu de HTTPS
 
 ## Utilisation
 

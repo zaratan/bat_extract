@@ -52,7 +52,6 @@ processed_images/
 output/
 results/
 extractions/
-*.json
 *extract.json
 *-extraction.json
 *-distribution.json
@@ -60,6 +59,6 @@ extractions/
 !tsconfig.json
 !eslint.config.js
 
-# Test images (keep README.md but ignore actual images)
+# Images (keep README.md but ignore actual images)
 images/*
 !images/README.md

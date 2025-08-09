@@ -1,6 +1,7 @@
 import * as sharp from 'sharp';
 import { writeFile } from 'fs/promises';
 import * as path from 'path';
+import { ColorLegendUtils } from '../data/color-legend-mapping';
 
 interface FrenchDepartment {
   code: string;
@@ -767,47 +768,8 @@ export class SmartDepartmentExtractor {
   }): string {
     const { r, g, b } = color;
 
-    // Correspondance avec la légende officielle du Plan National d'Actions Chiroptères
-    
-    // Rouge (#ea5257): Espèce actuellement très rarement inventoriée ou exceptionnellement observée
-    if (r >= 230 && r <= 240 && g >= 80 && g <= 90 && b >= 85 && b <= 95) {
-      return 'très rarement inventoriée';
-    }
-
-    // Orange (#f7a923): Espèce actuellement rare ou assez rare
-    if (r >= 245 && r <= 250 && g >= 165 && g <= 175 && b >= 30 && b <= 40) {
-      return 'rare ou assez rare';
-    }
-
-    // Vert clair (#dbe7b0): Espèce peu commune ou localement commune
-    if (r >= 215 && r <= 225 && g >= 225 && g <= 235 && b >= 170 && b <= 180) {
-      return 'peu commune ou localement commune';
-    }
-
-    // Vert foncé (#95cb9b): Espèce assez commune à très commune
-    if (r >= 145 && r <= 155 && g >= 200 && g <= 210 && b >= 150 && b <= 160) {
-      return 'assez commune à très commune';
-    }
-
-    // Jaune (#ffef23): Espèce présente mais mal connue
-    if (r >= 250 && r <= 255 && g >= 235 && g <= 245 && b >= 30 && b <= 40) {
-      return 'présente mais mal connue';
-    }
-
-    // Gris (#b0b1b3): Espèce disparue ou non retrouvée sur la zone
-    if (r >= 170 && r <= 180 && g >= 175 && g <= 185 && b >= 175 && b <= 185) {
-      return 'disparue ou non retrouvée';
-    }
-
-    // Blanc/Écru (#fffdea, #fefefe): Espèce absente, n'ayant jamais été trouvée
-    if (
-      (r >= 250 && r <= 255 && g >= 250 && g <= 255 && b >= 225 && b <= 235) || // #fffdea
-      (r >= 250 && r <= 255 && g >= 250 && g <= 255 && b >= 250 && b <= 255) // #fefefe
-    ) {
-      return 'absente';
-    }
-
-    return 'statut à déterminer';
+    // Utilisation de la correspondance centralisée des couleurs
+    return ColorLegendUtils.getDistributionStatus(r, g, b);
   }
 
   private async saveDetailedResults(

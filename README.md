@@ -25,6 +25,7 @@ pnpm extract
 ```
 
 Cette commande :
+
 1. Analyse toutes les images dans le dossier `/images`
 2. Extrait le nom de l'espèce depuis le nom du fichier
 3. Génère un rapport par espèce dans `/output`
@@ -54,12 +55,14 @@ output/                    # Rapports générés (ignoré par git)
 ## Format des images
 
 Les images doivent être nommées avec le nom de l'espèce :
+
 - `espece-nom.png` → espèce extraite : "espece-nom"
 - `plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png` → espèce : "barbastelle-deurope"
 
 ## Résultats
 
 Chaque extraction génère :
+
 - Un fichier JSON par espèce avec les détails de distribution
 - Un rapport consolidé avec toutes les espèces analysées
 

@@ -62,7 +62,10 @@ pnpm download:priority
 # 4. Extraire les données de toutes les cartes
 pnpm extract
 
-# 5. Vérification du code
+# 5. Générer un rapport Excel avec matrice colorée
+pnpm excel
+
+# 6. Vérification du code
 pnpm lint          # Vérification
 pnpm lint:fix      # Correction automatique
 ```
@@ -122,7 +125,28 @@ Cette commande :
 3. 🎨 Analyse les couleurs pour déterminer le statut de distribution
 4. 🗺️ Mappe chaque département français avec son statut
 5. 💾 Génère un rapport JSON par espèce dans `/output`
-6. 📊 Crée un rapport consolidé multi-espèces
+
+### 4. Génération du rapport Excel
+
+```bash
+pnpm excel
+```
+
+Cette commande génère un fichier Excel (`output/bat-distribution-matrix.xlsx`) avec :
+
+**Page 1 - Matrice de distribution :**
+
+- ✅ **Lignes** : Espèces de chauves-souris (34 espèces)
+- ✅ **Colonnes** : Départements français (01-95)
+- ✅ **Cellules colorées** : Selon le statut de distribution
+- ✅ **Codes courts** : TR (très rare), R (rare), PC (peu commune), AC (assez commune), etc.
+- ✅ **Panneaux figés** : Navigation facile dans la grande matrice
+
+**Page 2 - Légende des couleurs :**
+
+- ✅ **Correspondance complète** : Couleur → Statut → Description officielle
+- ✅ **Codes RGB** : Valeurs hexadécimales des couleurs
+- ✅ **Documentation** : Référence au Plan National d'Actions Chiroptères
 
 ## Structure du projet
 
@@ -133,6 +157,7 @@ src/
   ├── smartExtractor.ts           # Logique d'extraction par analyse de couleurs
   ├── discoverImageUrls.ts        # Découverte des URLs réelles
   ├── downloadMaps.ts             # Téléchargement automatique
+  ├── generateExcelReport.ts      # Génération de rapports Excel
   └── types.ts                    # Définitions TypeScript
 
 data/
@@ -143,6 +168,9 @@ data/
 
 images/                           # Images téléchargées (ignoré par git)
 output/                           # Rapports générés (ignoré par git)
+  ├── *-distribution.json         # Données par espèce
+  ├── consolidated-species-report.json  # Rapport consolidé
+  └── bat-distribution-matrix.xlsx     # Matrice Excel colorée
 ```
 
 ## Légende des couleurs
@@ -186,6 +214,7 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 | **Téléchargement**             | `pnpm download`          | Télécharge toutes les cartes (36)        |
 | **Téléchargement prioritaire** | `pnpm download:priority` | Télécharge les espèces prioritaires (17) |
 | **Extraction**                 | `pnpm extract`           | Extrait les données de toutes les cartes |
+| **Rapport Excel**              | `pnpm excel`             | Génère une matrice Excel colorée         |
 | **Build**                      | `pnpm dev`               | Build et run du projet                   |
 | **Linting**                    | `pnpm lint`              | Vérification du code                     |
 | **Correction**                 | `pnpm lint:fix`          | Correction automatique                   |
@@ -264,6 +293,14 @@ Chaque extraction génère :
 - 🗺️ Répartition géographique
 - 📈 Comparaisons inter-espèces
 - 🎯 Métriques de qualité
+
+**Rapport Excel** (`output/bat-distribution-matrix.xlsx`) :
+
+- 📋 **Matrice espèces × départements** avec cellules colorées selon le statut
+- 🎨 **Codes couleur officiels** du Plan National d'Actions Chiroptères
+- 📖 **Légende complète** sur une page séparée
+- 🔒 **Panneaux figés** pour navigation facile dans la matrice
+- 💡 **Codes courts** : TR (très rare), R (rare), PC (peu commune), AC (assez commune), etc.
 
 ### Format des images
 

@@ -50,6 +50,10 @@ pnpm install
 ### Commandes principales
 
 ```bash
+# WORKFLOW COMPLET (recommandé)
+pnpm workflow      # Exécute automatiquement toutes les étapes avec rapport détaillé
+
+# OU étapes individuelles :
 # 1. Découvrir les vraies URLs d'images
 pnpm discover-urls
 
@@ -70,7 +74,31 @@ pnpm lint          # Vérification
 pnpm lint:fix      # Correction automatique
 ```
 
-## Workflow complet
+## Workflow complet automatisé
+
+### Commande unifiée (recommandée)
+
+```bash
+pnpm workflow
+```
+
+Cette commande exécute automatiquement toutes les étapes dans l'ordre avec un rapport détaillé :
+
+1. 🔍 **Découverte des URLs** → Extraction des vraies URLs d'images
+2. 📥 **Téléchargement** → Récupération de toutes les cartes
+3. 🎨 **Extraction** → Analyse des couleurs et génération des données
+4. 📊 **Rapport Excel** → Création de la matrice finale
+
+**Avantages :**
+
+- ✅ **Automatisation complète** : Plus besoin de lancer chaque étape manuellement
+- ✅ **Rapport détaillé** : Statistiques et métriques pour chaque étape
+- ✅ **Gestion d'erreurs** : Continue même si une étape échoue partiellement
+- ✅ **Temps d'exécution** : Affichage de la durée de chaque étape
+- ✅ **Validation** : Vérification automatique des résultats
+- ✅ **Résumé final** : Aperçu complet du succès/échec de chaque étape
+
+## Workflow étape par étape (manuel)
 
 ### 1. Découverte des URLs réelles
 
@@ -108,7 +136,7 @@ pnpm download:priority
 
 **Format des noms :**
 
-```
+```text
 plan-actions-chiropteres.fr-{slug}-carte-{slug}-2048x1271.png
 ```
 
@@ -306,7 +334,7 @@ Chaque extraction génère :
 
 Les images doivent suivre le pattern :
 
-```
+```text
 plan-actions-chiropteres.fr-{espece}-carte-{espece}-2048x1271.png
 ```
 

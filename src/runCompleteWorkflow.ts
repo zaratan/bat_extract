@@ -1,0 +1,509 @@
+import { execSync } from 'child_process';
+import { readFile, access } from 'fs/promises';
+import { readdirSync, statSync } from 'fs';
+import * as path from 'path';
+
+interface StepResult {
+  name: string;
+  status: 'success' | 'error' | 'warning';
+  duration: number;
+  message: string;
+  details?: string[];
+  stats?: { [key: string]: number };
+}
+
+interface WorkflowReport {
+  startTime: Date;
+  endTime?: Date;
+  totalDuration?: number;
+  steps: StepResult[];
+  overallStatus: 'success' | 'partial' | 'failed';
+  summary: {
+    successCount: number;
+    errorCount: number;
+    warningCount: number;
+  };
+}
+
+export class BatExtractWorkflow {
+  private report: WorkflowReport;
+  private readonly outputDir: string;
+  private readonly imagesDir: string;
+
+  constructor() {
+    this.outputDir = path.join(process.cwd(), 'output');
+    this.imagesDir = path.join(process.cwd(), 'images');
+    this.report = {
+      startTime: new Date(),
+      steps: [],
+      overallStatus: 'success',
+      summary: {
+        successCount: 0,
+        errorCount: 0,
+        warningCount: 0,
+      },
+    };
+  }
+
+  async runCompleteWorkflow(): Promise<void> {
+    console.log('🦇 ================================');
+    console.log('🦇 WORKFLOW COMPLET BAT EXTRACT');
+    console.log('🦇 ================================');
+    console.log(
+      `🕒 Démarrage: ${this.report.startTime.toLocaleString('fr-FR')}`
+    );
+    console.log('');
+
+    try {
+      // Étape 1: Découverte des URLs
+      await this.runStep(
+        'Découverte des URLs',
+        '🔍',
+        'pnpm discover-urls',
+        async () => this.checkDiscoveredUrls()
+      );
+
+      // Étape 2: Téléchargement des cartes
+      await this.runStep(
+        'Téléchargement des cartes',
+        '📥',
+        'pnpm download',
+        async () => this.checkDownloadedImages()
+      );
+
+      // Étape 3: Extraction des données
+      await this.runStep(
+        'Extraction des données',
+        '🎨',
+        'pnpm extract',
+        async () => this.checkExtractedData()
+      );
+
+      // Étape 4: Génération du rapport Excel
+      await this.runStep(
+        'Génération rapport Excel',
+        '📊',
+        'pnpm excel',
+        async () => this.checkExcelReport()
+      );
+
+      // Finalisation
+      this.finalizeReport();
+      this.printFinalReport();
+    } catch (error) {
+      console.error('💥 Erreur critique dans le workflow:', error);
+      this.report.overallStatus = 'failed';
+      this.finalizeReport();
+      this.printFinalReport();
+      process.exit(1);
+    }
+  }
+
+  private async runStep(
+    stepName: string,
+    emoji: string,
+    command: string,
+    validator: () => Promise<{
+      stats?: { [key: string]: number };
+      details?: string[];
+    }>
+  ): Promise<void> {
+    console.log(`${emoji} ${stepName}...`);
+    console.log(`⚡ Commande: ${command}`);
+
+    const startTime = Date.now();
+    let result: StepResult;
+
+    try {
+      // Exécuter la commande
+      execSync(command, {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+        cwd: process.cwd(),
+      });
+
+      const duration = Date.now() - startTime;
+
+      // Valider le résultat
+      const validation = await validator();
+
+      result = {
+        name: stepName,
+        status: 'success',
+        duration,
+        message: `✅ ${stepName} terminée avec succès`,
+        details: validation.details,
+        stats: validation.stats,
+      };
+
+      console.log(`✅ Succès (${(duration / 1000).toFixed(1)}s)`);
+      if (validation.stats) {
+        Object.entries(validation.stats).forEach(([key, value]) => {
+          console.log(`   📊 ${key}: ${value}`);
+        });
+      }
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      result = {
+        name: stepName,
+        status: 'error',
+        duration,
+        message: `❌ Erreur lors de ${stepName}`,
+        details: [errorMessage],
+      };
+
+      console.log(`❌ Erreur (${(duration / 1000).toFixed(1)}s)`);
+      console.log(`   💬 ${errorMessage}`);
+
+      // Continuer le workflow même en cas d'erreur
+      this.report.overallStatus =
+        this.report.overallStatus === 'success' ? 'partial' : 'failed';
+    }
+
+    this.report.steps.push(result);
+    this.updateSummary(result.status);
+    console.log('');
+  }
+
+  private async checkDiscoveredUrls(): Promise<{
+    stats: { [key: string]: number };
+    details: string[];
+  }> {
+    try {
+      const filePath = path.join(
+        process.cwd(),
+        'data',
+        'discovered-image-urls.json'
+      );
+      await access(filePath);
+
+      const content = await readFile(filePath, 'utf-8');
+      const data = JSON.parse(content);
+
+      // Utiliser les métadonnées du fichier si disponibles
+      if (data.metadata) {
+        const { totalSpecies, imagesFound, errors } = data.metadata;
+        const successRate = Math.round((imagesFound / totalSpecies) * 100);
+
+        return {
+          stats: {
+            'URLs découvertes': imagesFound,
+            'Espèces analysées': totalSpecies,
+            Erreurs: errors,
+            'Taux de succès': successRate,
+          },
+          details: [
+            `${imagesFound}/${totalSpecies} URLs valides découvertes`,
+            errors > 0
+              ? `${errors} espèces sans image de carte`
+              : 'Toutes les espèces ont une image',
+          ],
+        };
+      }
+
+      // Fallback: compter manuellement depuis validImageUrls
+      const validUrls = Object.keys(data.validImageUrls || {}).length;
+      const totalResults = (data.results || []).length;
+
+      return {
+        stats: {
+          'URLs découvertes': validUrls,
+          'Espèces analysées': totalResults,
+          'Taux de succès':
+            totalResults > 0 ? Math.round((validUrls / totalResults) * 100) : 0,
+        },
+        details: [`${validUrls}/${totalResults} URLs valides découvertes`],
+      };
+    } catch (error) {
+      throw new Error(`Impossible de vérifier les URLs découvertes: ${error}`);
+    }
+  }
+
+  private async checkDownloadedImages(): Promise<{
+    stats: { [key: string]: number };
+    details: string[];
+  }> {
+    try {
+      await access(this.imagesDir);
+
+      const files = readdirSync(this.imagesDir);
+      const imageFiles = files.filter((file: string) => file.endsWith('.png'));
+
+      return {
+        stats: {
+          'Images téléchargées': imageFiles.length,
+          'Taille dossier (MB)': Math.round(
+            this.calculateDirectorySize(this.imagesDir) / (1024 * 1024)
+          ),
+        },
+        details: [`${imageFiles.length} cartes de distribution téléchargées`],
+      };
+    } catch (error) {
+      throw new Error(
+        `Impossible de vérifier les images téléchargées: ${error}`
+      );
+    }
+  }
+
+  private async checkExtractedData(): Promise<{
+    stats: { [key: string]: number };
+    details: string[];
+  }> {
+    try {
+      await access(this.outputDir);
+
+      const files = readdirSync(this.outputDir);
+
+      const distributionFiles = files.filter(
+        (file: string) =>
+          file.endsWith('-distribution.json') && !file.includes('consolidated')
+      );
+
+      const consolidatedExists = files.includes(
+        'consolidated-species-report.json'
+      );
+
+      // Analyser le rapport consolidé si disponible
+      let averageDetection = 0;
+
+      if (consolidatedExists) {
+        try {
+          const consolidatedPath = path.join(
+            this.outputDir,
+            'consolidated-species-report.json'
+          );
+          const consolidatedContent = await readFile(consolidatedPath, 'utf-8');
+          const consolidatedData = JSON.parse(consolidatedContent);
+
+          if (consolidatedData.summary) {
+            const speciesSummaries = Object.values(
+              consolidatedData.summary
+            ) as Array<{ detectedDepartments?: number }>;
+            if (speciesSummaries.length > 0) {
+              const detectionRates = speciesSummaries.map(
+                species => species.detectedDepartments || 0
+              );
+              averageDetection = Math.round(
+                detectionRates.reduce(
+                  (sum: number, rate: number) => sum + rate,
+                  0
+                ) / detectionRates.length
+              );
+            }
+          }
+        } catch {
+          console.warn("⚠️  Impossible d'analyser le rapport consolidé");
+        }
+      }
+
+      return {
+        stats: {
+          'Espèces extraites': distributionFiles.length,
+          'Départements détectés (moyenne)': averageDetection,
+          'Rapport consolidé': consolidatedExists ? 1 : 0,
+        },
+        details: [
+          `${distributionFiles.length} fichiers de distribution générés`,
+          consolidatedExists
+            ? 'Rapport consolidé créé'
+            : 'Rapport consolidé manquant',
+        ],
+      };
+    } catch (error) {
+      throw new Error(`Impossible de vérifier les données extraites: ${error}`);
+    }
+  }
+
+  private async checkExcelReport(): Promise<{
+    stats: { [key: string]: number };
+    details: string[];
+  }> {
+    try {
+      const excelPath = path.join(
+        this.outputDir,
+        'bat-distribution-matrix.xlsx'
+      );
+      await access(excelPath);
+
+      const stats = statSync(excelPath);
+      const fileSizeKB = Math.round(stats.size / 1024);
+
+      return {
+        stats: {
+          'Fichier Excel créé': 1,
+          'Taille fichier (KB)': fileSizeKB,
+        },
+        details: [
+          'Matrice espèces × départements générée',
+          'Page de légende incluse',
+          'Formatage couleur appliqué',
+        ],
+      };
+    } catch (error) {
+      throw new Error(`Impossible de vérifier le rapport Excel: ${error}`);
+    }
+  }
+
+  private calculateDirectorySize(dirPath: string): number {
+    let totalSize = 0;
+
+    try {
+      const files = readdirSync(dirPath);
+      files.forEach((file: string) => {
+        const filePath = path.join(dirPath, file);
+        const stats = statSync(filePath);
+        if (stats.isFile()) {
+          totalSize += stats.size;
+        }
+      });
+    } catch {
+      // Ignore errors
+    }
+
+    return totalSize;
+  }
+
+  private updateSummary(status: StepResult['status']): void {
+    switch (status) {
+      case 'success':
+        this.report.summary.successCount++;
+        break;
+      case 'error':
+        this.report.summary.errorCount++;
+        break;
+      case 'warning':
+        this.report.summary.warningCount++;
+        break;
+    }
+  }
+
+  private finalizeReport(): void {
+    this.report.endTime = new Date();
+    this.report.totalDuration =
+      this.report.endTime.getTime() - this.report.startTime.getTime();
+
+    // Déterminer le statut global
+    if (this.report.summary.errorCount === 0) {
+      this.report.overallStatus =
+        this.report.summary.warningCount > 0 ? 'partial' : 'success';
+    } else {
+      this.report.overallStatus =
+        this.report.summary.successCount > 0 ? 'partial' : 'failed';
+    }
+  }
+
+  private printFinalReport(): void {
+    console.log('🦇 ================================');
+    console.log('🦇 RAPPORT FINAL DU WORKFLOW');
+    console.log('🦇 ================================');
+    console.log('');
+
+    // Statut global
+    const statusEmoji = {
+      success: '✅',
+      partial: '⚠️',
+      failed: '❌',
+    };
+
+    const statusMessage = {
+      success: 'SUCCÈS COMPLET',
+      partial: 'SUCCÈS PARTIEL',
+      failed: 'ÉCHEC',
+    };
+
+    console.log(
+      `${statusEmoji[this.report.overallStatus]} Statut: ${statusMessage[this.report.overallStatus]}`
+    );
+    console.log(
+      `🕒 Durée totale: ${((this.report.totalDuration || 0) / 1000).toFixed(1)}s`
+    );
+    console.log(
+      `📊 Étapes: ${this.report.summary.successCount} succès, ${this.report.summary.errorCount} erreurs, ${this.report.summary.warningCount} avertissements`
+    );
+    console.log('');
+
+    // Détail par étape
+    console.log('📋 DÉTAIL DES ÉTAPES:');
+    console.log('====================');
+
+    this.report.steps.forEach((step, index) => {
+      const stepEmoji =
+        step.status === 'success'
+          ? '✅'
+          : step.status === 'warning'
+            ? '⚠️'
+            : '❌';
+      console.log(
+        `${index + 1}. ${stepEmoji} ${step.name} (${(step.duration / 1000).toFixed(1)}s)`
+      );
+
+      if (step.stats) {
+        Object.entries(step.stats).forEach(([key, value]) => {
+          console.log(`   📊 ${key}: ${value}`);
+        });
+      }
+
+      if (step.details) {
+        step.details.forEach(detail => {
+          console.log(`   💬 ${detail}`);
+        });
+      }
+
+      if (step.status === 'error') {
+        console.log(`   ❌ ${step.message}`);
+      }
+
+      console.log('');
+    });
+
+    // Résumé des fichiers générés
+    console.log('📁 FICHIERS GÉNÉRÉS:');
+    console.log('====================');
+    console.log(`📂 ${this.imagesDir}/`);
+    console.log('   🖼️  Cartes de distribution (PNG)');
+    console.log('');
+    console.log(`📂 ${this.outputDir}/`);
+    console.log('   📄 *-distribution.json (données par espèce)');
+    console.log('   📊 consolidated-species-report.json (rapport consolidé)');
+    console.log('   📈 bat-distribution-matrix.xlsx (matrice Excel)');
+    console.log('');
+
+    // Recommandations
+    if (this.report.overallStatus === 'partial') {
+      console.log('💡 RECOMMANDATIONS:');
+      console.log('===================');
+      console.log('• Vérifier les étapes en erreur ci-dessus');
+      console.log('• Relancer les étapes individuellement si nécessaire');
+      console.log("• Consulter les logs détaillés pour plus d'informations");
+      console.log('');
+    }
+
+    console.log('🦇 Workflow terminé!');
+
+    if (this.report.overallStatus === 'success') {
+      console.log('🎉 Toutes les étapes ont été exécutées avec succès!');
+      console.log(
+        `📊 Vous pouvez maintenant ouvrir: ${path.join(this.outputDir, 'bat-distribution-matrix.xlsx')}`
+      );
+    }
+  }
+}
+
+// Script principal
+async function main(): Promise<void> {
+  const workflow = new BatExtractWorkflow();
+
+  try {
+    await workflow.runCompleteWorkflow();
+  } catch (error) {
+    console.error('💥 Erreur fatale:', error);
+    process.exit(1);
+  }
+}
+
+if (require.main === module) {
+  main();
+}

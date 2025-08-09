@@ -8,6 +8,7 @@
     "download:priority": "ts-node src/downloadMaps.ts --priority",
     "discover-urls": "ts-node src/discoverImageUrls.ts",
     "excel": "ts-node src/generateExcelReport.ts",
+    "workflow": "ts-node src/runCompleteWorkflow.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix"
   },

@@ -91,7 +91,7 @@ Le projet utilise une GitHub Action qui s'exécute automatiquement sur chaque pu
 - **✅ Linting** : Vérification ESLint complète
 - **✅ Formatage** : Contrôle du formatage Prettier
 - **✅ Types** : Vérification TypeScript
-- **✅ Multi-environnement** : Tests sur Ubuntu avec Node.js 20
+- **✅ Multi-environnement** : Tests sur Ubuntu avec Node.js 20 et 22
 
 **Avantages :**
 

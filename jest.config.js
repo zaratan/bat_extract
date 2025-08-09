@@ -9,10 +9,17 @@ export default {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: true,
+      tsconfig: {
+        module: 'ESNext',
+        target: 'ES2022',
+        moduleResolution: 'Node',
+        allowSyntheticDefaultImports: true,
+        esModuleInterop: true,
+      },
     }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill)/)'
+    'node_modules/(?!(node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill)/)',
   ],
   testMatch: [
     '**/tests/**/*.test.ts',
@@ -21,7 +28,6 @@ export default {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.test.ts',
-    '!src/**/types.ts',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],

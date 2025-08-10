@@ -29,7 +29,8 @@ describe('SpeciesDataGenerator', () => {
     // Sauvegarder et mocker fetch
     originalFetch = globalThis.fetch;
     globalThis.fetch = mockFetch;
-    mockFetch.mockClear();
+    // IMPORTANT: reset (impl + calls) pour vider la file des réponses entre tests
+    mockFetch.mockReset();
     
     // Mock setTimeout pour éviter les délais dans les tests
     originalSetTimeout = globalThis.setTimeout;

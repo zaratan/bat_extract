@@ -270,6 +270,27 @@ describe('SpeciesDataGenerator', () => {
       expect(enrichedSpecies).toHaveLength(1);
       expect(enrichedSpecies[0].latinName).toBeUndefined();
     });
+
+    it('should partially enrich with latin names (mix success, no name, http error)', async () => {
+      const mockSpecies = [
+        { name: 'Espèce A', slug: 'espece-a', pageUrl: 'https://plan-actions-chiropteres.fr/espece-a/', isPriority: false },
+        { name: 'Espèce B', slug: 'espece-b', pageUrl: 'https://plan-actions-chiropteres.fr/espece-b/', isPriority: false },
+        { name: 'Espèce C', slug: 'espece-c', pageUrl: 'https://plan-actions-chiropteres.fr/espece-c/', isPriority: false },
+      ];
+
+      // A: succès avec nom latin
+      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, text: () => Promise.resolve('<p><em>Genus species</em></p>') } as Response);
+      // B: page sans nom latin
+      mockFetch.mockResolvedValueOnce({ ok: true, status: 200, text: () => Promise.resolve('<p>Aucun nom latin ici</p>') } as Response);
+      // C: erreur HTTP
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Server Error' } as Response);
+
+      const enriched = await generator.enrichWithLatinNames(mockSpecies as any);
+      expect(enriched).toHaveLength(3);
+      expect(enriched[0].latinName).toBe('Genus species');
+      expect(enriched[1].latinName).toBeUndefined();
+      expect(enriched[2].latinName).toBeUndefined();
+    });
   });
 
   describe('metadata priority count', () => {

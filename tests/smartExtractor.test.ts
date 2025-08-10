@@ -124,5 +124,24 @@ describe('SmartDepartmentExtractor', () => {
       const results = await extractor.extractDepartmentDistribution();
       expect(results.every(r => r.distributionStatus === 'non détecté')).toBe(true);
     });
+
+    it('should set status to non détecté for an unmapped color present below threshold', async () => {
+      const width = 15; const height = 15;
+      // Couleur arbitraire non dans le mapping (#7b2d43) mais peu de pixels (<10)
+      const buffer = Buffer.alloc(width * height * 3, 0);
+      let painted = 0;
+      for (let y = 0; y < 3; y++) {
+        for (let x = 0; x < 3; x++) { // 9 pixels seulement
+          const idx = (y * width + x) * 3;
+          buffer[idx] = 123; buffer[idx+1] = 45; buffer[idx+2] = 67;
+          painted++;
+        }
+      }
+      const mockSharpInstance = { raw: jest.fn().mockReturnThis(), toBuffer: jest.fn().mockResolvedValue({ data: buffer, info: { width, height } }) };
+      (mockSharp as any).mockReturnValue(mockSharpInstance);
+      const results = await extractor.extractDepartmentDistribution();
+      // Aucun département ne devrait avoir cette couleur dominante (seuil >10)
+      expect(results.every(r => r.distributionStatus === 'non détecté')).toBe(true);
+    });
   });
 });

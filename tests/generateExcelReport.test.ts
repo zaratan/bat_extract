@@ -116,6 +116,11 @@ describe('ExcelReportGenerator', () => {
       mockReadFile.mockRejectedValue(new Error('File read error'));
       await expect(generator.generateReport()).rejects.toThrow("Aucune donnée d'espèce trouvée dans le dossier output/");
     });
+
+    it('should throw if only consolidated or non-distribution files exist', async () => {
+      mockReaddir.mockResolvedValue(['consolidated-species-report.json','readme.txt'] as any);
+      await expect(generator.generateReport()).rejects.toThrow("Aucune donnée d'espèce trouvée dans le dossier output/");
+    });
   });
 
   describe('loadAllSpeciesData', () => {

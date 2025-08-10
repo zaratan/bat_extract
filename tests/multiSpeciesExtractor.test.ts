@@ -257,5 +257,63 @@ describe('MultiSpeciesExtractor', () => {
       expect(consolidated.metadata.totalSpecies).toBe(1);
       expect(consolidated.species).toHaveLength(1);
     });
+
+    it('devrait ignorer un fichier de distribution corrompu lors de la consolidation', async () => {
+      const imageFiles = [
+        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
+        'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
+      ];
+      const outputDistributionFiles: string[] = [];
+      const distributionContents: Record<string, string> = {};
+      let consolidatedContent = '';
+
+      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
+      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
+        const pathStr = p.toString();
+        if (pathStr.endsWith('images')) return imageFiles as any;
+        if (pathStr.endsWith('output')) return outputDistributionFiles as any;
+        return [] as any;
+      });
+
+      // On corrompt un des fichiers au moment de l'écriture
+      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (fileName.endsWith('-distribution.json')) {
+          outputDistributionFiles.push(fileName);
+          if (fileName.includes('grand-murin')) {
+            distributionContents[fileName] = '{ invalid json'; // contenu cassé
+          } else {
+            distributionContents[fileName] = data.toString(); // contenu valide
+          }
+        } else if (fileName === 'consolidated-species-report.json') {
+          consolidatedContent = data.toString();
+        }
+      });
+
+      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (distributionContents[fileName]) return distributionContents[fileName];
+        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
+        return '';
+      });
+
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const extractor = new MultiSpeciesExtractor();
+      await extractor.extractAllSpecies();
+
+      expect(MockSmart).toHaveBeenCalledTimes(2); // 2 extractions tentées
+      // Les deux fichiers existent mais un seul a pu être parsé
+      expect(outputDistributionFiles.length).toBe(2);
+      expect(consolidatedContent).not.toBe('');
+      const consolidated = JSON.parse(consolidatedContent);
+      // totalSpecies reflète le nombre de fichiers, même si l'un est corrompu
+      expect(consolidated.metadata.totalSpecies).toBe(2);
+      // Seulement 1 espèce valide dans le tableau
+      expect(consolidated.species).toHaveLength(1);
+      expect(warnSpy).toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
   });
 });

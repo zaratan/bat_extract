@@ -86,6 +86,22 @@ describe('ImageUrlDiscoverer', () => {
         error: 'HTTP 404: Not Found',
       });
     });
+
+    it('devrait retourner une erreur si aucune image de carte', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: async () => '<html><body><p>Aucune carte ici</p></body></html>',
+      } as Response);
+      const mockSpecies: BatSpecies = {
+        name: 'Grand Murin',
+        slug: 'grand-murin',
+        pageUrl: 'https://plan-actions-chiropteres.fr/grand-murin/',
+        isPriority: false,
+      };
+      const result = await discoverer.analyzeSpeciesPage(mockSpecies);
+      expect(result.error).toBe('Aucune image de carte trouvée');
+      expect(result.imageUrl).toBeUndefined();
+    });
   });
 
   describe('extractImageUrl', () => {
@@ -179,6 +195,43 @@ describe('ImageUrlDiscoverer', () => {
       // La découverte devrait échouer avec une erreur (process.exit mocké)
       await expect(discoverer.discoverImageUrls()).rejects.toThrow('Process exit called with code 1');
     });
+
+    it('should process multiple species with mixed results quickly (mocked delay)', async () => {
+      // Mock setTimeout pour ne pas attendre 1.5s
+      const originalSetTimeout = globalThis.setTimeout;
+      (globalThis as any).setTimeout = (fn: any) => fn();
+
+      const mockSpeciesData = {
+        species: [
+          { name: 'Espèce A', slug: 'espece-a', pageUrl: 'https://example.com/a', isPriority: false },
+          { name: 'Espèce B', slug: 'espece-b', pageUrl: 'https://example.com/b', isPriority: false },
+        ],
+      };
+      mockReadFile.mockResolvedValueOnce(JSON.stringify(mockSpeciesData));
+
+      // Première espèce: image trouvée
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        text: async () => '<img src="https://plan-actions-chiropteres.fr/wp-content/uploads/carte-espece-a-100x200.png" />',
+      } as Response);
+      // Deuxième espèce: erreur HTTP
+      mockFetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Server Error' } as Response);
+
+      const results = await discoverer.discoverImageUrls();
+      expect(results).toHaveLength(2);
+      const success = results.find(r => r.slug === 'espece-a');
+      const fail = results.find(r => r.slug === 'espece-b');
+      expect(success?.imageUrl).toContain('carte-espece-a');
+      expect(fail?.error).toMatch(/HTTP 500/);
+
+      // Restaurer setTimeout
+      (globalThis as any).setTimeout = originalSetTimeout;
+    });
+
+    it('should exit when species JSON is invalid', async () => {
+      mockReadFile.mockResolvedValueOnce('{invalid');
+      await expect(discoverer.discoverImageUrls()).rejects.toThrow('Process exit called with code 1');
+    });
   });
 
   describe('generateReport', () => {
@@ -196,6 +249,20 @@ describe('ImageUrlDiscoverer', () => {
 
       // Vérifier que writeFile a été appelé
       expect(mockWriteFile).toHaveBeenCalledTimes(1);
+    });
+
+    it('should generate report with mixed success & error counts', async () => {
+      const mockResults: ImageInfo[] = [
+        { species: 'Espèce OK', slug: 'ok', pageUrl: 'u1', imageUrl: 'https://example.com/ok.png' },
+        { species: 'Espèce KO', slug: 'ko', pageUrl: 'u2', error: 'Aucune image de carte trouvée' },
+      ];
+      await discoverer.generateReport(mockResults);
+      expect(mockWriteFile).toHaveBeenCalledTimes(1);
+      const dataStr = (mockWriteFile.mock.calls[0][1] as string).toString();
+      const parsed = JSON.parse(dataStr);
+      expect(parsed.metadata.imagesFound).toBe(1);
+      expect(parsed.metadata.errors).toBe(1);
+      expect(Object.keys(parsed.validImageUrls)).toEqual(['ok']);
     });
   });
 });

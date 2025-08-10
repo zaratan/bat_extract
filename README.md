@@ -52,16 +52,18 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
 
 ## Fonctionnalités
 
-- 🔍 **Extraction automatique** de données de distribution depuis des cartes d'espèces
-- 🗺️ **Identification des départements** et de leur statut de distribution par analyse de couleurs
-- 📦 **Traitement par lots** de plusieurs espèces (workflow dynamique basé sur scraping web)
-- 📊 **Génération de rapports consolidés** avec statistiques détaillées
-- 🎨 **Analyse de couleurs robuste** utilisant Sharp et coordonnées pré-mappées
-- 📥 **Téléchargement automatique** des cartes depuis le Plan National d'Actions Chiroptères
-- 🧠 **Découverte intelligente** des URLs réelles des images par scraping web
-- 🔄 **Données à jour** : Génération dynamique de la liste d'espèces depuis le site officiel
-- 📈 **Rapport Excel** : Matrice interactive espèces × départements avec formatage couleur
-- 🛡️ **Qualité de code** : Hooks Git automatiques avec Husky et lint-staged pour garantir la qualité
+(Usage décoratif des émojis réduit : conservés surtout pour illustrer le workflow séquentiel plus bas.)
+
+- **Extraction automatique** des données de distribution à partir des cartes
+- **Identification des départements** par analyse de couleurs
+- **Traitement par lots** multi-espèces (scraping dynamique)
+- **Rapports consolidés** (JSON + Excel)
+- **Analyse de couleurs** fiable (Sharp + coordonnées pré‑mappées)
+- **Téléchargement contrôlé** des cartes
+- **Découverte des URLs réelles** via scraping
+- **Mise à jour dynamique** de la liste d'espèces (pas de statique)
+- **Matrice Excel** espèces × départements (codes + couleurs)
+- **Qualité de code automatisée** (lint, tests, CI)
 
 ## Qualité de code
 
@@ -547,9 +549,10 @@ const isPresent = ColorLegendUtils.isPresenceConfirmed(r, g, b);
 Suite de tests complète avec **sécurité absolue** - aucun test ne peut appeler le vrai site web :
 
 - **Jest + TypeScript** : Configuration CommonJS stable et robuste
-- **nock** : Mocking HTTP complet, tous les appels réseau sont bloqués
-- **3 suites de tests** : Configuration/sécurité, utilitaires couleur, extracteur multi-espèces
-- **17 tests** : Couverture des fonctions principales et protection HTTP
+- **Mock explicite de globalThis.fetch** : Tous les tests qui déclenchent du scraping remplacent `fetch` par une fonction mock
+- **Blocage réseau implicite** : Tout test qui oublierait de mocker un accès réseau doit être corrigé (objectif : zéro HTTP réel)
+- **Suites de tests** : Configuration/sécurité, utilitaires couleur, extracteurs, workflow
+- **Couverture** : Fonctions principales et scénarios d'erreur
 - **CI/CD intégré** : Tests automatiques sur chaque commit/push
 - **Architecture propre** : Tests séparés du code fonctionnel
 
@@ -566,36 +569,37 @@ pnpm test:watch
 
 **Sécurité :**
 
-- ✅ **Protection HTTP** : `beforeAll()` bloque tout appel réseau non mocké
-- ✅ **Tests isolés** : Chaque test utilise des données mockées
-- ✅ **CI validé** : Aucun appel externe possible même en CI/CD
+- ✅ **Fetch mocké** : `globalThis.fetch` surchargé localement dans chaque test de scraping
+- ✅ **Tests isolés** : Chaque test utilise des données simulées
+- ✅ **CI validé** : Aucun appel externe prévu
 - ✅ **Architecture robuste** : Logique métier testable séparément des CLI
 
 ## Approche technique
 
 ### Analyse par couleurs (vs OCR)
 
-Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus de robustesse :
+Le projet privilégie l'analyse de couleurs plutôt que l'OCR pour une robustesse accrue :
 
-1. **🗺️ Coordonnées pré-mappées** : Chaque département français a des coordonnées relatives précises sur les cartes
-2. **🎨 Échantillonnage de couleurs** : Analyse des pixels dans un rayon de 30px autour de chaque département
-3. **🤖 Classification automatique** : Mapping automatique des couleurs vers les statuts de distribution
-4. **📦 Traitement par lots** : Extraction automatique de toutes les cartes du dossier `/images`
-5. **📊 Rapports consolidés** : Génération de statistiques multi-espèces pour analyse comparative
+1. 🗺️ Coordonnées pré-mappées : chaque département possède des coordonnées relatives stables.
+2. 🎨 Échantillonnage ciblé : rayon configurable (ex. 30px) autour de chaque point de référence.
+3. 🤖 Classification : mapping couleur → statut via tolérances définies dans `data/color-legend-mapping.ts`.
+4. 📦 Traitement par lots : toutes les images présentes dans `images/` sont parcourues.
+5. 📊 Agrégation : statistiques par espèce + consolidation multi-espèces pour Excel.
 
 ### Gestion des erreurs
 
-- ✅ **Continuation** : Le traitement continue même en cas d'erreur sur une image
-- ✅ **Rapports détaillés** : Identification des départements sans couleur détectée
-- ✅ **Tolérance** : Plages RGB avec tolérance pour les variations d'image
-- ✅ **Fallbacks** : URLs de secours pour le téléchargement
+- Continuer malgré des échecs isolés (image manquante, couleur non détectée).
+- Collecter et exposer les erreurs dans les rapports JSON consolidés.
+- Signaler explicitement : départements sans couleur ou ambiguë.
+- Empêcher l'arrêt complet du workflow sur un seul échec réseau ponctuel.
+- Mock explicite de `fetch` dans les tests pour garantir zéro trafic réel.
 
 ### Performance
 
-- ⚡ **Traitement direct** avec Sharp (pas de fichiers temporaires)
-- 🎯 **Analyse ciblée** par zone (rayon de 30px)
-- 🔄 **Traitement par lots** optimisé
-- 💾 **Sauvegarde incrémentale** des résultats
+- Sharp utilisé en mémoire (pas de fichiers temporaires intermédiaires).
+- Analyse ciblée uniquement sur zones pertinentes (évite scan exhaustif de pixels).
+- Possibilité future : parallélisation contrôlée (sémaphore) sans bloquer l'event loop.
+- Idempotence : ré-exécuter une étape réécrit proprement sans inflation de données.
 
 ## Technologies
 
@@ -604,7 +608,7 @@ Le projet utilise une approche d'analyse de couleurs plutôt que l'OCR pour plus
 - **Node.js** 22 (spécifiée dans `.nvmrc`) avec fetch natif pour les téléchargements
 - **Sharp** pour l'analyse d'images et le traitement de couleurs
 - **ExcelJS** pour la génération de rapports Excel avec formatage couleur
-- **Jest + nock** pour les tests avec protection HTTP complète
+- **Jest** pour les tests avec mocks explicites de `fetch`
 - **ESLint** et **Prettier** pour la qualité du code
 - **Husky** et **lint-staged** pour les hooks Git automatiques
 - **pnpm** comme gestionnaire de packages rapide

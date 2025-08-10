@@ -8,6 +8,7 @@ import {
 } from './config/defaultConfig.js';
 import { runWithConcurrency } from './utils/concurrency.js';
 import { createMetrics } from './utils/metrics.js';
+import { appendMultiSpeciesExtractionMetrics } from './utils/metricsStore.js';
 
 /** Interface d'un extracteur départemental (simplifiée pour injection) */
 export interface IDepartmentExtractor {
@@ -332,6 +333,17 @@ export class MultiSpeciesExtractor {
     const failCount = normalized.length - successCount;
     console.log(`\n📌 Bilan: ${successCount} succès, ${failCount} échec(s)`);
     metrics.logSummary();
+
+    try {
+      const snapshot = metrics.snapshot();
+      const metricsPath = await appendMultiSpeciesExtractionMetrics(snapshot, {
+        outputDir: this.outputPath,
+        extra: { successCount, failCount },
+      });
+      console.log(`📊 Métriques persistées: ${metricsPath}`);
+    } catch (e) {
+      console.warn('⚠️  Impossible de persister les métriques:', e);
+    }
 
     console.log('\n🎉 Extraction multi-espèces terminée !');
     console.log(`📁 Tous les résultats sont dans: ${this.outputPath}`);

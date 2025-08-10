@@ -97,9 +97,9 @@ describe('ExcelReportGenerator', () => {
     it('should generate Excel report successfully (mock writeFile)', async () => {
       await generator.generateReport();
       expect(mockReaddir).toHaveBeenCalled();
-      // 2 fichiers distribution + éventuellement generated-species-data.json (priorités)
+      // 2 fichiers distribution + éventuellement generated-species-data.json (priorités) + metrics
       expect(mockReadFile.mock.calls.length).toBeGreaterThanOrEqual(2);
-      expect(mockReadFile.mock.calls.length).toBeLessThanOrEqual(3);
+      expect(mockReadFile.mock.calls.length).toBeLessThanOrEqual(4);
       expect((ExcelJS as any).Workbook).toHaveBeenCalled();
       expect((ExcelJS as any).Workbook.mock.results.length).toBeGreaterThan(0);
       expect((ExcelJS as any).Workbook.mock.results[0].value.addWorksheet).toHaveBeenCalledWith('Distribution par Département');
@@ -284,6 +284,57 @@ describe('ExcelReportGenerator', () => {
       const workbook = new (ExcelJS as any).Workbook();
       await (generator as any).createLegendSheet(workbook);
       expect(workbook.addWorksheet).toHaveBeenCalledWith('Légende');
+    });
+  });
+
+  describe('createMetricsSheet (consolidated report)', () => {
+    it('should create metrics sheet from consolidated report', async () => {
+      // Préparer un consolidated report minimal cohérent
+      const consolidated = {
+        metadata: {
+          extractionDate: '2025-08-10T00:00:00.000Z',
+          totalSpecies: 2,
+          source: 'test-source',
+        },
+        species: [
+          {
+            name: 'Espèce A',
+            filename: 'espece-a-distribution.json',
+            totalDepartments: 94,
+            detectedDepartments: 90,
+            summary: {
+              'rare ou assez rare': 10,
+              absente: 84,
+            },
+          },
+          {
+            name: 'Espèce B',
+            filename: 'espece-b-distribution.json',
+            totalDepartments: 94,
+            detectedDepartments: 47,
+            summary: {
+              'assez commune à très commune': 47,
+              absente: 47,
+            },
+          },
+        ],
+      };
+
+      mockReadFile.mockReset();
+      mockReadFile.mockResolvedValueOnce(JSON.stringify(consolidated));
+
+      const workbook = new (ExcelJS as any).Workbook();
+      await (generator as any).createMetricsSheet(workbook);
+      expect(workbook.addWorksheet).toHaveBeenCalledWith('Métriques');
+    });
+
+    it('should throw if consolidated report file missing', async () => {
+      mockReadFile.mockReset();
+      mockReadFile.mockRejectedValueOnce(new Error('ENOENT'));
+      const workbook = new (ExcelJS as any).Workbook();
+      await expect(
+        (generator as any).createMetricsSheet(workbook)
+      ).rejects.toThrow('Fichier consolidated-species-report.json absent');
     });
   });
 

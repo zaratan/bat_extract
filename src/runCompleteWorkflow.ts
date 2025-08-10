@@ -8,6 +8,7 @@ import {
   type DeepPartial,
   type DefaultConfig,
 } from './config/defaultConfig.js';
+import { readMultiSpeciesExtractionMetrics } from './utils/metricsStore.js';
 
 interface SpeciesDataFile {
   metadata?: { totalSpecies: number; prioritySpecies: number };
@@ -352,6 +353,7 @@ export class BatExtractWorkflow {
       const consolidatedExists = files.includes(
         'consolidated-species-report.json'
       );
+      const metricsExists = files.includes('metrics-multi-species.json');
 
       // Analyser le rapport consolidé si disponible
       let averageDetection = 0;
@@ -394,12 +396,16 @@ export class BatExtractWorkflow {
           'Espèces extraites': distributionFiles.length,
           'Départements détectés (moyenne)': averageDetection,
           'Rapport consolidé': consolidatedExists ? 1 : 0,
+          'Métriques persistées': metricsExists ? 1 : 0,
         },
         details: [
           `${distributionFiles.length} fichiers de distribution générés`,
           consolidatedExists
             ? 'Rapport consolidé créé'
             : 'Rapport consolidé manquant',
+          metricsExists
+            ? 'Fichier de métriques présent'
+            : 'Fichier de métriques absent',
         ],
       };
     } catch (error) {
@@ -556,6 +562,7 @@ export class BatExtractWorkflow {
     console.log('   📄 *-distribution.json (données par espèce)');
     console.log('   📊 consolidated-species-report.json (rapport consolidé)');
     console.log('   📈 bat-distribution-matrix.xlsx (matrice Excel)');
+    console.log('   📊 metrics-multi-species.json (métriques persistées)');
     console.log('');
 
     // Recommandations
@@ -569,12 +576,40 @@ export class BatExtractWorkflow {
     }
 
     console.log('🦇 Workflow terminé!');
+    this.printMetricsSummary();
 
     if (this.report.overallStatus === 'success') {
       console.log('🎉 Toutes les étapes ont été exécutées avec succès!');
       console.log(
         `📊 Vous pouvez maintenant ouvrir: ${join(this.outputDir, 'bat-distribution-matrix.xlsx')}`
       );
+    }
+  }
+
+  private async printMetricsSummary(): Promise<void> {
+    try {
+      const metrics = await readMultiSpeciesExtractionMetrics(this.outputDir);
+      if (!metrics.runs.length) {
+        console.log('\n📊 Aucune métrique persistée encore.');
+        return;
+      }
+      console.log('\n📊 MÉTRIQUES HISTORIQUES (multi-espèces)');
+      console.log('======================================');
+      console.log(`Total runs: ${metrics.aggregates.totalRuns}`);
+      console.log(
+        `Espèces traitées cumulées: ${metrics.aggregates.totalSpeciesProcessed}`
+      );
+      console.log(
+        `Taux de succès global: ${metrics.aggregates.overallSuccessRate}%`
+      );
+      console.log(`Dernier run: ${metrics.aggregates.lastRunAt}`);
+      const last = metrics.runs[metrics.runs.length - 1];
+      console.log('\nDernier run (snapshot):');
+      console.log(
+        `  Label: ${last.label} | Succès: ${last.success}/${last.total} (${last.successRate}%) | Durée: ${(last.durationMs / 1000).toFixed(2)}s`
+      );
+    } catch (e) {
+      console.warn('⚠️  Impossible de lire les métriques:', e);
     }
   }
 }

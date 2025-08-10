@@ -52,6 +52,11 @@ export class ExcelReportGenerator {
     // Page 2: Légende
     await this.createLegendSheet(workbook);
 
+    // Page 3: Métriques historiques (si disponibles)
+    await this.createMetricsSheet(workbook).catch(err => {
+      console.warn('⚠️  Feuille métriques non générée:', err.message);
+    });
+
     // Sauvegarder le fichier
     await workbook.xlsx.writeFile(this.reportPath);
     console.log(`💾 Rapport Excel généré: ${this.reportPath}`);
@@ -423,6 +428,233 @@ export class ExcelReportGenerator {
     worksheet.mergeCells(noteRow, 1, noteRow, 4);
 
     console.log('✅ Feuille de légende créée');
+  }
+
+  private async createMetricsSheet(workbook: ExcelJS.Workbook): Promise<void> {
+    // Nouvelle implémentation : métriques issues de consolidated-species-report.json
+    const consolidatedPath = join(
+      this.outputDir,
+      'consolidated-species-report.json'
+    );
+    let raw: string;
+    try {
+      raw = await readFile(consolidatedPath, 'utf-8');
+    } catch {
+      throw new Error('Fichier consolidated-species-report.json absent');
+    }
+
+    interface ConsolidatedSpeciesEntry {
+      name: string;
+      filename: string;
+      totalDepartments: number;
+      detectedDepartments: number;
+      summary: Record<string, number>;
+    }
+    interface ConsolidatedReport {
+      metadata?: {
+        extractionDate?: string;
+        totalSpecies?: number;
+        source?: string;
+      };
+      species: ConsolidatedSpeciesEntry[];
+    }
+
+    let parsed: ConsolidatedReport;
+    try {
+      parsed = JSON.parse(raw) as ConsolidatedReport;
+    } catch {
+      throw new Error('JSON consolidé invalide');
+    }
+    if (!parsed || !Array.isArray(parsed.species)) {
+      throw new Error('Format consolidé inattendu');
+    }
+
+    const species = parsed.species;
+    if (species.length === 0) {
+      throw new Error('Rapport consolidé vide');
+    }
+
+    // Agrégations globales
+    const totalSpecies = species.length;
+    const sumTotalDepartments = species.reduce(
+      (acc, s) => acc + (s.totalDepartments || 0),
+      0
+    );
+    const sumDetectedDepartments = species.reduce(
+      (acc, s) => acc + (s.detectedDepartments || 0),
+      0
+    );
+    const avgDetectionRate =
+      sumTotalDepartments > 0
+        ? +((sumDetectedDepartments / sumTotalDepartments) * 100).toFixed(2)
+        : 0;
+
+    // Agrégation statuts
+    const statusTotals: Record<string, number> = {};
+    species.forEach(s => {
+      Object.entries(s.summary || {}).forEach(([status, count]) => {
+        statusTotals[status] = (statusTotals[status] || 0) + count;
+      });
+    });
+    const totalStatusOccurrences =
+      Object.values(statusTotals).reduce((a, b) => a + b, 0) || 1;
+
+    // Feuille
+    const ws = workbook.addWorksheet('Métriques');
+
+    // Titre
+    ws.getCell(1, 1).value =
+      'Métriques Consolidées – Distribution Multi-espèces';
+    ws.getCell(1, 1).font = { bold: true, size: 16 };
+    ws.mergeCells(1, 1, 1, 8);
+
+    // Métadonnées
+    ws.getCell(3, 1).value = 'Extraction';
+    ws.getCell(3, 1).font = { bold: true };
+    ws.getCell(3, 2).value = parsed.metadata?.extractionDate || '—';
+
+    ws.getCell(4, 1).value = 'Source';
+    ws.getCell(4, 1).font = { bold: true };
+    ws.getCell(4, 2).value = parsed.metadata?.source || '—';
+
+    ws.getCell(5, 1).value = 'Total espèces';
+    ws.getCell(5, 1).font = { bold: true };
+    ws.getCell(5, 2).value = totalSpecies;
+
+    ws.getCell(6, 1).value = 'Départements détectés (cumul)';
+    ws.getCell(6, 1).font = { bold: true };
+    ws.getCell(6, 2).value = sumDetectedDepartments;
+
+    ws.getCell(7, 1).value = 'Départements cumul théoriques';
+    ws.getCell(7, 1).font = { bold: true };
+    ws.getCell(7, 2).value = sumTotalDepartments;
+
+    ws.getCell(8, 1).value = 'Taux détection moyen (%)';
+    ws.getCell(8, 1).font = { bold: true };
+    ws.getCell(8, 2).value = avgDetectionRate;
+
+    // Tableau statuts agrégés
+    let row = 10;
+    ws.getCell(row, 1).value = 'Statuts agrégés';
+    ws.getCell(row, 1).font = { bold: true, size: 12 };
+    row += 1;
+
+    const statusHeader = ['Statut', 'Total observations', 'Part (%)'];
+    statusHeader.forEach((h, i) => {
+      const c = ws.getCell(row, i + 1);
+      c.value = h;
+      c.font = { bold: true };
+      c.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE6E6E6' },
+      };
+    });
+    row += 1;
+
+    Object.entries(statusTotals)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([status, total]) => {
+        const part = +((total / totalStatusOccurrences) * 100).toFixed(2);
+        ws.getCell(row, 1).value = status;
+        ws.getCell(row, 2).value = total;
+        ws.getCell(row, 3).value = part;
+        const statusColor = this.getStatusColor(status);
+        [1, 2, 3].forEach(col => {
+          ws.getCell(row, col).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: statusColor },
+          };
+        });
+        row += 1;
+      });
+
+    row += 1;
+    ws.getCell(row, 1).value = 'Espèces (résumé)';
+    ws.getCell(row, 1).font = { bold: true, size: 12 };
+    row += 1;
+
+    const speciesHeader = [
+      '#',
+      'Espèce',
+      'Départs détectés',
+      '% Détection',
+      'Statuts dominants',
+    ];
+    speciesHeader.forEach((h, i) => {
+      const c = ws.getCell(row, i + 1);
+      c.value = h;
+      c.font = { bold: true };
+      c.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE6E6E6' },
+      };
+    });
+    // Nouvelles colonnes: pourcentages par statut (ordre = tri agrégé)
+    const orderedStatuses = Object.entries(statusTotals)
+      .sort((a, b) => b[1] - a[1])
+      .map(([s]) => s);
+    orderedStatuses.forEach((status, idx) => {
+      const colIndex = speciesHeader.length + idx + 1; // après colonnes existantes
+      const c = ws.getCell(row, colIndex);
+      c.value = `% ${this.getStatusShortCode(status)}`; // code court
+      c.font = { bold: true };
+      c.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: this.getStatusColor(status) },
+      };
+      ws.getColumn(colIndex).width = 8;
+    });
+    row += 1;
+
+    species.forEach((s, idx) => {
+      const detectionRate =
+        s.totalDepartments > 0
+          ? +((s.detectedDepartments / s.totalDepartments) * 100).toFixed(2)
+          : 0;
+      const sortedStatuses = Object.entries(s.summary || {}).sort(
+        (a, b) => b[1] - a[1]
+      );
+      const topStatuses = sortedStatuses
+        .slice(0, 2)
+        .map(([st]) => st)
+        .join(', ');
+      ws.getCell(row, 1).value = idx + 1;
+      ws.getCell(row, 2).value = s.name;
+      ws.getCell(row, 3).value = s.detectedDepartments;
+      ws.getCell(row, 4).value = detectionRate;
+      ws.getCell(row, 5).value = topStatuses;
+      // Pourcentages par statut spécifiques à l'espèce
+      orderedStatuses.forEach((status, sIdx) => {
+        const colIndex = speciesHeader.length + sIdx + 1;
+        const count = s.summary?.[status] || 0;
+        const pct =
+          s.totalDepartments > 0
+            ? +((count / s.totalDepartments) * 100).toFixed(2)
+            : 0;
+        const cell = ws.getCell(row, colIndex);
+        cell.value = pct;
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: this.getStatusColor(status) },
+        };
+      });
+      row += 1;
+    });
+
+    // Largeurs
+    ws.getColumn(1).width = 5;
+    ws.getColumn(2).width = 28;
+    ws.getColumn(3).width = 16;
+    ws.getColumn(4).width = 14;
+    ws.getColumn(5).width = 40;
+    // Colonnes % déjà width dans boucle
+
+    console.log('✅ Feuille métriques créée (consolidated)');
   }
 
   private getAllDepartmentCodes(): string[] {

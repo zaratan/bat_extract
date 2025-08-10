@@ -399,4 +399,94 @@ describe('MultiSpeciesExtractor', () => {
       expect(consolidatedContent).not.toBe('');
     });
   });
+
+  describe('Persistance des métriques', () => {
+    const realFs: typeof import('fs') = require('fs');
+
+    it('devrait persister les métriques multi-espèces', async () => {
+      const imageFiles = [
+        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
+      ];
+      const outputDistributionFiles: string[] = [];
+      const distributionContents: Record<string, string> = {};
+      let consolidatedContent = '';
+      let metricsContent = '';
+      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
+      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
+        const pathStr = p.toString();
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
+        return [] as any;
+      });
+      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (fileName.endsWith('-distribution.json')) {
+          outputDistributionFiles.push(fileName);
+          distributionContents[fileName] = data.toString();
+        } else if (fileName === 'consolidated-species-report.json') {
+          consolidatedContent = data.toString();
+        } else if (fileName === 'metrics-multi-species.json') {
+          metricsContent = data.toString();
+        }
+      });
+      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (distributionContents[fileName]) return distributionContents[fileName];
+        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
+        if (fileName === 'metrics-multi-species.json') return metricsContent;
+        return '';
+      });
+      const extractor = new MultiSpeciesExtractor();
+      await extractor.extractAllSpecies();
+      expect(metricsContent).not.toBe('');
+      const metricsJson = JSON.parse(metricsContent);
+      expect(metricsJson.type).toBe('multiSpeciesExtractionMetrics');
+      expect(Array.isArray(metricsJson.runs)).toBe(true);
+      expect(metricsJson.runs.length).toBe(1);
+      const run = metricsJson.runs[0];
+      expect(run.total).toBe(1);
+      expect(metricsJson.aggregates.totalRuns).toBe(1);
+    });
+
+    it('ne devrait pas dupliquer un run métrique identique consécutif', async () => {
+      const imageFiles = [
+        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png'
+      ];
+      const outputDistributionFiles: string[] = [];
+      const distributionContents: Record<string,string> = {};
+      let metricsContent = '';
+      const realFs: typeof import('fs') = require('fs');
+      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
+      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p:any)=>{
+        const pathStr = p.toString();
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
+        return [] as any;
+      });
+      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p:any,data:any)=>{
+        const fileName = p.toString().split('/').pop()!;
+        if (fileName.endsWith('-distribution.json')) {
+          outputDistributionFiles.push(fileName);
+          distributionContents[fileName] = data.toString();
+        } else if (fileName === 'metrics-multi-species.json') {
+          metricsContent = data.toString();
+        }
+      });
+      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p:any)=>{
+        const f = p.toString().split('/').pop()!;
+        if (distributionContents[f]) return distributionContents[f];
+        if (f === 'metrics-multi-species.json') return metricsContent;
+        return '';
+      });
+      const extractor1 = new MultiSpeciesExtractor();
+      await extractor1.extractAllSpecies();
+      const afterFirst = JSON.parse(metricsContent);
+      expect(afterFirst.runs.length).toBe(1);
+      // Second run identique (mêmes images) → ne doit pas ajouter
+      const extractor2 = new MultiSpeciesExtractor();
+      await extractor2.extractAllSpecies();
+      const afterSecond = JSON.parse(metricsContent);
+      expect(afterSecond.runs.length).toBe(1);
+    });
+  });
 });

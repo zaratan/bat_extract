@@ -2,6 +2,35 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { SmartDepartmentExtractor } from './smartExtractor.js';
 
+/** Interface d'un extracteur départemental (simplifiée pour injection) */
+export interface IDepartmentExtractor {
+  extractDepartmentDistribution(): Promise<unknown>;
+  cleanup(): Promise<void>;
+}
+
+/** Factory pour créer les extracteurs (permet de mocker facilement) */
+export interface IDepartmentExtractorFactory {
+  create(imagePath: string, speciesName: string): IDepartmentExtractor;
+}
+
+class SmartDepartmentExtractorFactory implements IDepartmentExtractorFactory {
+  create(imagePath: string, speciesName: string): IDepartmentExtractor {
+    return new SmartDepartmentExtractor(
+      imagePath,
+      speciesName
+    ) as unknown as IDepartmentExtractor;
+  }
+}
+
+/** Résultat structuré du traitement d'une espèce */
+export interface ProcessSpeciesResult {
+  speciesName: string;
+  filename: string;
+  success: boolean;
+  outputFile?: string;
+  error?: string;
+}
+
 /**
  * Extracteur multi-espèces qui traite automatiquement toutes les cartes
  * dans le dossier /images et extrait les données de distribution par département
@@ -9,6 +38,13 @@ import { SmartDepartmentExtractor } from './smartExtractor.js';
 export class MultiSpeciesExtractor {
   private readonly imagesPath = join(process.cwd(), 'images');
   private readonly outputPath = join(process.cwd(), 'output');
+  private readonly factory: IDepartmentExtractorFactory;
+
+  constructor(
+    factory: IDepartmentExtractorFactory = new SmartDepartmentExtractorFactory()
+  ) {
+    this.factory = factory;
+  }
 
   /**
    * Extrait le nom de l'espèce depuis le nom du fichier
@@ -80,9 +116,21 @@ export class MultiSpeciesExtractor {
   }
 
   /**
-   * Traite une seule image/espèce
+   * Crée l'extracteur (point d'extension/test)
    */
-  private async processSpecies(filename: string): Promise<void> {
+  protected createExtractor(
+    imagePath: string,
+    speciesName: string
+  ): IDepartmentExtractor {
+    return this.factory.create(imagePath, speciesName);
+  }
+
+  /**
+   * Traite une seule image/espèce et retourne un résultat structuré
+   */
+  private async processSpecies(
+    filename: string
+  ): Promise<ProcessSpeciesResult> {
     const speciesName = this.extractSpeciesName(filename);
     const imagePath = join(this.imagesPath, filename);
 
@@ -91,13 +139,9 @@ export class MultiSpeciesExtractor {
     console.log('='.repeat(80));
 
     try {
-      // Créer un extracteur pour cette espèce
-      const extractor = new SmartDepartmentExtractor(imagePath, speciesName);
-
-      // Faire l'extraction
+      const extractor = this.createExtractor(imagePath, speciesName);
       const results = await extractor.extractDepartmentDistribution();
 
-      // Sauvegarder les résultats spécifiques à cette espèce
       const outputFile = join(
         this.outputPath,
         `${speciesName.toLowerCase().replace(/\s+/g, '-')}-distribution.json`
@@ -109,8 +153,12 @@ export class MultiSpeciesExtractor {
       console.log(`💾 Résultats sauvegardés: ${outputFile}`);
 
       await extractor.cleanup();
+
+      return { speciesName, filename, success: true, outputFile };
     } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       console.error(`❌ Erreur lors du traitement de ${speciesName}:`, error);
+      return { speciesName, filename, success: false, error: message };
     }
   }
 
@@ -150,13 +198,13 @@ export class MultiSpeciesExtractor {
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
 
-          // Les fichiers -distribution.json sont des tableaux de départements
-          const departmentsArray = Array.isArray(data) ? data : [];
+          const departmentsArray = Array.isArray(data)
+            ? (data as Array<{ distributionStatus?: string }>)
+            : [];
           const detectedDepartments = departmentsArray.filter(
             d => d.distributionStatus !== 'non détecté'
           ).length;
 
-          // Calculer le résumé par statut
           const summary: { [key: string]: number } = {};
           departmentsArray.forEach(dept => {
             const status = dept.distributionStatus || 'non détecté';
@@ -187,7 +235,6 @@ export class MultiSpeciesExtractor {
 
       console.log(`\n📊 Rapport consolidé généré: ${reportPath}`);
 
-      // Afficher un résumé
       console.log('\n🦇 RÉSUMÉ MULTI-ESPÈCES:');
       console.log('='.repeat(50));
       consolidatedData.species.forEach(species => {
@@ -213,7 +260,7 @@ export class MultiSpeciesExtractor {
   /**
    * Lance l'extraction pour toutes les espèces
    */
-  async extractAllSpecies(): Promise<void> {
+  async extractAllSpecies(): Promise<ProcessSpeciesResult[]> {
     console.log("🚀 Démarrage de l'extraction multi-espèces");
     console.log('🔍 Recherche des cartes dans le dossier /images...');
 
@@ -223,7 +270,7 @@ export class MultiSpeciesExtractor {
 
     if (imageFiles.length === 0) {
       console.log('❌ Aucune image trouvée dans le dossier /images');
-      return;
+      return [];
     }
 
     console.log(`📸 ${imageFiles.length} carte(s) trouvée(s):`);
@@ -232,15 +279,21 @@ export class MultiSpeciesExtractor {
       console.log(`  - ${file} → ${speciesName}`);
     });
 
-    // Traiter chaque espèce
+    const results: ProcessSpeciesResult[] = [];
     for (const filename of imageFiles) {
-      await this.processSpecies(filename);
+      const r = await this.processSpecies(filename);
+      results.push(r);
     }
 
-    // Générer le rapport consolidé
     await this.generateConsolidatedReport();
+
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.length - successCount;
+    console.log(`\n📌 Bilan: ${successCount} succès, ${failCount} échec(s)`);
 
     console.log('\n🎉 Extraction multi-espèces terminée !');
     console.log(`📁 Tous les résultats sont dans: ${this.outputPath}`);
+
+    return results;
   }
 }

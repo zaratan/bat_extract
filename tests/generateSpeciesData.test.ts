@@ -230,9 +230,10 @@ describe('SpeciesDataGenerator', () => {
       generator = new SpeciesDataGenerator({
         priorityDetection: {
           headingClassNames: ['has-orange-background-color'],
-            enableInlineStyleFallback: true,
-            fallbackInlineStyleColors: ['#f7a923'],
-            fallbackStyleColorKeyword: 'orange'
+          enableInlineStyleFallback: true,
+          fallbackInlineStyleColors: ['#f7a923'],
+          fallbackStyleColorKeyword: 'orange',
+          searchWindowChars: 600,
         }
       } as any);
 
@@ -262,9 +263,9 @@ describe('SpeciesDataGenerator', () => {
       generator = new SpeciesDataGenerator({
         priorityDetection: {
           headingClassNames: ['has-orange-background-color'],
-            enableInlineStyleFallback: false,
-            fallbackInlineStyleColors: ['#f7a923'],
-            fallbackStyleColorKeyword: 'orange'
+          enableInlineStyleFallback: false,
+          fallbackInlineStyleColors: ['#f7a923'],
+          fallbackStyleColorKeyword: 'orange'
         }
       } as any);
 
@@ -284,6 +285,27 @@ describe('SpeciesDataGenerator', () => {
       const barbastelle = parsed.species.find((s: any) => s.slug === 'barbastelle-deurope');
       expect(barbastelle.isPriority).toBe(false); // fallback désactivé
       expect(parsed.metadata.prioritySpecies).toBe(0);
+    });
+
+    it('should respect a smaller searchWindowChars (no heading found)', async () => {
+      generator = new SpeciesDataGenerator({
+        priorityDetection: {
+          headingClassNames: ['has-orange-background-color'],
+          enableInlineStyleFallback: false,
+          fallbackInlineStyleColors: ['#f7a923'],
+          fallbackStyleColorKeyword: 'orange',
+          searchWindowChars: 10, // trop petit pour atteindre le heading
+        }
+      } as any);
+      const listHtml = `\n        <div>\n          <!-- beaucoup de padding -->${' '.repeat(50)}<h4 class='wp-block-heading has-orange-background-color'><a href="/les-chauves-souris/les-especes/barbastelle-deurope/">Barbastelle d'Europe</a></h4>\n        </div>`;
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, status: 200, text: () => Promise.resolve(listHtml) } as Response)
+        .mockResolvedValueOnce({ ok: true, status: 200, text: () => Promise.resolve('<div></div>') } as Response);
+      await generator.generateSpeciesData();
+      const [, content] = mockWriteFile.mock.calls[0];
+      const parsed = JSON.parse(content as string);
+      const barbastelle = parsed.species.find((s: any) => s.slug === 'barbastelle-deurope');
+      expect(barbastelle.isPriority).toBe(false); // heading hors fenêtre
     });
   });
 });

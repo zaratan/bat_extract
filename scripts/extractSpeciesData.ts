@@ -7,6 +7,7 @@
  */
 
 import { MultiSpeciesExtractor } from '../src/multiSpeciesExtractor.js';
+import { resolveUserConfigFromProcess } from '../src/config/loadUserConfig.js';
 
 async function main(): Promise<void> {
   try {
@@ -15,7 +16,10 @@ async function main(): Promise<void> {
     console.log('📁 Destination: dossier /output');
     console.log('');
 
-    const extractor = new MultiSpeciesExtractor();
+    const userConfig = await resolveUserConfigFromProcess(
+      process.argv.slice(2)
+    );
+    const extractor = new MultiSpeciesExtractor(undefined, userConfig);
     await extractor.extractAllSpecies();
 
     console.log('');

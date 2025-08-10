@@ -7,6 +7,11 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
 - [BatExtract](#batextract)
   - [Table des matières](#table-des-matières)
   - [Fonctionnalités](#fonctionnalités)
+  - [Qualité de code](#qualité-de-code)
+    - [🛡️ Hooks Git automatiques](#️-hooks-git-automatiques)
+    - [🔧 Vérifications automatiques](#-vérifications-automatiques)
+    - [🤖 GitHub Actions](#-github-actions)
+    - [🚀 Commandes manuelles](#-commandes-manuelles)
   - [Installation](#installation)
     - [🔧 Prérequis système](#-prérequis-système)
     - [🚀 Installation pour débutants (Mac)](#-installation-pour-débutants-mac)
@@ -19,6 +24,7 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
       - [7. Vérification de l'installation](#7-vérification-de-linstallation)
       - [8. Premier lancement](#8-premier-lancement)
     - [⚡ Installation rapide (pour développeurs)](#-installation-rapide-pour-développeurs)
+      - [🎯 Avec nvm (Node Version Manager)](#-avec-nvm-node-version-manager)
     - [🔧 Dépannage](#-dépannage)
       - ["command not found: brew"](#command-not-found-brew)
       - ["command not found: pnpm"](#command-not-found-pnpm)
@@ -39,16 +45,21 @@ Un extracteur de données de cartes de distribution utilisant l'analyse de coule
     - [Correspondance officielle](#correspondance-officielle)
     - [Correspondance technique](#correspondance-technique)
   - [Scripts disponibles](#scripts-disponibles)
-  - [Tests](#-tests)
+  - [🧪 Tests](#-tests)
   - [Approche technique](#approche-technique)
     - [Analyse par couleurs (vs OCR)](#analyse-par-couleurs-vs-ocr)
     - [Gestion des erreurs](#gestion-des-erreurs)
     - [Performance](#performance)
-  - [Technologies](#technologies)
-  - [Résultats](#résultats)
-    - [Format des données extraites](#format-des-données-extraites)
-    - [Format des images](#format-des-images)
-  - [Source des données](#source-des-données)
+    - [Détection des espèces prioritaires](#détection-des-espèces-prioritaires)
+  - [Configuration](#configuration)
+    - [Structure (résumé)](#structure-résumé)
+    - [Principes](#principes)
+    - [Champs importants](#champs-importants)
+    - [Override utilisateur (fichier local)](#override-utilisateur-fichier-local)
+    - [Chargement automatique (ajout minimal)](#chargement-automatique-ajout-minimal)
+    - [Override via CLI (JSON inline)](#override-via-cli-json-inline)
+    - [Bonnes pratiques](#bonnes-pratiques)
+    - [Extension future](#extension-future)
 
 ## Fonctionnalités
 
@@ -659,3 +670,133 @@ La détection est entièrement structurée et ne repose plus sur des motifs text
 - Ajout futur (si besoin) d'un test d'intégration simulant un changement de classe afin de documenter l'échec attendu
 
 > Si la classe venait à disparaître, la détection redeviendrait neutre (zéro prioritaire) plutôt que faussement positive, ce qui est un mode dégradé plus sûr.
+
+## Configuration
+
+La configuration centralisée se trouve dans `src/config/defaultConfig.ts`. Elle fournit des valeurs par défaut immuables fusionnées via `mergeConfig(partial)`.
+
+### Structure (résumé)
+
+```ts
+interface DefaultConfig {
+  paths: { imagesDir: string; outputDir: string; tempDir: string };
+  extraction: {
+    sampleRadius: number;
+    minPixelThreshold: number;
+    maxDepartmentRetries: number;
+  };
+  network: { requestDelayMs: number; timeoutMs: number; retryCount: number };
+  parallel: {
+    maxConcurrentDownloads: number;
+    maxConcurrentExtractions: number;
+  };
+  excel: {
+    sheetNameMatrix: string;
+    sheetNameLegend: string;
+    autosizeColumns: boolean;
+  };
+  workflow: {
+    failFast: boolean;
+    continueOnPartialErrors: boolean;
+    verbose: boolean;
+  };
+  priorityDetection: {
+    headingClassNames: string[];
+    enableInlineStyleFallback: boolean;
+    fallbackInlineStyleColors: string[];
+    fallbackStyleColorKeyword: string | null;
+    searchWindowChars: number;
+  };
+  sources: {
+    baseUrl: string;
+    speciesListPath: string;
+    speciesPathSegment: string;
+  };
+  images: {
+    resolutionSuffix: string; // ex: -2048x1271
+    fileNamePattern: string; // placeholders {slug} {resolution}
+  };
+}
+```
+
+### Principes
+
+- Lecture seule par défaut (`defaultConfig` gelé).
+- Fusion superficielle contrôlée (erreur si clé inconnue) via `mergeConfig`.
+- Pas de mutation cachée : toute surcharge est explicite au point d instanciation d une classe.
+- Évite la duplication de constantes (URLs, patterns fichiers, fenêtre heuristique, etc.).
+
+### Champs importants
+
+| Domaine           | Clé                | Rôle                                                                    |
+| ----------------- | ------------------ | ----------------------------------------------------------------------- |
+| sources           | baseUrl            | Domaine racine du site à scraper                                        |
+| sources           | speciesListPath    | Chemin relatif de la page listant les espèces                           |
+| sources           | speciesPathSegment | Segment commun détecté dans les href pour filtrer                       |
+| priorityDetection | headingClassNames  | Classes de heading marquant priorité                                    |
+| priorityDetection | searchWindowChars  | Fenêtre (en caractères) remontant avant le lien pour trouver le heading |
+| images            | resolutionSuffix   | Suffixe résolution attendu dans les noms d images                       |
+| images            | fileNamePattern    | Pattern fallback pour nom de fichier / URL (combine slug + resolution)  |
+| network           | requestDelayMs     | Délai entre appels HTTP (throttling simple)                             |
+
+### Override utilisateur (fichier local)
+
+Créez un fichier à la racine (non versionné) `batExtract.config.json` (chargé automatiquement si présent) :
+
+```jsonc
+{
+  "network": { "requestDelayMs": 300 },
+  "priorityDetection": {
+    "headingClassNames": ["has-orange-background-color", "highlight-orange"],
+    "searchWindowChars": 800,
+  },
+  "images": { "resolutionSuffix": "-1536x950" },
+}
+```
+
+### Chargement automatique (ajout minimal)
+
+Vous pouvez instancier les classes avec ce JSON chargé au préalable :
+
+```ts
+import { readFile } from 'fs/promises';
+import { SpeciesDataGenerator } from './src/generateSpeciesData.js';
+import { mergeConfig } from './src/config/defaultConfig.js';
+
+async function main() {
+  let userCfg = {};
+  try {
+    const raw = await readFile('batExtract.config.json', 'utf-8');
+    userCfg = JSON.parse(raw);
+  } catch {
+    /* fichier optionnel */
+  }
+  const generator = new SpeciesDataGenerator(userCfg as any);
+  await generator.generateSpeciesData();
+}
+main();
+```
+
+### Override via CLI (JSON inline)
+
+Pour une exécution ponctuelle (ex: augmenter vitesse en dev) :
+
+```bash
+CONFIG='{"network":{"requestDelayMs":100},"priorityDetection":{"searchWindowChars":400}}' pnpm generate-species
+# ou
+pnpm generate-species --config '{"network":{"requestDelayMs":100}}'
+```
+
+Ordre de priorité des surcharges : `--config` > variable d'environnement `CONFIG` > fichier `batExtract.config.json` > valeurs par défaut.
+
+(Implémenté dans `src/config/loadUserConfig.ts` utilisé par tous les scripts.)
+
+### Bonnes pratiques
+
+- Ne réduisez pas `requestDelayMs` à 0 pour éviter un flood réseau.
+- Gardez une seule classe marqueuse dans `headingClassNames` tant que le site ne change pas.
+- Testez chaque changement de pattern d image via un test unitaire ciblé.
+
+### Extension future
+
+Refactors planifiés : centralisation d une validation plus stricte + loader automatique multi-formats (JSON / JS / ESM) — non implémentés tant que non nécessaires.

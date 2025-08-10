@@ -35,12 +35,14 @@ interface SpeciesDataOutput {
 }
 
 export class SpeciesDataGenerator {
-  private readonly baseUrl = 'https://plan-actions-chiropteres.fr';
-  private readonly speciesListUrl = `${this.baseUrl}/les-chauves-souris/les-especes/`;
+  private readonly baseUrl: string;
+  private readonly speciesListUrl: string;
   private readonly config: DefaultConfig;
 
   constructor(cfg?: DeepPartial<DefaultConfig>) {
     this.config = mergeConfig(cfg);
+    this.baseUrl = this.config.sources.baseUrl;
+    this.speciesListUrl = `${this.baseUrl}${this.config.sources.speciesListPath}`;
   }
 
   /**
@@ -107,8 +109,10 @@ export class SpeciesDataGenerator {
    */
   private extractSpeciesFromHtml(html: string): BatSpecies[] {
     const species: BatSpecies[] = [];
-    const linkPattern =
-      /<a[^>]+href="([^"']*\/les-especes\/([^/]+)\/)["'][^>]*>([^<]+)<\/a>/gi;
+    const linkPattern = new RegExp(
+      `<a[^>]+href="([^"']*${this.config.sources.speciesPathSegment}([^/]+)/)["'][^>]*>([^<]+)</a>`,
+      'gi'
+    );
     let match: RegExpExecArray | null;
     const seenSlugs = new Set<string>();
     while ((match = linkPattern.exec(html)) !== null) {
@@ -138,7 +142,7 @@ export class SpeciesDataGenerator {
     _slug: string
   ): boolean {
     const cfg = this.config.priorityDetection;
-    const windowStart = Math.max(0, linkStart - 600);
+    const windowStart = Math.max(0, linkStart - cfg.searchWindowChars);
     const before = html.slice(windowStart, linkStart);
     // Heading avec classes ET éventuellement style inline
     const headingRegex = /<h[2-6][^>]*>/gi;

@@ -32,16 +32,22 @@ export interface DefaultConfig {
     readonly continueOnPartialErrors: boolean;
     readonly verbose: boolean;
   };
-  // Nouvelle section : détection des espèces prioritaires
   readonly priorityDetection: {
-    /** Liste de classes (complètes) marquant un heading prioritaire */
     readonly headingClassNames: readonly string[];
-    /** Active le fallback sur style inline (background / background-color) */
     readonly enableInlineStyleFallback: boolean;
-    /** Couleurs hex (avec #) considérées comme indicateur prioritaire si présentes dans style */
     readonly fallbackInlineStyleColors: readonly string[];
-    /** Mot-clé facultatif (ex: 'orange') à rechercher dans le style si aucune couleur hex exacte */
     readonly fallbackStyleColorKeyword: string | null;
+    /** Taille de la fenêtre de recherche (chars) avant le lien */
+    readonly searchWindowChars: number;
+  };
+  readonly sources: {
+    readonly baseUrl: string;
+    readonly speciesListPath: string; // chemin relatif pour la page liste
+    readonly speciesPathSegment: string; // segment utilisé dans les href
+  };
+  readonly images: {
+    readonly resolutionSuffix: string; // ex: -2048x1271
+    readonly fileNamePattern: string; // pattern avec placeholders {slug}
   };
 }
 
@@ -74,6 +80,17 @@ export const defaultConfig: DefaultConfig = Object.freeze({
     enableInlineStyleFallback: true,
     fallbackInlineStyleColors: ['#f7a923'],
     fallbackStyleColorKeyword: 'orange',
+    searchWindowChars: 600,
+  },
+  sources: {
+    baseUrl: 'https://plan-actions-chiropteres.fr',
+    speciesListPath: '/les-chauves-souris/les-especes/',
+    speciesPathSegment: '/les-chauves-souris/les-especes/',
+  },
+  images: {
+    resolutionSuffix: '-2048x1271',
+    fileNamePattern:
+      'plan-actions-chiropteres.fr-{slug}-carte-{slug}{resolution}.png',
   },
 } satisfies DefaultConfig);
 

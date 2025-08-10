@@ -6,9 +6,11 @@
  */
 
 import { BatExtractWorkflow } from '../src/runCompleteWorkflow.js';
+import { resolveUserConfigFromProcess } from '../src/config/loadUserConfig.js';
 
 async function main(): Promise<void> {
-  const workflow = new BatExtractWorkflow();
+  const userConfig = await resolveUserConfigFromProcess(process.argv.slice(2));
+  const workflow = new BatExtractWorkflow(undefined, { config: userConfig });
 
   try {
     await workflow.runCompleteWorkflow();

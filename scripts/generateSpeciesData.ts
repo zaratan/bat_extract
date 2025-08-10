@@ -6,9 +6,11 @@
  */
 
 import { SpeciesDataGenerator } from '../src/generateSpeciesData.js';
+import { resolveUserConfigFromProcess } from '../src/config/loadUserConfig.js';
 
 async function main(): Promise<void> {
-  const generator = new SpeciesDataGenerator();
+  const userConfig = await resolveUserConfigFromProcess(process.argv.slice(2));
+  const generator = new SpeciesDataGenerator(userConfig);
 
   try {
     await generator.generateSpeciesData();

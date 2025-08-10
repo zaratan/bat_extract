@@ -6,10 +6,14 @@
  */
 
 import { ImageUrlDiscoverer } from '../src/discoverImageUrls.js';
+import { resolveUserConfigFromProcess } from '../src/config/loadUserConfig.js';
 
 async function main(): Promise<void> {
   try {
-    const discoverer = new ImageUrlDiscoverer();
+    const userConfig = await resolveUserConfigFromProcess(
+      process.argv.slice(2)
+    );
+    const discoverer = new ImageUrlDiscoverer(userConfig);
     const results = await discoverer.discoverImageUrls();
     await discoverer.generateReport(results);
   } catch (error) {

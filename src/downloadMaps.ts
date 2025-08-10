@@ -81,16 +81,24 @@ async function loadDiscoveredUrls(
 /**
  * Génère l'URL de fallback pour une espèce (pattern observé)
  */
-function getSpeciesImageUrl(slug: string): string {
-  return `https://plan-actions-chiropteres.fr/wp-content/uploads/2024/11/plan-actions-chiropteres.fr-${slug}-carte-${slug}-2048x1271.png`;
+function getSpeciesImageUrl(slug: string, cfg: DefaultConfig): string {
+  // Fallback pattern basé sur config
+  const pattern = cfg.images.fileNamePattern
+    .replace(/\{slug\}/g, slug)
+    .replace('{resolution}', cfg.images.resolutionSuffix);
+  return `${cfg.sources.baseUrl}/wp-content/uploads/2024/11/${pattern}`; // TODO: année/mois potentiellement à configurer plus tard
 }
 
 /**
  * Obtient l'URL d'image pour une espèce (découverte ou pattern par défaut)
  */
-async function getImageUrl(slug: string, outputDir: string): Promise<string> {
+async function getImageUrl(
+  slug: string,
+  outputDir: string,
+  cfg: DefaultConfig
+): Promise<string> {
   const discovered = await loadDiscoveredUrls(outputDir);
-  return discovered[slug] || getSpeciesImageUrl(slug);
+  return discovered[slug] || getSpeciesImageUrl(slug, cfg);
 }
 
 /**
@@ -128,8 +136,10 @@ async function downloadImage(
 /**
  * Génère le nom de fichier standardisé pour une espèce
  */
-function generateFileName(slug: string): string {
-  return `plan-actions-chiropteres.fr-${slug}-carte-${slug}-2048x1271.png`;
+function generateFileName(slug: string, cfg: DefaultConfig): string {
+  return cfg.images.fileNamePattern
+    .replace(/\{slug\}/g, slug)
+    .replace('{resolution}', cfg.images.resolutionSuffix);
 }
 
 function delay(ms: number): Promise<void> {
@@ -154,13 +164,13 @@ async function downloadAllMapsInternal(cfg: DefaultConfig): Promise<void> {
   let errorCount = 0;
   for (let i = 0; i < species.length; i++) {
     const currentSpecies = species[i];
-    const filename = generateFileName(currentSpecies.slug);
+    const filename = generateFileName(currentSpecies.slug, cfg);
     const filePath = join(imagesDir, filename);
     console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
     if (existsSync(filePath)) {
       console.log('   ⏭️  Fichier déjà présent, passage au suivant');
     } else {
-      const imageUrl = await getImageUrl(currentSpecies.slug, outputDir);
+      const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
       console.log(`   🔗 URL: ${imageUrl}`);
       const success = await downloadImage(
         imageUrl,
@@ -202,7 +212,7 @@ async function downloadPriorityMapsInternal(cfg: DefaultConfig): Promise<void> {
   let errorCount = 0;
   for (let i = 0; i < prioritySpecies.length; i++) {
     const currentSpecies = prioritySpecies[i];
-    const filename = generateFileName(currentSpecies.slug);
+    const filename = generateFileName(currentSpecies.slug, cfg);
     const filePath = join(imagesDir, filename);
     console.log(
       `[${i + 1}/${prioritySpecies.length}] ${currentSpecies.name} 🎯`
@@ -210,7 +220,7 @@ async function downloadPriorityMapsInternal(cfg: DefaultConfig): Promise<void> {
     if (existsSync(filePath)) {
       console.log('   ⏭️  Fichier déjà présent, passage au suivant');
     } else {
-      const imageUrl = await getImageUrl(currentSpecies.slug, outputDir);
+      const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
       console.log(`   🔗 URL: ${imageUrl}`);
       const success = await downloadImage(
         imageUrl,

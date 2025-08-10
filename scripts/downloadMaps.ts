@@ -6,13 +6,15 @@
  */
 
 import { MapDownloader } from '../src/downloadMaps.js';
+import { resolveUserConfigFromProcess } from '../src/config/loadUserConfig.js';
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const isPriorityMode = args.includes('--priority');
 
   try {
-    const downloader = new MapDownloader();
+    const userConfig = await resolveUserConfigFromProcess(args);
+    const downloader = new MapDownloader(userConfig);
 
     if (isPriorityMode) {
       await downloader.downloadPriorityMaps();

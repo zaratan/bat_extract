@@ -6,9 +6,12 @@
  */
 
 import { ExcelReportGenerator } from '../src/generateExcelReport.js';
+import { resolveUserConfigFromProcess } from '../src/config/loadUserConfig.js';
 
 async function main(): Promise<void> {
-  const generator = new ExcelReportGenerator();
+  const userConfig = await resolveUserConfigFromProcess(process.argv.slice(2));
+  const outputDir = userConfig?.paths?.outputDir; // si surchargé
+  const generator = new ExcelReportGenerator(outputDir);
 
   try {
     console.log('🦇 Démarrage de la génération du rapport Excel...');

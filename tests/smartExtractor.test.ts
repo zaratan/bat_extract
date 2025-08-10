@@ -100,4 +100,29 @@ describe('SmartDepartmentExtractor', () => {
       });
     });
   });
+
+  describe('inference & status mapping', () => {
+    it('should infer distribution status from a synthetic buffer color', async () => {
+      const width = 20; const height = 20;
+      const buffer = Buffer.alloc(width * height * 3);
+      for (let i = 0; i < buffer.length; i += 3) {
+        buffer[i] = 150; buffer[i+1] = 203; buffer[i+2] = 155;
+      }
+      const mockSharpInstance = { raw: jest.fn().mockReturnThis(), toBuffer: jest.fn().mockResolvedValue({ data: buffer, info: { width, height } }) };
+      (mockSharp as any).mockReturnValue(mockSharpInstance);
+      const results = await extractor.extractDepartmentDistribution();
+      const withColor = results.filter(r => r.dominantColor);
+      expect(withColor.length).toBeGreaterThan(0);
+      expect(withColor[0].distributionStatus).toBe('assez commune à très commune');
+    });
+
+    it('should mark all departments as non détecté for blank image', async () => {
+      const width = 10; const height = 10;
+      const buffer = Buffer.alloc(width * height * 3, 255);
+      const mockSharpInstance = { raw: jest.fn().mockReturnThis(), toBuffer: jest.fn().mockResolvedValue({ data: buffer, info: { width, height } }) };
+      (mockSharp as any).mockReturnValue(mockSharpInstance);
+      const results = await extractor.extractDepartmentDistribution();
+      expect(results.every(r => r.distributionStatus === 'non détecté')).toBe(true);
+    });
+  });
 });

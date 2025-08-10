@@ -271,4 +271,64 @@ describe('SpeciesDataGenerator', () => {
       expect(enrichedSpecies[0].latinName).toBeUndefined();
     });
   });
+
+  describe('metadata priority count', () => {
+    it('should compute correct prioritySpecies count in generated file', async () => {
+      const listHtml = `
+        <div>
+          <a href="/les-chauves-souris/les-especes/barbastelle-deurope/">Barbastelle d'Europe</a>
+          <a href="/les-chauves-souris/les-especes/grand-murin/">Grand murin</a>
+          <a href="/les-chauves-souris/les-especes/espece-non-prioritaire/">Espèce Non Prioritaire</a>
+        </div>`;
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(listHtml)
+      } as Response);
+
+      await generator.generateSpeciesData();
+      expect(mockWriteFile).toHaveBeenCalledTimes(1);
+      const [, content] = mockWriteFile.mock.calls[0];
+      const parsed = JSON.parse(content as string);
+      expect(parsed.metadata.totalSpecies).toBe(3);
+      // barbastelle + grand murin sont dans la liste prioritaire
+      expect(parsed.metadata.prioritySpecies).toBe(2);
+    });
+  });
+
+  describe('latin name pattern detection', () => {
+    const patterns = [
+      {
+        html: `<div class="entry-content"><p>Texte <em>Myotis myotis</em> fin.</p></div>`,
+        expected: 'Myotis myotis'
+      },
+      {
+        html: `<div class="entry-content"><p>Texte <i>Plecotus auritus</i> fin.</p></div>`,
+        expected: 'Plecotus auritus'
+      },
+      {
+        html: `<div class="entry-content"><p>Le Murin (Rhinolophus ferrumequinum) est présent...</p></div>`,
+        expected: 'Rhinolophus ferrumequinum'
+      },
+      {
+        html: `<div class="entry-content"><span class="latin">Miniopterus schreibersii</span></div>`,
+        expected: 'Miniopterus schreibersii'
+      }
+    ];
+
+    for (const { html, expected } of patterns) {
+      it(`should extract latin name pattern: ${expected}`, async () => {
+        const species = [{
+          name: 'Test',
+            slug: 'test',
+            pageUrl: 'https://plan-actions-chiropteres.fr/test/',
+            isPriority: false,
+        }];
+        mockFetch.mockResolvedValueOnce({ ok: true, status: 200, text: () => Promise.resolve(html) } as Response);
+        const enriched = await generator.enrichWithLatinNames(species as any);
+        expect(enriched[0].latinName).toBe(expected);
+      });
+    }
+  });
 });

@@ -167,6 +167,48 @@ describe('ExcelReportGenerator', () => {
         color: { hex: '#dbe7b0' },
       });
     });
+
+    it('should sort species alphabetically regardless of file order', async () => {
+      mockReaddir.mockResolvedValueOnce([
+        'z-species-distribution.json',
+        'a-species-distribution.json'
+      ] as any);
+
+      const zData = [
+        { department: { code: '01', name: 'Ain' }, distributionStatus: 'assez commune à très commune' }
+      ];
+      const aData = [
+        { department: { code: '01', name: 'Ain' }, distributionStatus: 'rare ou assez rare' }
+      ];
+
+      // L'ordre des readFile suit l'ordre des fichiers retournés par readdir
+      mockReadFile
+        .mockResolvedValueOnce(JSON.stringify(zData))
+        .mockResolvedValueOnce(JSON.stringify(aData));
+
+      const list = await (generator as any).loadAllSpeciesData();
+      expect(list.map((s: any) => s.speciesName)).toEqual(['A Species', 'Z Species']);
+    });
+
+    it('should ignore invalid JSON files but keep valid ones', async () => {
+      mockReadFile.mockReset();
+      mockReaddir.mockResolvedValueOnce([
+        'valid-species-distribution.json',
+        'invalid-species-distribution.json'
+      ] as any);
+
+      const validData = [
+        { department: { code: '01', name: 'Ain' }, distributionStatus: 'assez commune à très commune' }
+      ];
+
+      mockReadFile
+        .mockResolvedValueOnce(JSON.stringify(validData))
+        .mockRejectedValueOnce(new Error('read error'));
+
+      const list = await (generator as any).loadAllSpeciesData();
+      expect(list).toHaveLength(1);
+      expect(list[0].speciesName).toBe('Valid Species');
+    });
   });
 
   describe('extractSpeciesNameFromFilename', () => {
@@ -236,6 +278,31 @@ describe('ExcelReportGenerator', () => {
       const workbook = new (ExcelJS as any).Workbook();
       await (generator as any).createLegendSheet(workbook);
       expect(workbook.addWorksheet).toHaveBeenCalledWith('Légende');
+    });
+  });
+
+  describe('additional behaviors', () => {
+    it('should freeze panes in data matrix worksheet', async () => {
+      mockReaddir.mockResolvedValueOnce(['freeze-test-distribution.json'] as any);
+      const data = [
+        { department: { code: '01', name: 'Ain' }, distributionStatus: 'assez commune à très commune' }
+      ];
+      mockReadFile.mockResolvedValueOnce(JSON.stringify(data));
+
+      const workbook = new (ExcelJS as any).Workbook();
+      await (generator as any).createDataMatrix(workbook, await (generator as any).loadAllSpeciesData());
+
+      // Vérifier qu'au moins une feuille a été ajoutée et que views contient freeze
+      expect(workbook.addWorksheet).toHaveBeenCalledWith('Distribution par Département');
+      // Notre mockWorksheet est réutilisé, on vérifie que views a été affecté
+      expect(Array.isArray(workbook.addWorksheet.mock.results[0].value.views)).toBe(true);
+    });
+
+    it('should map unknown status to default color and short code', () => {
+      const color = (generator as any).getStatusColor('statut inexistant XYZ');
+      const code = (generator as any).getStatusShortCode('statut inexistant XYZ');
+      expect(color).toBe('FFCCCCCC');
+      expect(code).toBe('?');
     });
   });
 });

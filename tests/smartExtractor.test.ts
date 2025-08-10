@@ -1,4 +1,4 @@
-import { SmartDepartmentExtractor } from '../src/smartExtractor.js';
+import { SmartDepartmentExtractor, SharpImageLoader } from '../src/smartExtractor.js';
 import { writeFile } from 'fs/promises';
 import sharp from 'sharp';
 
@@ -142,6 +142,61 @@ describe('SmartDepartmentExtractor', () => {
       const results = await extractor.extractDepartmentDistribution();
       // Aucun département ne devrait avoir cette couleur dominante (seuil >10)
       expect(results.every(r => r.distributionStatus === 'non détecté')).toBe(true);
+    });
+  });
+
+  describe('options & injection', () => {
+    it('devrait utiliser un imageLoader injecté', async () => {
+      const fakeData = Buffer.alloc(30 * 30 * 3, 0);
+      // Peindre une couleur significative > threshold
+      for (let i = 0; i < 400; i++) {
+        fakeData[i * 3] = 150;
+        fakeData[i * 3 + 1] = 203;
+        fakeData[i * 3 + 2] = 155;
+      }
+      const mockLoader = { loadRaw: jest.fn().mockResolvedValue({ data: fakeData, width: 30, height: 30 }) };
+      const custom = new SmartDepartmentExtractor('/tmp/img.png', 'Espèce Test', { imageLoader: mockLoader as any });
+      const mappings = await custom.extractDepartmentDistribution();
+      expect(mockLoader.loadRaw).toHaveBeenCalledTimes(1);
+      expect(mappings.length).toBeGreaterThan(0);
+    });
+
+    it('devrait respecter un sampleRadius plus petit (moins de pixels examinés)', async () => {
+      // Construire un buffer où seule une petite zone centrale a la couleur cible
+      const size = 100;
+      const buf = Buffer.alloc(size * size * 3, 255); // fond blanc ignoré
+      // Petite zone  (10x10) couleur verte mappée
+      for (let y = 45; y < 55; y++) {
+        for (let x = 45; x < 55; x++) {
+          const idx = (y * size + x) * 3;
+          buf[idx] = 150; buf[idx + 1] = 203; buf[idx + 2] = 155;
+        }
+      }
+      const mockLoader = { loadRaw: jest.fn().mockResolvedValue({ data: buf, width: size, height: size }) };
+
+      const smallRadiusExtractor = new SmartDepartmentExtractor('/tmp/img.png', 'Test', { imageLoader: mockLoader as any, sampleRadius: 5 });
+      const largeRadiusExtractor = new SmartDepartmentExtractor('/tmp/img.png', 'Test', { imageLoader: mockLoader as any, sampleRadius: 40 });
+
+      const small = await smallRadiusExtractor.extractDepartmentDistribution();
+      const large = await largeRadiusExtractor.extractDepartmentDistribution();
+
+      // Avec un petit rayon, moins de départements auront une couleur dominante détectée
+      const smallDetected = small.filter(m => m.dominantColor).length;
+      const largeDetected = large.filter(m => m.dominantColor).length;
+      expect(largeDetected).toBeGreaterThanOrEqual(smallDetected);
+    });
+
+    it('devrait respecter un minPixelThreshold élevé (aucune détection)', async () => {
+      const size = 40;
+      const buf = Buffer.alloc(size * size * 3, 0);
+      // Peindre 30 pixels d'une couleur mappée
+      for (let i = 0; i < 30; i++) {
+        buf[i * 3] = 150; buf[i * 3 + 1] = 203; buf[i * 3 + 2] = 155;
+      }
+      const mockLoader = { loadRaw: jest.fn().mockResolvedValue({ data: buf, width: size, height: size }) };
+      const highThresholdExtractor = new SmartDepartmentExtractor('/tmp/img.png', 'Test', { imageLoader: mockLoader as any, minPixelThreshold: 200 });
+      const mappings = await highThresholdExtractor.extractDepartmentDistribution();
+      expect(mappings.every(m => m.distributionStatus === 'non détecté')).toBe(true);
     });
   });
 });

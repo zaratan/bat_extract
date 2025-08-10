@@ -97,10 +97,11 @@ describe('ExcelReportGenerator', () => {
     it('should generate Excel report successfully (mock writeFile)', async () => {
       await generator.generateReport();
       expect(mockReaddir).toHaveBeenCalled();
-      expect(mockReadFile).toHaveBeenCalledTimes(2);
+      // 2 fichiers distribution + éventuellement generated-species-data.json (priorités)
+      expect(mockReadFile.mock.calls.length).toBeGreaterThanOrEqual(2);
+      expect(mockReadFile.mock.calls.length).toBeLessThanOrEqual(3);
       expect((ExcelJS as any).Workbook).toHaveBeenCalled();
       expect((ExcelJS as any).Workbook.mock.results.length).toBeGreaterThan(0);
-      // Deux feuilles ajoutées
       expect((ExcelJS as any).Workbook.mock.results[0].value.addWorksheet).toHaveBeenCalledWith('Distribution par Département');
       expect((ExcelJS as any).Workbook.mock.results[0].value.addWorksheet).toHaveBeenCalledWith('Légende');
       expect((ExcelJS as any).Workbook.mock.results[0].value.xlsx.writeFile).toHaveBeenCalledWith(expect.stringContaining('bat-distribution-matrix.xlsx'));

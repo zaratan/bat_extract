@@ -8,6 +8,7 @@ import {
 
 interface SpeciesData {
   speciesName: string;
+  slug: string; // slug dérivé du nom de fichier
   departments: {
     [departmentCode: string]: {
       name: string;
@@ -16,6 +17,9 @@ interface SpeciesData {
     };
   };
 }
+
+// Couleur de fond légère pour marquer une espèce prioritaire (teinte douce dérivée du orange prioritaire)
+const PRIORITY_SPECIES_NAME_FILL = 'FFFCE8D1';
 
 export class ExcelReportGenerator {
   private readonly outputDir: string;
@@ -68,6 +72,7 @@ export class ExcelReportGenerator {
         const content = await readFile(filePath, 'utf-8');
         const data = JSON.parse(content);
 
+        const slug = file.replace('-distribution.json', '');
         const speciesName = this.extractSpeciesNameFromFilename(file);
         const departments: {
           [code: string]: {
@@ -116,6 +121,7 @@ export class ExcelReportGenerator {
 
         speciesDataList.push({
           speciesName,
+          slug,
           departments,
         });
       } catch (error) {
@@ -141,13 +147,37 @@ export class ExcelReportGenerator {
       .replace(/dor/gi, "d'Or");
   }
 
+  private async loadPrioritySpeciesSlugs(): Promise<Set<string>> {
+    const filePath = join(this.outputDir, 'generated-species-data.json');
+    interface SpeciesEntry {
+      slug?: string;
+      isPriority?: boolean;
+    }
+    try {
+      const raw = await readFile(filePath, 'utf-8');
+      const parsed: { species?: SpeciesEntry[] } = JSON.parse(raw);
+      if (Array.isArray(parsed?.species)) {
+        const set = new Set<string>();
+        parsed.species.forEach(s => {
+          if (s && s.isPriority && typeof s.slug === 'string') set.add(s.slug);
+        });
+        return set;
+      }
+    } catch {
+      // Silencieux
+    }
+    return new Set();
+  }
+
   private async createDataMatrix(
     workbook: ExcelJS.Workbook,
     speciesDataList: SpeciesData[]
   ): Promise<void> {
     const worksheet = workbook.addWorksheet('Distribution par Département');
 
-    // Obtenir la liste de tous les départements (01-95)
+    // Précharger set d'espèces prioritaires (optionnel)
+    const prioritySlugs = await this.loadPrioritySpeciesSlugs();
+
     const allDepartments = this.getAllDepartmentCodes();
 
     // Largeur des colonnes
@@ -185,11 +215,23 @@ export class ExcelReportGenerator {
       // Nom de l'espèce
       const speciesCell = worksheet.getCell(row, 1);
       speciesCell.value = species.speciesName;
-      speciesCell.font = { bold: true, size: 11 };
+      // Couleur de base
+      let fgColor = 'FFF0F0F0';
+      if (prioritySlugs.has(species.slug)) {
+        // Surlignage priorité
+        fgColor = PRIORITY_SPECIES_NAME_FILL;
+        speciesCell.font = {
+          bold: true,
+          size: 11,
+          color: { argb: 'FF9B4A00' },
+        };
+      } else {
+        speciesCell.font = { bold: true, size: 11 };
+      }
       speciesCell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FFF0F0F0' },
+        fgColor: { argb: fgColor },
       };
 
       // Statut par département

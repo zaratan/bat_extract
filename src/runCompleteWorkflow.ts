@@ -1,7 +1,24 @@
 import { execSync } from 'child_process';
-import { readFile, access } from 'fs/promises';
+import { access } from 'fs/promises';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
+import { readJson } from './utils/fsUtils.js';
+
+interface SpeciesDataFile {
+  metadata?: { totalSpecies: number; prioritySpecies: number };
+  species?: unknown[];
+  [k: string]: unknown;
+}
+interface DiscoveredUrlsFile {
+  metadata?: { totalSpecies: number; imagesFound: number; errors: number };
+  validImageUrls?: Record<string, string>;
+  results?: unknown[];
+  [k: string]: unknown;
+}
+interface ConsolidatedSummaryFile {
+  summary?: Record<string, { detectedDepartments?: number }>;
+  [k: string]: unknown;
+}
 
 interface StepResult {
   name: string;
@@ -25,14 +42,35 @@ interface WorkflowReport {
   };
 }
 
+export interface IStepCommandRunner {
+  run(command: string): void;
+}
+
+export class LocalStepCommandRunner implements IStepCommandRunner {
+  run(command: string): void {
+    execSync(command, {
+      stdio: 'pipe',
+      encoding: 'utf-8',
+      cwd: process.cwd(),
+    });
+  }
+}
+
 export class BatExtractWorkflow {
   private report: WorkflowReport;
   private readonly outputDir: string;
   private readonly imagesDir: string;
+  private readonly runner: IStepCommandRunner;
+  private readonly shouldExitOnFatal: boolean;
 
-  constructor() {
+  constructor(
+    runner: IStepCommandRunner = new LocalStepCommandRunner(),
+    options?: { exitOnFatal?: boolean }
+  ) {
     this.outputDir = join(process.cwd(), 'output');
     this.imagesDir = join(process.cwd(), 'images');
+    this.runner = runner;
+    this.shouldExitOnFatal = options?.exitOnFatal !== false; // true par défaut
     this.report = {
       startTime: new Date(),
       steps: [],
@@ -103,7 +141,9 @@ export class BatExtractWorkflow {
       this.report.overallStatus = 'failed';
       this.finalizeReport();
       this.printFinalReport();
-      process.exit(1);
+      if (this.shouldExitOnFatal) {
+        process.exit(1);
+      }
     }
   }
 
@@ -123,12 +163,8 @@ export class BatExtractWorkflow {
     let result: StepResult;
 
     try {
-      // Exécuter la commande
-      execSync(command, {
-        stdio: 'pipe',
-        encoding: 'utf-8',
-        cwd: process.cwd(),
-      });
+      // Exécuter la commande via runner injecté
+      this.runner.run(command);
 
       const duration = Date.now() - startTime;
 
@@ -186,10 +222,10 @@ export class BatExtractWorkflow {
         'output',
         'generated-species-data.json'
       );
-      await access(filePath);
-
-      const content = await readFile(filePath, 'utf-8');
-      const data = JSON.parse(content);
+      const data = await readJson<SpeciesDataFile>(filePath);
+      if (!data) {
+        throw new Error('Fichier vide');
+      }
 
       if (data.metadata) {
         const { totalSpecies, prioritySpecies } = data.metadata;
@@ -236,10 +272,8 @@ export class BatExtractWorkflow {
         'output',
         'discovered-image-urls.json'
       );
-      await access(filePath);
-
-      const content = await readFile(filePath, 'utf-8');
-      const data = JSON.parse(content);
+      const data = await readJson<DiscoveredUrlsFile>(filePath);
+      if (!data) throw new Error('Fichier vide');
 
       // Utiliser les métadonnées du fichier si disponibles
       if (data.metadata) {
@@ -333,10 +367,13 @@ export class BatExtractWorkflow {
             this.outputDir,
             'consolidated-species-report.json'
           );
-          const consolidatedContent = await readFile(consolidatedPath, 'utf-8');
-          const consolidatedData = JSON.parse(consolidatedContent);
-
-          if (consolidatedData.summary) {
+          const consolidatedData = await readJson<ConsolidatedSummaryFile>(
+            consolidatedPath,
+            {
+              optional: true,
+            }
+          );
+          if (consolidatedData && consolidatedData.summary) {
             const speciesSummaries = Object.values(
               consolidatedData.summary
             ) as Array<{ detectedDepartments?: number }>;

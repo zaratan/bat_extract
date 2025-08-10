@@ -1,4 +1,8 @@
-import { BatExtractWorkflow } from '../src/runCompleteWorkflow.js';
+// Déplacer les mocks en haut avant import module testé
+jest.mock('fs/promises', () => ({ access: jest.fn(), readFile: jest.fn(), writeFile: jest.fn() }));
+jest.mock('child_process', () => ({ execSync: jest.fn(() => '') }));
+
+import { BatExtractWorkflow, IStepCommandRunner } from '../src/runCompleteWorkflow.js';
 import * as fsPromises from 'fs/promises';
 import * as fs from 'fs';
 import { mkdtempSync, writeFileSync } from 'fs';
@@ -6,8 +10,16 @@ import { join } from 'path';
 import * as os from 'os';
 import * as childProcess from 'child_process';
 
-jest.mock('child_process', () => ({ execSync: jest.fn(() => '') }));
-jest.mock('fs/promises', () => ({ access: jest.fn(), readFile: jest.fn(), writeFile: jest.fn() }));
+class MockRunner implements IStepCommandRunner {
+  public calls: string[] = [];
+  public failAt: number | null = null;
+  run(cmd: string) {
+    this.calls.push(cmd);
+    if (this.failAt !== null && this.calls.length === this.failAt) {
+      throw new Error('fail step');
+    }
+  }
+}
 
 // Répertoire temporaire racine pour isoler les tests
 let tempRoot: string;
@@ -40,19 +52,18 @@ function setupFilesystem(options: { corruptConsolidated?: boolean } = {}) {
 }
 
 describe('BatExtractWorkflow', () => {
-  let execSpy: jest.Mock;
+  let runner: MockRunner;
 
   beforeEach(() => {
-    execSpy = (childProcess as any).execSync as jest.Mock;
-    execSpy.mockReset();
+    runner = new MockRunner();
   });
 
   it('devrait exécuter le workflow complet avec succès', async () => {
     setupFilesystem();
     const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempRoot);
-    const workflow = new BatExtractWorkflow();
+    const workflow = new BatExtractWorkflow(runner, { exitOnFatal: false });
     await workflow.runCompleteWorkflow();
-    expect(execSpy).toHaveBeenCalledTimes(5);
+    expect(runner.calls).toHaveLength(5);
     const report = (workflow as any).report;
     expect(report.overallStatus).toBe('success');
     cwdSpy.mockRestore();
@@ -61,13 +72,8 @@ describe('BatExtractWorkflow', () => {
   it('devrait marquer le workflow en partiel si une étape échoue', async () => {
     setupFilesystem();
     const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempRoot);
-    let call = 0;
-    execSpy.mockImplementation(() => {
-      call++;
-      if (call === 2) throw new Error('fail step');
-      return '';
-    });
-    const workflow = new BatExtractWorkflow();
+    runner.failAt = 2; // échoue à la 2e commande
+    const workflow = new BatExtractWorkflow(runner, { exitOnFatal: false });
     await workflow.runCompleteWorkflow();
     const report = (workflow as any).report;
     expect(report.overallStatus).toBe('partial');
@@ -79,7 +85,7 @@ describe('BatExtractWorkflow', () => {
     setupFilesystem({ corruptConsolidated: true });
     const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempRoot);
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    const workflow = new BatExtractWorkflow();
+    const workflow = new BatExtractWorkflow(runner, { exitOnFatal: false });
     await workflow.runCompleteWorkflow();
     const report = (workflow as any).report;
     const extractionStep = report.steps.find((s: any) => s.name.includes('Extraction'));

@@ -6,6 +6,11 @@ import {
   FRENCH_DEPARTMENTS,
   FrenchDepartment,
 } from '../data/french-departments.js';
+import {
+  mergeConfig,
+  type DefaultConfig,
+  type DeepPartial,
+} from './config/defaultConfig.js';
 
 // === Nouveaux ajouts pour injection et personnalisation ===
 export interface IRawImageData {
@@ -27,8 +32,9 @@ export class SharpImageLoader implements IImageLoader {
 }
 export interface SmartExtractorOptions {
   imageLoader?: IImageLoader;
-  sampleRadius?: number; // rayon d'échantillonnage
-  minPixelThreshold?: number; // seuil min pour considérer une couleur dominante
+  sampleRadius?: number; // override local
+  minPixelThreshold?: number; // override local
+  config?: DeepPartial<DefaultConfig>; // configuration globale (optionnel)
 }
 
 interface DepartmentColorMapping {
@@ -44,6 +50,8 @@ export class SmartDepartmentExtractor {
   private readonly imageLoader: IImageLoader;
   private readonly sampleRadius: number;
   private readonly minPixelThreshold: number;
+  private readonly config: DefaultConfig;
+  private readonly outputDir: string;
 
   // Liste des départements français externalisée
   private departments: FrenchDepartment[] = FRENCH_DEPARTMENTS;
@@ -53,17 +61,21 @@ export class SmartDepartmentExtractor {
     speciesName?: string,
     options?: SmartExtractorOptions
   ) {
+    this.config = mergeConfig(options?.config);
     this.imagePath =
       imagePath ||
       join(
         process.cwd(),
-        'images',
+        this.config.paths.imagesDir,
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png'
       );
     this.speciesName = speciesName || "Barbastelle d'Europe";
     this.imageLoader = options?.imageLoader || new SharpImageLoader();
-    this.sampleRadius = options?.sampleRadius ?? 30;
-    this.minPixelThreshold = options?.minPixelThreshold ?? 10;
+    this.sampleRadius =
+      options?.sampleRadius ?? this.config.extraction.sampleRadius;
+    this.minPixelThreshold =
+      options?.minPixelThreshold ?? this.config.extraction.minPixelThreshold;
+    this.outputDir = join(process.cwd(), this.config.paths.outputDir);
   }
 
   async extractDepartmentDistribution(): Promise<DepartmentColorMapping[]> {
@@ -267,7 +279,9 @@ export class SmartDepartmentExtractor {
         extractionDate: new Date().toISOString(),
         totalDepartments: mappings.length,
         detectedDepartments: mappings.filter(m => m.dominantColor).length,
-        sourceMap: "Barbastelle d'Europe - Distribution Atlas",
+        sourceMap: `${this.speciesName} - Distribution Atlas`,
+        sampleRadius: this.sampleRadius,
+        minPixelThreshold: this.minPixelThreshold,
       },
       departments: mappings.map(mapping => ({
         code: mapping.department.code,
@@ -288,11 +302,14 @@ export class SmartDepartmentExtractor {
         byStatus: this.groupByStatus(mappings),
         byRegion: this.groupByRegion(mappings),
       },
+      config: {
+        sampleRadius: this.sampleRadius,
+        minPixelThreshold: this.minPixelThreshold,
+      },
     };
 
     const outputFilename = join(
-      process.cwd(),
-      'output',
+      this.outputDir,
       `${this.speciesName
         .toLowerCase()
         .replace(/\s+/g, '-')

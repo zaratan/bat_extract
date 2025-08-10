@@ -7,6 +7,11 @@
 
 import { writeFile, readFile } from 'fs/promises';
 import { join } from 'path';
+import {
+  mergeConfig,
+  type DefaultConfig,
+  type DeepPartial,
+} from './config/defaultConfig.js';
 
 interface BatSpecies {
   name: string;
@@ -132,14 +137,11 @@ function delay(ms: number): Promise<void> {
   });
 }
 
-/**
- * Charge les données d'espèces depuis le fichier JSON généré
- */
-async function loadSpeciesData(): Promise<BatSpecies[]> {
+async function loadSpeciesData(outputDir: string): Promise<BatSpecies[]> {
   try {
     const filePath = join(
       process.cwd(),
-      'output',
+      outputDir,
       'generated-species-data.json'
     );
     const content = await readFile(filePath, 'utf-8');
@@ -152,55 +154,42 @@ async function loadSpeciesData(): Promise<BatSpecies[]> {
   }
 }
 
-/**
- * Découvre toutes les URLs d'images réelles
- */
-async function discoverImageUrls(): Promise<ImageInfo[]> {
-  // Charger les données d'espèces
-  const species = await loadSpeciesData();
-
+async function discoverImageUrlsInternal(
+  cfg: DefaultConfig
+): Promise<ImageInfo[]> {
+  const species = await loadSpeciesData(cfg.paths.outputDir);
   console.log(
     `🦇 Découverte des URLs d'images pour ${species.length} espèces\n`
   );
-
   const results: ImageInfo[] = [];
-  const DELAY = 1500; // 1.5 secondes entre chaque requête
-
+  const delayMs = cfg.network.requestDelayMs; // utilisation config centralisée
   for (let i = 0; i < species.length; i++) {
     const currentSpecies = species[i];
     console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
-
     const info = await analyzeSpeciesPage(currentSpecies);
     results.push(info);
-
-    // Pause entre les requêtes
     if (i < species.length - 1) {
-      await delay(DELAY);
+      await delay(delayMs);
     }
-
-    console.log(''); // Ligne vide pour la lisibilité
+    console.log('');
   }
-
   return results;
 }
 
-/**
- * Génère un rapport et sauvegarde les URLs découvertes
- */
-async function generateReport(results: ImageInfo[]): Promise<void> {
+async function generateReportInternal(
+  results: ImageInfo[],
+  cfg: DefaultConfig
+): Promise<void> {
   const successCount = results.filter(r => r.imageUrl).length;
   const errorCount = results.filter(r => r.error).length;
-
   console.log('🎯 RAPPORT DE DÉCOUVERTE');
   console.log('========================');
   console.log(`✅ Images trouvées: ${successCount}`);
   console.log(`❌ Erreurs/manquantes: ${errorCount}`);
   console.log(`📊 Total analysé: ${results.length}`);
-
-  // Sauvegarde des résultats
   const outputPath = join(
     process.cwd(),
-    'output',
+    cfg.paths.outputDir,
     'discovered-image-urls.json'
   );
   const reportData = {
@@ -218,7 +207,6 @@ async function generateReport(results: ImageInfo[]): Promise<void> {
       hasImage: !!r.imageUrl,
       error: r.error || null,
     })),
-    // URLs valides seulement pour utilisation dans downloadMaps
     validImageUrls: results
       .filter(r => r.imageUrl)
       .reduce(
@@ -229,11 +217,8 @@ async function generateReport(results: ImageInfo[]): Promise<void> {
         {} as Record<string, string>
       ),
   };
-
   await writeFile(outputPath, JSON.stringify(reportData, null, 2));
   console.log(`\n📁 Rapport sauvegardé: ${outputPath}`);
-
-  // Afficher les erreurs
   if (errorCount > 0) {
     console.log('\n📋 DÉTAILS DES ERREURS:');
     results
@@ -242,8 +227,6 @@ async function generateReport(results: ImageInfo[]): Promise<void> {
         console.log(`• ${r.species}: ${r.error}`);
       });
   }
-
-  // Afficher quelques exemples d'URLs trouvées
   const validUrls = results.filter(r => r.imageUrl).slice(0, 3);
   if (validUrls.length > 0) {
     console.log("\n📋 EXEMPLES D'URLS TROUVÉES:");
@@ -254,27 +237,41 @@ async function generateReport(results: ImageInfo[]): Promise<void> {
 }
 
 /**
- * Classe wrapper pour la découverte d'URLs d'images
+ * Classe wrapper pour la découverte d'URLs d'images (configurable)
  */
 export class ImageUrlDiscoverer {
+  private readonly config: DefaultConfig;
+  constructor(cfg?: DeepPartial<DefaultConfig>) {
+    this.config = mergeConfig(cfg);
+  }
   async discoverImageUrls(): Promise<ImageInfo[]> {
-    return discoverImageUrls();
+    return discoverImageUrlsInternal(this.config);
   }
-
   async generateReport(results: ImageInfo[]): Promise<void> {
-    return generateReport(results);
+    return generateReportInternal(results, this.config);
   }
-
   extractImageUrl(html: string, slug: string): string | null {
     return extractImageUrl(html, slug);
   }
-
   async analyzeSpeciesPage(species: BatSpecies): Promise<ImageInfo> {
     return analyzeSpeciesPage(species);
   }
 }
 
-// Le script d'exécution est maintenant dans scripts/discoverImageUrls.ts
+// Fonctions exportées (retro-compat) avec config optionnelle
+async function discoverImageUrls(
+  cfg?: DeepPartial<DefaultConfig>
+): Promise<ImageInfo[]> {
+  const merged = mergeConfig(cfg);
+  return discoverImageUrlsInternal(merged);
+}
+async function generateReport(
+  results: ImageInfo[],
+  cfg?: DeepPartial<DefaultConfig>
+): Promise<void> {
+  const merged = mergeConfig(cfg);
+  return generateReportInternal(results, merged);
+}
 
 export {
   discoverImageUrls,
@@ -282,4 +279,5 @@ export {
   extractImageUrl,
   ImageInfo,
   BatSpecies,
+  generateReport,
 };

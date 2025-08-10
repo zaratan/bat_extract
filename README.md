@@ -349,16 +349,52 @@ Cette étape scrape automatiquement le site <https://plan-actions-chiropteres.fr
 
 - ✅ **Scraping intelligent** : Analyse automatique de la page des espèces
 - ✅ **Données dynamiques** : Toujours à jour avec le site web
-- ✅ **Classification automatique** : Identification des espèces prioritaires
+- ✅ **Détection dynamique de priorité** : Basée uniquement sur la structure HTML réelle (aucune liste statique)
 - ✅ **Format JSON** : Sauvegarde dans `output/generated-species-data.json`
 - ✅ **Métadonnées** : Date de génération, source, statistiques
 
-**Avantages vs fichier statique :**
+**Heuristique de priorité (actuelle) :**
 
-- 🔄 Pas besoin de maintenance manuelle
-- 🆕 Détection automatique des nouvelles espèces
-- 📊 Statistiques précises et actuelles
-- 🌐 Source unique de vérité (le site web officiel)
+La priorité est détectée directement sur la page liste via la présence d'un titre (balise `h2`–`h6`) portant la classe CSS `has-orange-background-color` contenant le lien de l'espèce.
+
+| Élément inspecté                 | Critère                                                 | Décision             |
+| -------------------------------- | ------------------------------------------------------- | -------------------- |
+| Heading parent immédiat du `<a>` | Contient la classe exacte `has-orange-background-color` | `isPriority = true`  |
+| Autre cas                        | Classe absente                                          | `isPriority = false` |
+
+Aucune requête supplémentaire n'est effectuée juste pour déterminer la priorité (les pages détail peuvent être appelées plus tard pour d'autres enrichissements comme le nom latin).
+
+**Pourquoi ce choix :**
+
+- Correspond exactement au signal visuel réel du site (fond orange sur le heading)
+- Stable tant que la classe CSS reste identique
+- Zéro maintenance d'un Set de slugs → conformité aux règles du projet
+- Simple à tester (fixtures HTML ciblées)
+
+**Cas limites :**
+
+- Si le site change la classe (`has-orange-background-color` renommée), les espèces ne seront plus marquées prioritaires → il faudra mettre à jour l'heuristique + tests.
+- Si une future variation applique la couleur via style inline sans classe, une adaptation (fallback) sera à envisager explicitement.
+
+**Tests associés :**
+
+- Cas positif : heading avec la classe
+- Cas négatif : heading sans la classe
+- Comptage agrégé dans les métadonnées (`prioritySpecies`)
+
+**Avantages vs heuristique précédente (badges / texte voisin) :**
+
+- Réduction des faux positifs
+- Moins de parsing contextuel fragile
+- Plus proche de l'intention éditoriale réelle (mise en avant visuelle)
+- Performances légèrement meilleures (moins d'analyse de fenêtres de texte)
+
+**Évolutions possibles :**
+
+- Paramétrer le nom de classe dans une future config centralisée
+- Ajouter un fallback optionnel (ex: détection de style inline `background-color` si pertinent)
+
+**Résumé :** détection purement structurelle → fiable, simple, idempotente.
 
 #### 2. Découverte des URLs réelles
 
@@ -601,112 +637,25 @@ Le projet privilégie l'analyse de couleurs plutôt que l'OCR pour une robustess
 - Possibilité future : parallélisation contrôlée (sémaphore) sans bloquer l'event loop.
 - Idempotence : ré-exécuter une étape réécrit proprement sans inflation de données.
 
-## Technologies
+### Détection des espèces prioritaires
 
-- **TypeScript** avec configuration stricte et typage explicite
-- **ESM (ECMAScript Modules)** pour une architecture moderne et standardisée
-- **Node.js** 22 (spécifiée dans `.nvmrc`) avec fetch natif pour les téléchargements
-- **Sharp** pour l'analyse d'images et le traitement de couleurs
-- **ExcelJS** pour la génération de rapports Excel avec formatage couleur
-- **Jest** pour les tests avec mocks explicites de `fetch`
-- **ESLint** et **Prettier** pour la qualité du code
-- **Husky** et **lint-staged** pour les hooks Git automatiques
-- **pnpm** comme gestionnaire de packages rapide
-- **tsx** pour l'exécution directe des scripts TypeScript ESM
-- **Coordonnées pré-mappées** des 101 départements français
+La détection est entièrement structurée et ne repose plus sur des motifs textuels autour du lien :
 
-### 🔄 Architecture ESM (ECMAScript Modules)
+1. Parcours de chaque lien d'espèce (`href` contenant `/les-chauves-souris/les-especes/{slug}/`).
+2. Recherche du heading englobant le plus proche (h2–h6) contenant ce lien.
+3. Vérification de la présence de la classe exacte `has-orange-background-color` sur ce heading.
+4. Attribution : `isPriority = (classe présente)`.
 
-Le projet utilise **ESM (ECMAScript Modules)** pour une architecture moderne et standardisée :
+**Caractéristiques :**
 
-**Avantages ESM :**
+- 🔍 Signal unique et explicite → faible ambiguïté
+- 🔄 Aucune liste codée en dur
+- 🧪 Couvert par des tests unitaires (fixtures minimales)
+- 🛠️ Facile à adapter si le site change (un seul point à modifier)
 
-- ✅ **Standard moderne** : Syntaxe `import/export` native JavaScript/TypeScript
-- ✅ **Tree-shaking** : Optimisation automatique du bundling
-- ✅ **Interopérabilité** : Compatibilité avec les outils modernes
-- ✅ **Performance** : Chargement asynchrone et mise en cache des modules
-- ✅ **Sécurité** : Imports explicites et résolution de modules stricte
+**Surveillance recommandée :**
 
-**Configuration :**
+- Audit périodique (manuel) de la page source pour confirmer la persistance de la classe
+- Ajout futur (si besoin) d'un test d'intégration simulant un changement de classe afin de documenter l'échec attendu
 
-- `package.json` : `"type": "module"` pour ESM natif
-- `tsconfig.json` : Configuration TypeScript optimisée pour ESM
-- `tsx` : Remplacement de `ts-node` pour l'exécution ESM
-- Extensions `.js` : Imports relatifs avec extensions explicites
-- Jest : Preset ESM pour les tests (`ts-jest/presets/default-esm`)
-
-**Migration depuis CommonJS :**
-
-- Tous les `require()` → `import`
-- Tous les `module.exports` → `export`
-- Extensions `.js` ajoutées aux imports relatifs
-- Scripts mis à jour pour utiliser `tsx` au lieu de `ts-node`
-- Tests configurés pour ESM avec support TypeScript
-
-## Résultats
-
-### Format des données extraites
-
-Chaque extraction génère :
-
-**Par espèce** (`output/{espece}-distribution.json`) :
-
-```json
-{
-  "metadata": {
-    "extractionDate": "2025-08-09T...",
-    "totalDepartments": 101,
-    "detectedDepartments": 91,
-    "sourceMap": "Espèce - Distribution Atlas"
-  },
-  "departments": [
-    {
-      "code": "01",
-      "name": "Ain",
-      "region": "Auvergne-Rhône-Alpes",
-      "color": { "r": 149, "g": 203, "b": 155, "hex": "#95cb9b" },
-      "distributionStatus": "assez commune à très commune",
-      "confidence": "high"
-    }
-  ],
-  "summary": {
-    "byStatus": { "assez commune à très commune": 57 },
-    "byRegion": { "Auvergne-Rhône-Alpes": 8 }
-  }
-}
-```
-
-**Rapport consolidé** (`output/consolidated-species-report.json`) :
-
-- 📊 Statistiques par espèce
-- 🗺️ Répartition géographique
-- 📈 Comparaisons inter-espèces
-- 🎯 Métriques de qualité
-
-**Rapport Excel** (`output/bat-distribution-matrix.xlsx`) :
-
-- 📋 **Matrice espèces × départements** avec cellules colorées selon le statut
-- 🎨 **Codes couleur officiels** du Plan National d'Actions Chiroptères
-- 📖 **Légende complète** sur une page séparée
-- 🔒 **Panneaux figés** pour navigation facile dans la matrice
-- 💡 **Codes courts** : TR (très rare), R (rare), PC (peu commune), AC (assez commune), etc.
-
-### Format des images
-
-Les images doivent suivre le pattern :
-
-```text
-plan-actions-chiropteres.fr-{espece}-carte-{espece}-2048x1271.png
-```
-
-**Exemples :**
-
-- `plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png`
-- `plan-actions-chiropteres.fr-grand-murin-carte-grand-murin-2048x1271.png`
-
-## Source des données
-
-**Plan National d'Actions en faveur des Chiroptères 2016-2025**  
-Référence : <https://plan-actions-chiropteres.fr/>
-
-Les cartes de distribution sont téléchargées directement depuis le site officiel et analysées automatiquement pour extraire les données de présence par département.
+> Si la classe venait à disparaître, la détection redeviendrait neutre (zéro prioritaire) plutôt que faussement positive, ce qui est un mode dégradé plus sûr.

@@ -1,6 +1,11 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { SmartDepartmentExtractor } from './smartExtractor.js';
+import {
+  mergeConfig,
+  type DeepPartial,
+  type DefaultConfig,
+} from './config/defaultConfig.js';
 
 /** Interface d'un extracteur départemental (simplifiée pour injection) */
 export interface IDepartmentExtractor {
@@ -33,17 +38,22 @@ export interface ProcessSpeciesResult {
 
 /**
  * Extracteur multi-espèces qui traite automatiquement toutes les cartes
- * dans le dossier /images et extrait les données de distribution par département
+ * dans le dossier images configuré et extrait les données de distribution
  */
 export class MultiSpeciesExtractor {
-  private readonly imagesPath = join(process.cwd(), 'images');
-  private readonly outputPath = join(process.cwd(), 'output');
+  private readonly imagesPath: string;
+  private readonly outputPath: string;
   private readonly factory: IDepartmentExtractorFactory;
+  private readonly config: DefaultConfig;
 
   constructor(
-    factory: IDepartmentExtractorFactory = new SmartDepartmentExtractorFactory()
+    factory: IDepartmentExtractorFactory = new SmartDepartmentExtractorFactory(),
+    config?: DeepPartial<DefaultConfig>
   ) {
     this.factory = factory;
+    this.config = mergeConfig(config);
+    this.imagesPath = join(process.cwd(), this.config.paths.imagesDir);
+    this.outputPath = join(process.cwd(), this.config.paths.outputDir);
   }
 
   /**
@@ -55,13 +65,9 @@ export class MultiSpeciesExtractor {
 
     // Patterns pour extraire le nom de l'espèce
     const patterns = [
-      // Pattern: plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271
       /plan-actions-chiropteres\.fr-([^-]+(?:-[^-]+)*)-carte/i,
-      // Pattern: plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271
       /plan-actions-chiropteres\.fr-carte-([^-]+(?:-[^-]+)*)-carte/i,
-      // Pattern général: quelque-chose-ESPECE-quelque-chose
       /carte-([^-]+(?:-[^-]+)*)-carte/i,
-      // Pattern de fallback: tout ce qui ressemble à un nom d'espèce
       /([a-z]+-[a-z]+(?:-[a-z]+)*)/i,
     ];
 
@@ -72,7 +78,6 @@ export class MultiSpeciesExtractor {
       }
     }
 
-    // Si aucun pattern ne marche, utiliser le nom du fichier nettoyé
     return this.formatSpeciesName(nameWithoutExt);
   }
 
@@ -111,7 +116,7 @@ export class MultiSpeciesExtractor {
     try {
       await fs.mkdir(this.outputPath, { recursive: true });
     } catch {
-      // Le dossier existe déjà, c'est ok
+      // ok
     }
   }
 
@@ -262,14 +267,14 @@ export class MultiSpeciesExtractor {
    */
   async extractAllSpecies(): Promise<ProcessSpeciesResult[]> {
     console.log("🚀 Démarrage de l'extraction multi-espèces");
-    console.log('🔍 Recherche des cartes dans le dossier /images...');
+    console.log('🔍 Recherche des cartes dans le dossier images...');
 
     await this.ensureOutputDir();
 
     const imageFiles = await this.getImageFiles();
 
     if (imageFiles.length === 0) {
-      console.log('❌ Aucune image trouvée dans le dossier /images');
+      console.log('❌ Aucune image trouvée dans le dossier images');
       return [];
     }
 

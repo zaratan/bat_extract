@@ -5,6 +5,11 @@
 
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
+import {
+  mergeConfig,
+  type DefaultConfig,
+  type DeepPartial,
+} from './config/defaultConfig.js';
 
 interface BatSpecies {
   /** Nom français de l'espèce */
@@ -32,6 +37,11 @@ interface SpeciesDataOutput {
 export class SpeciesDataGenerator {
   private readonly baseUrl = 'https://plan-actions-chiropteres.fr';
   private readonly speciesListUrl = `${this.baseUrl}/les-chauves-souris/les-especes/`;
+  private readonly config: DefaultConfig;
+
+  constructor(cfg?: DeepPartial<DefaultConfig>) {
+    this.config = mergeConfig(cfg);
+  }
 
   /**
    * Génère le fichier JSON des espèces depuis le site web
@@ -41,13 +51,7 @@ export class SpeciesDataGenerator {
     console.log(`🌐 Source: ${this.speciesListUrl}`);
 
     try {
-      // Récupérer la page principale des espèces
-      const speciesData = await this.scrapeSpeciesList();
-
-      // Déterminer les espèces prioritaires (basé sur la liste connue)
-      const speciesWithPriority = this.addPriorityFlags(speciesData);
-
-      // Créer la structure de sortie
+      const speciesWithPriority = await this.scrapeSpeciesList();
       const output: SpeciesDataOutput = {
         metadata: {
           generatedAt: new Date().toISOString(),
@@ -57,15 +61,12 @@ export class SpeciesDataGenerator {
         },
         species: speciesWithPriority,
       };
-
-      // Sauvegarder le fichier JSON
       const outputPath = join(
         process.cwd(),
-        'output',
+        this.config.paths.outputDir,
         'generated-species-data.json'
       );
       await writeFile(outputPath, JSON.stringify(output, null, 2), 'utf-8');
-
       console.log(`✅ Données générées: ${outputPath}`);
       console.log(`📊 Total: ${output.metadata.totalSpecies} espèces`);
       console.log(
@@ -106,43 +107,54 @@ export class SpeciesDataGenerator {
    */
   private extractSpeciesFromHtml(html: string): BatSpecies[] {
     const species: BatSpecies[] = [];
-
-    // Pattern pour trouver les liens vers les pages d'espèces
-    // Recherche les liens qui pointent vers /les-especes/[slug]/
     const linkPattern =
-      /<a[^>]+href="([^"]*\/les-especes\/([^/]+)\/)["'][^>]*>([^<]+)<\/a>/gi;
-
-    let match;
+      /<a[^>]+href="([^"']*\/les-especes\/([^/]+)\/)["'][^>]*>([^<]+)<\/a>/gi;
+    let match: RegExpExecArray | null;
     const seenSlugs = new Set<string>();
-
     while ((match = linkPattern.exec(html)) !== null) {
+      const matchIndex = match.index;
       const [, fullUrl, slug, rawName] = match;
-
-      // Nettoyer le nom de l'espèce
       const name = this.cleanSpeciesName(rawName);
-
-      // Éviter les doublons
-      if (seenSlugs.has(slug) || !name || name.length < 3) {
-        continue;
-      }
-
-      // Construire l'URL complète si nécessaire
+      if (seenSlugs.has(slug) || !name || name.length < 3) continue;
       const pageUrl = fullUrl.startsWith('http')
         ? fullUrl
         : `${this.baseUrl}${fullUrl}`;
-
-      species.push({
-        name,
-        slug,
-        pageUrl,
-        isPriority: false, // Sera déterminé plus tard
-      });
-
+      const isPriority = this.detectPriorityNear(html, matchIndex, slug);
+      species.push({ name, slug, pageUrl, isPriority });
       seenSlugs.add(slug);
     }
-
-    // Trier par nom pour une sortie cohérente
     return species.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+  }
+
+  /**
+   * Détecte la priorité à partir du lien :
+   * 1. Cherche le dernier tag ouvrant <article ...> ou <div ...> avant le lien dans une fenêtre limitée.
+   * 2. Inspecte ses classes.
+   * 3. Cherche juste après le lien (fenêtre courte) un badge ou span prioritaire.
+   */
+  private detectPriorityNear(
+    html: string,
+    linkStart: number,
+    _slug: string
+  ): boolean {
+    // Fenêtre avant le lien pour trouver le heading englobant
+    const windowStart = Math.max(0, linkStart - 600);
+    const before = html.slice(windowStart, linkStart);
+    // Trouver toutes les balises heading avec classes avant le lien
+    const headingRegex = /<h[2-6][^>]*class=["']([^"']+)["'][^>]*>/gi;
+    let m: RegExpExecArray | null;
+    let lastClasses: string | null = null;
+    while ((m = headingRegex.exec(before)) !== null) {
+      lastClasses = m[1];
+    }
+    if (!lastClasses) return false;
+    const cls = lastClasses.toLowerCase();
+    // Critère principal : classe Gutenberg has-orange-background-color
+    if (/(^|\s)has-orange-background-color(\s|$)/.test(cls)) return true;
+    if (/has-[a-z0-9-]*orange[a-z0-9-]*-background-color/.test(cls)) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -161,58 +173,32 @@ export class SpeciesDataGenerator {
   }
 
   /**
-   * Ajoute les flags de priorité basés sur la connaissance existante
-   */
-  private addPriorityFlags(species: BatSpecies[]): BatSpecies[] {
-    // Liste des espèces prioritaires selon le PNAC
-    const prioritySlugs = new Set([
-      'barbastelle-deurope',
-      'grand-murin',
-      'grand-rhinolophe',
-      'grande-noctule',
-      'minioptere-de-schreibers',
-      'molosse-de-cestoni',
-      'murin-a-oreilles-echancrees',
-      'murin-de-bechstein',
-      'murin-de-capaccini',
-      'murin-des-marais',
-      'oreillard-gris',
-      'petit-murin',
-      'petit-rhinolophe',
-      'pipistrelle-pygmee',
-      'rhinolophe-de-mehely',
-      'rhinolophe-euryale',
-      'vespere-de-savi',
-    ]);
-
-    return species.map(sp => ({
-      ...sp,
-      isPriority: prioritySlugs.has(sp.slug),
-    }));
-  }
-
-  /**
    * Enrichit les données avec les noms latins depuis les pages individuelles
+   * (et met aussi à jour la priorité si pas encore renseignée)
    */
   async enrichWithLatinNames(species: BatSpecies[]): Promise<BatSpecies[]> {
     console.log('🔬 Enrichissement avec les noms latins...');
-
     const enrichedSpecies: BatSpecies[] = [];
-
+    const delayMs = this.config.network.requestDelayMs;
     for (let index = 0; index < species.length; index++) {
       const sp = species[index];
       console.log(`📖 (${index + 1}/${species.length}) ${sp.name}...`);
-
       try {
-        const latinName = await this.extractLatinName(sp.pageUrl);
-        enrichedSpecies.push({
-          ...sp,
-          latinName,
-        });
-
-        // Délai pour respecter le serveur
+        const response = await fetch(sp.pageUrl);
+        if (!response || !response.ok) {
+          enrichedSpecies.push(sp);
+        } else {
+          const html = await response.text();
+          const latinName = this.extractLatinNameFromHtml(html);
+          const updated: BatSpecies = {
+            ...sp,
+            latinName,
+            // isPriority déjà déterminé lors de l'extraction de la liste
+          };
+          enrichedSpecies.push(updated);
+        }
         await new Promise<void>(resolve => {
-          globalThis.setTimeout(resolve, 1000);
+          globalThis.setTimeout(resolve, delayMs);
         });
       } catch (error) {
         console.warn(
@@ -221,40 +207,38 @@ export class SpeciesDataGenerator {
         enrichedSpecies.push(sp);
       }
     }
-
     return enrichedSpecies;
+  }
+
+  // Nouvelle factorisation de l'extraction du nom latin depuis un HTML déjà récupéré
+  private extractLatinNameFromHtml(html: string): string | undefined {
+    const patterns = [
+      /<em[^>]*>([A-Z][a-z]+ [a-z]+)<\/em>/i,
+      /<i[^>]*>([A-Z][a-z]+ [a-z]+)<\/i>/i,
+      /\(([A-Z][a-z]+ [a-z]+)\)/,
+      /<span[^>]*class="[^"]*latin[^"]*"[^>]*>([A-Z][a-z]+ [a-z]+)<\/span>/i,
+    ];
+    for (const pattern of patterns) {
+      const match = html.match(pattern);
+      if (match && match[1]) {
+        const latinName = match[1].trim();
+        if (/^[A-Z][a-z]+ [a-z]+$/.test(latinName)) return latinName;
+      }
+    }
+    return undefined;
   }
 
   /**
    * Extrait le nom latin depuis une page d'espèce
    */
   private async extractLatinName(pageUrl: string): Promise<string | undefined> {
+    // Conservée pour compat compat éventuelle (utilisée par tests existants),
+    // mais redirige vers logique factorisée.
     try {
       const response = await fetch(pageUrl);
-      if (!response.ok) return undefined;
-
+      if (!response || !response.ok) return undefined;
       const html = await response.text();
-
-      // Patterns pour trouver le nom latin
-      const patterns = [
-        /<em[^>]*>([A-Z][a-z]+ [a-z]+)<\/em>/i,
-        /<i[^>]*>([A-Z][a-z]+ [a-z]+)<\/i>/i,
-        /\(([A-Z][a-z]+ [a-z]+)\)/,
-        /<span[^>]*class="[^"]*latin[^"]*"[^>]*>([A-Z][a-z]+ [a-z]+)<\/span>/i,
-      ];
-
-      for (const pattern of patterns) {
-        const match = html.match(pattern);
-        if (match && match[1]) {
-          const latinName = match[1].trim();
-          // Vérifier que c'est bien un nom latin (format Genus species)
-          if (/^[A-Z][a-z]+ [a-z]+$/.test(latinName)) {
-            return latinName;
-          }
-        }
-      }
-
-      return undefined;
+      return this.extractLatinNameFromHtml(html);
     } catch {
       return undefined;
     }

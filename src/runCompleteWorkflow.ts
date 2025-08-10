@@ -3,6 +3,11 @@ import { access } from 'fs/promises';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { readJson } from './utils/fsUtils.js';
+import {
+  mergeConfig,
+  type DeepPartial,
+  type DefaultConfig,
+} from './config/defaultConfig.js';
 
 interface SpeciesDataFile {
   metadata?: { totalSpecies: number; prioritySpecies: number };
@@ -62,24 +67,22 @@ export class BatExtractWorkflow {
   private readonly imagesDir: string;
   private readonly runner: IStepCommandRunner;
   private readonly shouldExitOnFatal: boolean;
+  private readonly config: DefaultConfig;
 
   constructor(
     runner: IStepCommandRunner = new LocalStepCommandRunner(),
-    options?: { exitOnFatal?: boolean }
+    options?: { exitOnFatal?: boolean; config?: DeepPartial<DefaultConfig> }
   ) {
-    this.outputDir = join(process.cwd(), 'output');
-    this.imagesDir = join(process.cwd(), 'images');
+    this.config = mergeConfig(options?.config);
+    this.outputDir = join(process.cwd(), this.config.paths.outputDir);
+    this.imagesDir = join(process.cwd(), this.config.paths.imagesDir);
     this.runner = runner;
     this.shouldExitOnFatal = options?.exitOnFatal !== false; // true par défaut
     this.report = {
       startTime: new Date(),
       steps: [],
       overallStatus: 'success',
-      summary: {
-        successCount: 0,
-        errorCount: 0,
-        warningCount: 0,
-      },
+      summary: { successCount: 0, errorCount: 0, warningCount: 0 },
     };
   }
 
@@ -217,11 +220,7 @@ export class BatExtractWorkflow {
     details: string[];
   }> {
     try {
-      const filePath = join(
-        process.cwd(),
-        'output',
-        'generated-species-data.json'
-      );
+      const filePath = join(this.outputDir, 'generated-species-data.json');
       const data = await readJson<SpeciesDataFile>(filePath);
       if (!data) {
         throw new Error('Fichier vide');
@@ -267,11 +266,7 @@ export class BatExtractWorkflow {
     details: string[];
   }> {
     try {
-      const filePath = join(
-        process.cwd(),
-        'output',
-        'discovered-image-urls.json'
-      );
+      const filePath = join(this.outputDir, 'discovered-image-urls.json');
       const data = await readJson<DiscoveredUrlsFile>(filePath);
       if (!data) throw new Error('Fichier vide');
 

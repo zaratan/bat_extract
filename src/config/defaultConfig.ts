@@ -32,6 +32,17 @@ export interface DefaultConfig {
     readonly continueOnPartialErrors: boolean;
     readonly verbose: boolean;
   };
+  // Nouvelle section : détection des espèces prioritaires
+  readonly priorityDetection: {
+    /** Liste de classes (complètes) marquant un heading prioritaire */
+    readonly headingClassNames: readonly string[];
+    /** Active le fallback sur style inline (background / background-color) */
+    readonly enableInlineStyleFallback: boolean;
+    /** Couleurs hex (avec #) considérées comme indicateur prioritaire si présentes dans style */
+    readonly fallbackInlineStyleColors: readonly string[];
+    /** Mot-clé facultatif (ex: 'orange') à rechercher dans le style si aucune couleur hex exacte */
+    readonly fallbackStyleColorKeyword: string | null;
+  };
 }
 
 // DeepPartial type (utility) – minimal implementation (no need for external lib)
@@ -58,6 +69,12 @@ export const defaultConfig: DefaultConfig = Object.freeze({
     autosizeColumns: true,
   },
   workflow: { failFast: false, continueOnPartialErrors: true, verbose: false },
+  priorityDetection: {
+    headingClassNames: ['has-orange-background-color'],
+    enableInlineStyleFallback: true,
+    fallbackInlineStyleColors: ['#f7a923'],
+    fallbackStyleColorKeyword: 'orange',
+  },
 } satisfies DefaultConfig);
 
 export function mergeConfig(

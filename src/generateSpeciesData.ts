@@ -137,22 +137,36 @@ export class SpeciesDataGenerator {
     linkStart: number,
     _slug: string
   ): boolean {
-    // Fenêtre avant le lien pour trouver le heading englobant
+    const cfg = this.config.priorityDetection;
     const windowStart = Math.max(0, linkStart - 600);
     const before = html.slice(windowStart, linkStart);
-    // Trouver toutes les balises heading avec classes avant le lien
-    const headingRegex = /<h[2-6][^>]*class=["']([^"']+)["'][^>]*>/gi;
+    // Heading avec classes ET éventuellement style inline
+    const headingRegex = /<h[2-6][^>]*>/gi;
     let m: RegExpExecArray | null;
-    let lastClasses: string | null = null;
+    let lastHeading: string | null = null;
     while ((m = headingRegex.exec(before)) !== null) {
-      lastClasses = m[1];
+      lastHeading = m[0];
     }
-    if (!lastClasses) return false;
-    const cls = lastClasses.toLowerCase();
-    // Critère principal : classe Gutenberg has-orange-background-color
-    if (/(^|\s)has-orange-background-color(\s|$)/.test(cls)) return true;
-    if (/has-[a-z0-9-]*orange[a-z0-9-]*-background-color/.test(cls)) {
-      return true;
+    if (!lastHeading) return false;
+    const classMatch = /class=["']([^"']+)["']/i.exec(lastHeading);
+    const styleMatch = /style=["']([^"']+)["']/i.exec(lastHeading);
+    const classes = classMatch ? classMatch[1].toLowerCase().split(/\s+/) : [];
+    // Critère principal : classe listée dans la config
+    for (const c of classes) {
+      if (cfg.headingClassNames.includes(c)) return true;
+    }
+    // Fallback optionnel : style inline contenant une couleur cible
+    if (cfg.enableInlineStyleFallback && styleMatch) {
+      const style = styleMatch[1].toLowerCase();
+      for (const hex of cfg.fallbackInlineStyleColors) {
+        if (style.includes(hex.toLowerCase())) return true;
+      }
+      if (
+        cfg.fallbackStyleColorKeyword &&
+        style.includes(cfg.fallbackStyleColorKeyword.toLowerCase())
+      ) {
+        return true;
+      }
     }
     return false;
   }

@@ -13,6 +13,7 @@ import {
   type DefaultConfig,
   type DeepPartial,
 } from './config/defaultConfig.js';
+import { runWithConcurrency } from './utils/concurrency.js';
 
 interface BatSpecies {
   name: string;
@@ -160,16 +161,45 @@ async function downloadAllMapsInternal(cfg: DefaultConfig): Promise<void> {
     await mkdir(imagesDir, { recursive: true });
     console.log(`📁 Dossier créé: ${imagesDir}\n`);
   }
+  const limit = Math.max(1, cfg.parallel.maxConcurrentDownloads || 1);
+  if (limit > 1) {
+    console.log(
+      `⚙️  Mode parallèle limité: ${limit} téléchargements simultanés`
+    );
+  }
   let successCount = 0;
   let errorCount = 0;
-  for (let i = 0; i < species.length; i++) {
-    const currentSpecies = species[i];
-    const filename = generateFileName(currentSpecies.slug, cfg);
-    const filePath = join(imagesDir, filename);
-    console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
-    if (existsSync(filePath)) {
-      console.log('   ⏭️  Fichier déjà présent, passage au suivant');
-    } else {
+  if (limit === 1) {
+    for (let i = 0; i < species.length; i++) {
+      const currentSpecies = species[i];
+      const filename = generateFileName(currentSpecies.slug, cfg);
+      const filePath = join(imagesDir, filename);
+      console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
+      if (existsSync(filePath)) {
+        console.log('   ⏭️  Fichier déjà présent, passage au suivant');
+      } else {
+        const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
+        console.log(`   🔗 URL: ${imageUrl}`);
+        const success = await downloadImage(
+          imageUrl,
+          filePath,
+          currentSpecies.name
+        );
+        if (success) successCount++;
+        else errorCount++;
+      }
+      if (i < species.length - 1) await delay(delayMs);
+      console.log('');
+    }
+  } else {
+    await runWithConcurrency(species, limit, async (currentSpecies, index) => {
+      const filename = generateFileName(currentSpecies.slug, cfg);
+      const filePath = join(imagesDir, filename);
+      console.log(`[${index + 1}/${species.length}] ${currentSpecies.name}`);
+      if (existsSync(filePath)) {
+        console.log('   ⏭️  Fichier déjà présent, passage au suivant');
+        return;
+      }
       const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
       console.log(`   🔗 URL: ${imageUrl}`);
       const success = await downloadImage(
@@ -177,14 +207,9 @@ async function downloadAllMapsInternal(cfg: DefaultConfig): Promise<void> {
         filePath,
         currentSpecies.name
       );
-      if (success) {
-        successCount++;
-      } else {
-        errorCount++;
-      }
-    }
-    if (i < species.length - 1) await delay(delayMs);
-    console.log('');
+      if (success) successCount++;
+      else errorCount++;
+    });
   }
   console.log('🦇 ================================');
   console.log('🦇 RAPPORT DE TÉLÉCHARGEMENT');
@@ -208,33 +233,63 @@ async function downloadPriorityMapsInternal(cfg: DefaultConfig): Promise<void> {
     await mkdir(imagesDir, { recursive: true });
     console.log(`📁 Dossier créé: ${imagesDir}\n`);
   }
+  const limit = Math.max(1, cfg.parallel.maxConcurrentDownloads || 1);
+  if (limit > 1) {
+    console.log(
+      `⚙️  Mode parallèle limité: ${limit} téléchargements simultanés`
+    );
+  }
   let successCount = 0;
   let errorCount = 0;
-  for (let i = 0; i < prioritySpecies.length; i++) {
-    const currentSpecies = prioritySpecies[i];
-    const filename = generateFileName(currentSpecies.slug, cfg);
-    const filePath = join(imagesDir, filename);
-    console.log(
-      `[${i + 1}/${prioritySpecies.length}] ${currentSpecies.name} 🎯`
-    );
-    if (existsSync(filePath)) {
-      console.log('   ⏭️  Fichier déjà présent, passage au suivant');
-    } else {
-      const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
-      console.log(`   🔗 URL: ${imageUrl}`);
-      const success = await downloadImage(
-        imageUrl,
-        filePath,
-        currentSpecies.name
+  if (limit === 1) {
+    for (let i = 0; i < prioritySpecies.length; i++) {
+      const currentSpecies = prioritySpecies[i];
+      const filename = generateFileName(currentSpecies.slug, cfg);
+      const filePath = join(imagesDir, filename);
+      console.log(
+        `[${i + 1}/${prioritySpecies.length}] ${currentSpecies.name} 🎯`
       );
-      if (success) {
-        successCount++;
+      if (existsSync(filePath)) {
+        console.log('   ⏭️  Fichier déjà présent, passage au suivant');
       } else {
-        errorCount++;
+        const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
+        console.log(`   🔗 URL: ${imageUrl}`);
+        const success = await downloadImage(
+          imageUrl,
+          filePath,
+          currentSpecies.name
+        );
+        if (success) successCount++;
+        else errorCount++;
       }
+      if (i < prioritySpecies.length - 1) await delay(delayMs);
+      console.log('');
     }
-    if (i < prioritySpecies.length - 1) await delay(delayMs);
-    console.log('');
+  } else {
+    await runWithConcurrency(
+      prioritySpecies,
+      limit,
+      async (currentSpecies, index) => {
+        const filename = generateFileName(currentSpecies.slug, cfg);
+        const filePath = join(imagesDir, filename);
+        console.log(
+          `[${index + 1}/${prioritySpecies.length}] ${currentSpecies.name} 🎯`
+        );
+        if (existsSync(filePath)) {
+          console.log('   ⏭️  Fichier déjà présent, passage au suivant');
+          return;
+        }
+        const imageUrl = await getImageUrl(currentSpecies.slug, outputDir, cfg);
+        console.log(`   🔗 URL: ${imageUrl}`);
+        const success = await downloadImage(
+          imageUrl,
+          filePath,
+          currentSpecies.name
+        );
+        if (success) successCount++;
+        else errorCount++;
+      }
+    );
   }
   console.log('🦇 ================================');
   console.log('🦇 RAPPORT DE TÉLÉCHARGEMENT');

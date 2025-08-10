@@ -33,4 +33,5 @@ export default {
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 10000,
+  watchPathIgnorePatterns: ['<rootDir>/output', '<rootDir>/images'],
 };

@@ -50,6 +50,8 @@ processed_images/
 
 # Results and outputs
 output/
+# Dossiers de sortie tests (isolation)
+output_test/
 results/
 extractions/
 *extract.json
@@ -61,4 +63,6 @@ extractions/
 
 # Images (keep README.md but ignore actual images)
 images/*
+# Dossier images tests (isolation)
+images_test/
 !images/README.md

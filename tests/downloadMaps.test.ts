@@ -9,9 +9,11 @@ jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
 }));
 
-jest.mock('fs', () => ({
-  existsSync: jest.fn(),
-}));
+// Préserver les autres fonctions de fs (mkdirSync utilisé dans setup.ts)
+jest.mock('fs', () => {
+  const real = jest.requireActual('fs');
+  return { ...real, existsSync: jest.fn() };
+});
 
 const mockWriteFile = writeFile as jest.MockedFunction<typeof writeFile>;
 const mockMkdir = mkdir as jest.MockedFunction<typeof mkdir>;
@@ -29,17 +31,14 @@ describe('MapDownloader', () => {
   beforeEach(() => {
     downloader = new MapDownloader();
     jest.clearAllMocks();
-    
     // Sauvegarder et mocker fetch
     originalFetch = globalThis.fetch;
     globalThis.fetch = mockFetch;
-    
     // Mock process.exit pour tous les tests
     mockExit = jest.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('Process exit called');
     });
-    
-    // Mock fetch to return successful responses
+    // Mock fetch success par défaut
     mockFetch.mockImplementation(() => {
       const mockImageBuffer = Buffer.from('fake-image-data');
       return Promise.resolve({
@@ -54,7 +53,6 @@ describe('MapDownloader', () => {
 
   afterEach(() => {
     mockExit.mockRestore();
-    // Restaurer fetch original
     globalThis.fetch = originalFetch;
   });
 

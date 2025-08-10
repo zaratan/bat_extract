@@ -112,9 +112,13 @@ describe('loadUserConfig / resolveUserConfigFromProcess', () => {
   describe('integration with mergeConfig', () => {
     it('properly merges user overrides', async () => {
       const user = { network: { requestDelayMs: 42 } };
+      const baseline = mergeConfig();
       const merged = mergeConfig(user);
       expect(merged.network.requestDelayMs).toBe(42);
-      expect(merged.paths.imagesDir).toBe(defaultConfig.paths.imagesDir);
+      // Le chemin des images ne doit pas changer en dehors de l override user; on compare au baseline (qui inclut potentiels overrides test)
+      expect(merged.paths.imagesDir).toBe(baseline.paths.imagesDir);
+      // Et defaultConfig reste la source "brute"
+      expect(defaultConfig.paths.imagesDir).toBe('images');
     });
   });
 });

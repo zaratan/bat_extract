@@ -12,6 +12,7 @@ import {
   type DefaultConfig,
   type DeepPartial,
 } from './config/defaultConfig.js';
+import { runWithConcurrency } from './utils/concurrency.js';
 
 interface BatSpecies {
   name: string;
@@ -161,19 +162,36 @@ async function discoverImageUrlsInternal(
   console.log(
     `🦇 Découverte des URLs d'images pour ${species.length} espèces\n`
   );
-  const results: ImageInfo[] = [];
   const delayMs = cfg.network.requestDelayMs; // utilisation config centralisée
-  for (let i = 0; i < species.length; i++) {
-    const currentSpecies = species[i];
-    console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
-    const info = await analyzeSpeciesPage(currentSpecies);
-    results.push(info);
-    if (i < species.length - 1) {
-      await delay(delayMs);
-    }
-    console.log('');
+  const limit = Math.max(1, cfg.parallel.maxConcurrentDownloads || 1);
+  if (limit > 1) {
+    console.log(
+      `⚙️  Mode parallèle limité découverte: ${limit} requêtes simultanées`
+    );
   }
-  return results;
+  if (limit === 1) {
+    const results: ImageInfo[] = [];
+    for (let i = 0; i < species.length; i++) {
+      const currentSpecies = species[i];
+      console.log(`[${i + 1}/${species.length}] ${currentSpecies.name}`);
+      const info = await analyzeSpeciesPage(currentSpecies);
+      results.push(info);
+      if (i < species.length - 1) {
+        await delay(delayMs);
+      }
+      console.log('');
+    }
+    return results;
+  }
+  const indexed = species.map((s, i) => ({ s, i }));
+  const resultsArr: ImageInfo[] = new Array(species.length);
+  await runWithConcurrency(indexed, limit, async ({ s, i }) => {
+    console.log(`[${i + 1}/${species.length}] ${s.name}`);
+    const info = await analyzeSpeciesPage(s);
+    resultsArr[i] = info;
+    return info;
+  });
+  return resultsArr;
 }
 
 async function generateReportInternal(

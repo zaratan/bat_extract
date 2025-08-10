@@ -18,6 +18,11 @@ jest.mock('sharp', () => {
   });
 });
 
+// Empêcher l'écriture réelle dans output/
+jest.mock('fs/promises', () => ({
+  writeFile: jest.fn(),
+}));
+
 describe('SmartDepartmentExtractor config utilisation', () => {
   it('accepte maxDepartmentRetries dans la config sans erreur', async () => {
     const cfg = mergeConfig({ extraction: { maxDepartmentRetries: 1 } });

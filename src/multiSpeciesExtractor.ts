@@ -6,6 +6,8 @@ import {
   type DeepPartial,
   type DefaultConfig,
 } from './config/defaultConfig.js';
+import { runWithConcurrency } from './utils/concurrency.js';
+import { createMetrics } from './utils/metrics.js';
 
 /** Interface d'un extracteur départemental (simplifiée pour injection) */
 export interface IDepartmentExtractor {
@@ -284,21 +286,56 @@ export class MultiSpeciesExtractor {
       console.log(`  - ${file} → ${speciesName}`);
     });
 
-    const results: ProcessSpeciesResult[] = [];
-    for (const filename of imageFiles) {
-      const r = await this.processSpecies(filename);
-      results.push(r);
+    const limit = Math.max(
+      1,
+      this.config.parallel.maxConcurrentExtractions || 1
+    );
+    if (limit > 1) {
+      console.log(
+        `⚙️  Mode parallèle limité: ${limit} extractions simultanées`
+      );
     }
+
+    const metrics = createMetrics('Extraction multi-espèces');
+
+    const results = await runWithConcurrency(
+      imageFiles,
+      limit,
+      async filename => {
+        const r = await this.processSpecies(filename);
+        if (r.success) {
+          metrics.markSuccess();
+        } else {
+          metrics.markFailure();
+        }
+        return r;
+      }
+    );
+
+    // results peut contenir potentiellement des Error si worker a throw hors try/catch
+    const normalized: ProcessSpeciesResult[] = results.map(r => {
+      if (r instanceof Error) {
+        metrics.markFailure();
+        return {
+          speciesName: 'Inconnu',
+          filename: 'inconnu',
+          success: false,
+          error: r.message,
+        };
+      }
+      return r as ProcessSpeciesResult;
+    });
 
     await this.generateConsolidatedReport();
 
-    const successCount = results.filter(r => r.success).length;
-    const failCount = results.length - successCount;
+    const successCount = normalized.filter(r => r.success).length;
+    const failCount = normalized.length - successCount;
     console.log(`\n📌 Bilan: ${successCount} succès, ${failCount} échec(s)`);
+    metrics.logSummary();
 
     console.log('\n🎉 Extraction multi-espèces terminée !');
     console.log(`📁 Tous les résultats sont dans: ${this.outputPath}`);
 
-    return results;
+    return normalized;
   }
 }

@@ -24,6 +24,15 @@ jest.mock('../src/smartExtractor.js', () => {
 const { SmartDepartmentExtractor: MockSmart } = require('../src/smartExtractor.js');
 const mockFs = fs as jest.Mocked<typeof fs>;
 
+// Helpers pour détecter suffixes dynamiques (images_test / output_test en environnement tests)
+const testImagesDirName = process.env.BATEXTRACT_TEST_IMAGES_DIR || 'images';
+const testOutputDirName = process.env.BATEXTRACT_TEST_OUTPUT_DIR || 'output';
+
+// Fonction utilitaire: tester si un chemin se termine bien par le répertoire attendu
+function endsWithDir(pathStr: string, dirName: string): boolean {
+  return pathStr.split(/[/\\]/).pop() === dirName;
+}
+
 describe('MultiSpeciesExtractor', () => {
   let extractor: MultiSpeciesExtractor;
 
@@ -32,17 +41,13 @@ describe('MultiSpeciesExtractor', () => {
     jest.clearAllMocks();
   });
 
-  describe('Extraction de noms d\'espèces', () => {
+  describe('Extraction des noms d\'espèces', () => {
     test('devrait extraire le nom d\'espèce depuis un filename standard', () => {
-      // On ne peut pas tester directement les méthodes privées,
-      // mais on peut tester le comportement global
       const testFilenames = [
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
         'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
         'plan-actions-chiropteres.fr-murin-de-bechstein-carte-murin-de-bechstein-2048x1271.png'
       ];
-
-      // Test que le fichier est reconnu comme valide
       testFilenames.forEach(filename => {
         expect(filename).toMatch(/\.(png|jpg|jpeg)$/i);
         expect(filename).not.toMatch(/^README\.md$/);
@@ -53,20 +58,13 @@ describe('MultiSpeciesExtractor', () => {
     test('devrait reconnaître les extensions d\'image valides', () => {
       const validExtensions = ['test.png', 'test.jpg', 'test.jpeg', 'test.PNG', 'test.JPG'];
       const invalidExtensions = ['test.txt', 'test.pdf', 'README.md', '.hidden'];
-
-      validExtensions.forEach(filename => {
-        expect(filename).toMatch(/\.(png|jpg|jpeg)$/i);
-      });
-
-      invalidExtensions.forEach(filename => {
-        expect(filename).not.toMatch(/\.(png|jpg|jpeg)$/i);
-      });
+      validExtensions.forEach(filename => { expect(filename).toMatch(/\.(png|jpg|jpeg)$/i); });
+      invalidExtensions.forEach(filename => { expect(filename).not.toMatch(/\.(png|jpg|jpeg)$/i); });
     });
   });
 
   describe('Gestion des fichiers', () => {
     test('devrait filtrer les fichiers images correctement', async () => {
-      // Arrange
       const mockFiles = [
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
         'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
@@ -75,21 +73,12 @@ describe('MultiSpeciesExtractor', () => {
         'document.pdf',
         'another-species.jpg'
       ];
-
       mockFs.readdir.mockResolvedValue(mockFiles as any);
-
-      // Act - On ne peut pas appeler directement getImageFiles (méthode privée)
-      // Mais on peut vérifier que readdir est appelé avec le bon chemin
-      // En réalité, on devrait tester via extractAllSpecies qui est publique
-
-      // Pour ce test, on vérifie juste la logique de filtrage
       const validFiles = mockFiles.filter(file =>
         /\.(png|jpg|jpeg)$/i.test(file) &&
         !file.startsWith('.') &&
         file !== 'README.md'
       );
-
-      // Assert
       expect(validFiles).toEqual([
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
         'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
@@ -98,14 +87,8 @@ describe('MultiSpeciesExtractor', () => {
     });
 
     test('devrait créer le dossier de sortie', async () => {
-      // Arrange
       mockFs.mkdir.mockResolvedValue(undefined);
-
-      // Act - On ne peut pas tester ensureOutputDir directement
-      // Mais on peut vérifier que mkdir serait appelé avec les bons paramètres
-      const outputPath = join(process.cwd(), 'output');
-
-      // Assert - Vérifier que le chemin est correct
+      const outputPath = join(process.cwd(), testOutputDirName);
       expect(outputPath).toContain('output');
       expect(isAbsolute(outputPath)).toBe(true);
     });
@@ -113,10 +96,8 @@ describe('MultiSpeciesExtractor', () => {
 
   describe('Configuration des chemins', () => {
     test('devrait avoir les bons chemins par défaut', () => {
-      // Test que les chemins sont corrects
-      const imagesPath = join(process.cwd(), 'images');
-      const outputPath = join(process.cwd(), 'output');
-
+      const imagesPath = join(process.cwd(), testImagesDirName);
+      const outputPath = join(process.cwd(), testOutputDirName);
       expect(imagesPath).toContain('images');
       expect(outputPath).toContain('output');
       expect(isAbsolute(imagesPath)).toBe(true);
@@ -126,14 +107,8 @@ describe('MultiSpeciesExtractor', () => {
 
   describe('Gestion d\'erreurs', () => {
     test('devrait gérer les erreurs de lecture de dossier', async () => {
-      // Arrange
       mockFs.readdir.mockRejectedValue(new Error('Dossier non trouvé'));
-
-      // La méthode getImageFiles étant privée, on ne peut pas la tester directement
-      // Mais on peut vérifier que l'erreur serait capturée
-      expect(async () => {
-        await mockFs.readdir('/chemin/inexistant');
-      }).rejects.toThrow('Dossier non trouvé');
+      await expect(mockFs.readdir('/chemin/inexistant')).rejects.toThrow('Dossier non trouvé');
     });
   });
 
@@ -149,17 +124,14 @@ describe('MultiSpeciesExtractor', () => {
       jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
       jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
         const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return [] as any; // aucune image
-        if (pathStr.endsWith('output')) return [] as any; // pas encore de fichiers
+        if (endsWithDir(pathStr, testImagesDirName)) return [] as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return [] as any;
         return [] as any;
       });
       jest.spyOn(realFs.promises, 'writeFile').mockResolvedValue(undefined as any);
-
       const extractor = new MultiSpeciesExtractor();
       await extractor.extractAllSpecies();
-
       expect(MockSmart).not.toHaveBeenCalled();
-      // Aucun writeFile (ni distribution ni consolidé)
       expect((realFs.promises.writeFile as any).mock.calls.length).toBe(0);
     });
 
@@ -171,21 +143,20 @@ describe('MultiSpeciesExtractor', () => {
       const outputDistributionFiles: string[] = [];
       const distributionContents: Record<string, string> = {};
       let consolidatedContent = '';
-
       jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
       jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
         const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return imageFiles as any;
-        if (pathStr.endsWith('output')) return outputDistributionFiles as any;
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
         return [] as any;
       });
       jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
         const fileName = p.toString().split('/').pop()!;
         if (fileName.endsWith('-distribution.json')) {
-            outputDistributionFiles.push(fileName);
-            distributionContents[fileName] = data.toString();
+          outputDistributionFiles.push(fileName);
+          distributionContents[fileName] = data.toString();
         } else if (fileName === 'consolidated-species-report.json') {
-            consolidatedContent = data.toString();
+          consolidatedContent = data.toString();
         }
       });
       jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
@@ -194,10 +165,8 @@ describe('MultiSpeciesExtractor', () => {
         if (fileName === 'consolidated-species-report.json') return consolidatedContent;
         return '';
       });
-
       const extractor = new MultiSpeciesExtractor();
       await extractor.extractAllSpecies();
-
       expect(MockSmart).toHaveBeenCalledTimes(2);
       expect(outputDistributionFiles.length).toBe(2);
       expect(consolidatedContent).not.toBe('');
@@ -217,122 +186,15 @@ describe('MultiSpeciesExtractor', () => {
       const outputDistributionFiles: string[] = [];
       const distributionContents: Record<string, string> = {};
       let consolidatedContent = '';
-
-      // Première instance échoue, les suivantes utilisent mock par défaut (succès)
-      (MockSmart as jest.Mock).mockImplementationOnce((imagePath: string, speciesName: string) => ({
+      (MockSmart as jest.Mock).mockImplementationOnce(() => ({
         extractDepartmentDistribution: jest.fn().mockRejectedValue(new Error('fail')),
         cleanup: jest.fn().mockResolvedValue(undefined),
       }));
-
       jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
       jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
         const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return imageFiles as any;
-        if (pathStr.endsWith('output')) return outputDistributionFiles as any;
-        return [] as any;
-      });
-      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
-        const fileName = p.toString().split('/').pop()!;
-        if (fileName.endsWith('-distribution.json')) {
-            outputDistributionFiles.push(fileName);
-            distributionContents[fileName] = data.toString();
-        } else if (fileName === 'consolidated-species-report.json') {
-            consolidatedContent = data.toString();
-        }
-      });
-      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
-        const fileName = p.toString().split('/').pop()!;
-        if (distributionContents[fileName]) return distributionContents[fileName];
-        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
-        return '';
-      });
-
-      const extractor = new MultiSpeciesExtractor();
-      await extractor.extractAllSpecies();
-
-      expect(MockSmart).toHaveBeenCalledTimes(2);
-      expect(outputDistributionFiles.length).toBe(1);
-      expect(consolidatedContent).not.toBe('');
-      const consolidated = JSON.parse(consolidatedContent);
-      expect(consolidated.metadata.totalSpecies).toBe(1);
-      expect(consolidated.species).toHaveLength(1);
-    });
-
-    it('devrait ignorer un fichier de distribution corrompu lors de la consolidation', async () => {
-      const imageFiles = [
-        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
-        'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
-      ];
-      const outputDistributionFiles: string[] = [];
-      const distributionContents: Record<string, string> = {};
-      let consolidatedContent = '';
-
-      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
-      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
-        const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return imageFiles as any;
-        if (pathStr.endsWith('output')) return outputDistributionFiles as any;
-        return [] as any;
-      });
-
-      // On corrompt un des fichiers au moment de l'écriture
-      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
-        const fileName = p.toString().split('/').pop()!;
-        if (fileName.endsWith('-distribution.json')) {
-          outputDistributionFiles.push(fileName);
-          if (fileName.includes('grand-murin')) {
-            distributionContents[fileName] = '{ invalid json'; // contenu cassé
-          } else {
-            distributionContents[fileName] = data.toString(); // contenu valide
-          }
-        } else if (fileName === 'consolidated-species-report.json') {
-          consolidatedContent = data.toString();
-        }
-      });
-
-      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
-        const fileName = p.toString().split('/').pop()!;
-        if (distributionContents[fileName]) return distributionContents[fileName];
-        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
-        return '';
-      });
-
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
-      const extractor = new MultiSpeciesExtractor();
-      await extractor.extractAllSpecies();
-
-      expect(MockSmart).toHaveBeenCalledTimes(2); // 2 extractions tentées
-      // Les deux fichiers existent mais un seul a pu être parsé
-      expect(outputDistributionFiles.length).toBe(2);
-      expect(consolidatedContent).not.toBe('');
-      const consolidated = JSON.parse(consolidatedContent);
-      // totalSpecies reflète le nombre de fichiers, même si l'un est corrompu
-      expect(consolidated.metadata.totalSpecies).toBe(2);
-      // Seulement 1 espèce valide dans le tableau
-      expect(consolidated.species).toHaveLength(1);
-      expect(warnSpy).toHaveBeenCalled();
-
-      warnSpy.mockRestore();
-    });
-  });
-
-  describe('Retour structuré et injection de factory', () => {
-    const realFs: typeof import('fs') = require('fs');
-
-    it('devrait retourner un résultat structuré success avec outputFile', async () => {
-      const imageFiles = [
-        'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
-      ];
-      const outputDistributionFiles: string[] = [];
-      const distributionContents: Record<string, string> = {};
-      let consolidatedContent = '';
-
-      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
-      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
-        const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return imageFiles as any;
-        if (pathStr.endsWith('output')) return outputDistributionFiles as any;
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
         return [] as any;
       });
       jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
@@ -350,10 +212,98 @@ describe('MultiSpeciesExtractor', () => {
         if (fileName === 'consolidated-species-report.json') return consolidatedContent;
         return '';
       });
+      const extractor = new MultiSpeciesExtractor();
+      await extractor.extractAllSpecies();
+      expect(MockSmart).toHaveBeenCalledTimes(2);
+      expect(outputDistributionFiles.length).toBe(1);
+      expect(consolidatedContent).not.toBe('');
+      const consolidated = JSON.parse(consolidatedContent);
+      expect(consolidated.metadata.totalSpecies).toBe(1);
+      expect(consolidated.species).toHaveLength(1);
+    });
 
+    it('devrait ignorer un fichier de distribution corrompu lors de la consolidation', async () => {
+      const imageFiles = [
+        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
+        'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
+      ];
+      const outputDistributionFiles: string[] = [];
+      const distributionContents: Record<string, string> = {};
+      let consolidatedContent = '';
+      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
+      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
+        const pathStr = p.toString();
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
+        return [] as any;
+      });
+      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (fileName.endsWith('-distribution.json')) {
+          outputDistributionFiles.push(fileName);
+          if (fileName.includes('grand-murin')) {
+            distributionContents[fileName] = '{ invalid json';
+          } else {
+            distributionContents[fileName] = data.toString();
+          }
+        } else if (fileName === 'consolidated-species-report.json') {
+          consolidatedContent = data.toString();
+        }
+      });
+      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (distributionContents[fileName]) return distributionContents[fileName];
+        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
+        return '';
+      });
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const extractor = new MultiSpeciesExtractor();
+      await extractor.extractAllSpecies();
+      expect(MockSmart).toHaveBeenCalledTimes(2);
+      expect(outputDistributionFiles.length).toBe(2);
+      expect(consolidatedContent).not.toBe('');
+      const consolidated = JSON.parse(consolidatedContent);
+      expect(consolidated.metadata.totalSpecies).toBe(2);
+      expect(consolidated.species).toHaveLength(1);
+      expect(warnSpy).toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+  });
+
+  describe('Retour structuré et injection de factory', () => {
+    const realFs: typeof import('fs') = require('fs');
+
+    it('devrait retourner un résultat structuré success avec outputFile', async () => {
+      const imageFiles = [
+        'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
+      ];
+      const outputDistributionFiles: string[] = [];
+      const distributionContents: Record<string, string> = {};
+      let consolidatedContent = '';
+      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
+      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
+        const pathStr = p.toString();
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
+        return [] as any;
+      });
+      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p: any, data: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (fileName.endsWith('-distribution.json')) {
+          outputDistributionFiles.push(fileName);
+          distributionContents[fileName] = data.toString();
+        } else if (fileName === 'consolidated-species-report.json') {
+          consolidatedContent = data.toString();
+        }
+      });
+      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p: any) => {
+        const fileName = p.toString().split('/').pop()!;
+        if (distributionContents[fileName]) return distributionContents[fileName];
+        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
+        return '';
+      });
       const extractor = new MultiSpeciesExtractor();
       const results = await extractor.extractAllSpecies();
-
       expect(results).toHaveLength(1);
       const r = results[0];
       expect(r.success).toBe(true);
@@ -366,28 +316,17 @@ describe('MultiSpeciesExtractor', () => {
       const imageFiles = [
         'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
       ];
-
-      class FailingFactory {
-        create() {
-          return {
-            extractDepartmentDistribution: jest.fn().mockRejectedValue(new Error('explosion')),
-            cleanup: jest.fn().mockResolvedValue(undefined),
-          };
-        }
-      }
-
+      class FailingFactory { create() { return { extractDepartmentDistribution: jest.fn().mockRejectedValue(new Error('explosion')), cleanup: jest.fn().mockResolvedValue(undefined) }; } }
       jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
       jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
         const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return imageFiles as any;
-        if (pathStr.endsWith('output')) return [] as any; // aucun fichier écrit
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return [] as any;
         return [] as any;
       });
       jest.spyOn(realFs.promises, 'writeFile').mockResolvedValue(undefined as any);
-
       const extractor = new MultiSpeciesExtractor(new (FailingFactory as any)());
       const results = await extractor.extractAllSpecies();
-
       expect(results).toHaveLength(1);
       const r = results[0];
       expect(r.success).toBe(false);
@@ -399,35 +338,65 @@ describe('MultiSpeciesExtractor', () => {
       const imageFiles = [
         'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
       ];
-      const createSpy = jest.fn().mockImplementation(() => ({
-        extractDepartmentDistribution: jest.fn().mockResolvedValue([]),
-        cleanup: jest.fn().mockResolvedValue(undefined),
-      }));
-
-      class SpyFactory {
-        create(imagePath: string, speciesName: string) {
-          return createSpy(imagePath, speciesName);
-        }
-      }
-
+      const createSpy = jest.fn().mockImplementation(() => ({ extractDepartmentDistribution: jest.fn().mockResolvedValue([]), cleanup: jest.fn().mockResolvedValue(undefined) }));
+      class SpyFactory { create(imagePath: string, speciesName: string) { return createSpy(imagePath, speciesName); } }
       jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
       jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
         const pathStr = p.toString();
-        if (pathStr.endsWith('images')) return imageFiles as any;
-        if (pathStr.endsWith('output')) return [] as any;
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return [] as any;
         return [] as any;
       });
       jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async () => {});
       jest.spyOn(realFs.promises, 'readFile').mockResolvedValue('[]' as any);
-
       const extractor = new MultiSpeciesExtractor(new (SpyFactory as any)());
       await extractor.extractAllSpecies();
-
       expect(createSpy).toHaveBeenCalledTimes(1);
       const [imagePathArg, speciesNameArg] = createSpy.mock.calls[0];
-      expect(imagePathArg).toContain('images');
+      expect(imagePathArg).toContain(testImagesDirName.replace('_test',''));
       expect(imagePathArg).toContain('.png');
       expect(speciesNameArg.toLowerCase()).toContain('barbastelle');
+    });
+  });
+
+  describe('Parallélisation', () => {
+    const realFs: typeof import('fs') = require('fs');
+    it('devrait utiliser le mode parallèle limité quand maxConcurrentExtractions>1', async () => {
+      const imageFiles = [
+        'plan-actions-chiropteres.fr-barbastelle-deurope-carte-barbastelle-deurope-2048x1271.png',
+        'plan-actions-chiropteres.fr-carte-grand-murin-carte-grand-murin-2048x1271.png',
+        'plan-actions-chiropteres.fr-murin-de-bechstein-carte-murin-de-bechstein-2048x1271.png'
+      ];
+      const outputDistributionFiles: string[] = [];
+      const distributionContents: Record<string,string> = {};
+      let consolidatedContent = '';
+      jest.spyOn(realFs.promises, 'mkdir').mockResolvedValue(undefined as any);
+      jest.spyOn(realFs.promises, 'readdir').mockImplementation(async (p: any) => {
+        const pathStr = p.toString();
+        if (endsWithDir(pathStr, testImagesDirName)) return imageFiles as any;
+        if (endsWithDir(pathStr, testOutputDirName)) return outputDistributionFiles as any;
+        return [] as any;
+      });
+      jest.spyOn(realFs.promises, 'writeFile').mockImplementation(async (p:any,data:any)=>{
+        const fileName = p.toString().split('/').pop()!;
+        if (fileName.endsWith('-distribution.json')) {
+          outputDistributionFiles.push(fileName);
+          distributionContents[fileName] = data.toString();
+        } else if (fileName === 'consolidated-species-report.json') {
+          consolidatedContent = data.toString();
+        }
+      });
+      jest.spyOn(realFs.promises, 'readFile').mockImplementation(async (p:any)=>{
+        const fileName = p.toString().split('/').pop()!;
+        if (distributionContents[fileName]) return distributionContents[fileName];
+        if (fileName === 'consolidated-species-report.json') return consolidatedContent;
+        return '';
+      });
+      const extractor = new MultiSpeciesExtractor(undefined as any, { parallel: { maxConcurrentExtractions: 2 } });
+      const results = await extractor.extractAllSpecies();
+      expect(results).toHaveLength(3);
+      expect(outputDistributionFiles.length).toBe(3);
+      expect(consolidatedContent).not.toBe('');
     });
   });
 });

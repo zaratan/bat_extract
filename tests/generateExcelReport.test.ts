@@ -94,7 +94,7 @@ describe('ExcelReportGenerator', () => {
         .mockResolvedValueOnce(JSON.stringify(mockGrandMurinData));
     });
 
-    it('should generate Excel report successfully', async () => {
+    it('should generate Excel report successfully (mock writeFile)', async () => {
       await generator.generateReport();
       expect(mockReaddir).toHaveBeenCalled();
       expect(mockReadFile).toHaveBeenCalledTimes(2);

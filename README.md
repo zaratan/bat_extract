@@ -80,7 +80,6 @@ Plus petit = plus rapide (évitez 0). Si vous ne savez pas quoi mettre, ne crée
 
 ```bash
 pnpm workflow         # Tout en une fois (recommandé)
-# Commandes séparées (rarement nécessaire) :
 pnpm generate-species # Récupérer la liste des espèces
 pnpm discover-urls    # Trouver où sont les images
 pnpm download         # Télécharger les cartes
@@ -236,8 +235,40 @@ Clés sensibles :
 | workflow          | failFast          | Arrêt précoce ou non               |
 | priorityDetection | headingClassNames | Classes CSS marquant priorité      |
 | images            | fileNamePattern   | Pattern fallback nommage           |
+| parallel          | maxConcurrent\*   | Concurrence contrôlée (tâches)     |
 
 Override : fichier local `batExtract.config.json`, env `CONFIG`, argument `--config` (priorité décroissante).
+
+#### Parallélisation (implémentée)
+
+Valeurs par défaut actuelles :
+
+```text
+maxConcurrentDownloads   = 3
+maxConcurrentExtractions = 4
+```
+
+Comportement :
+
+- Découverte des URLs d'images en pool (I/O réseau) – réutilise la même limite `maxConcurrentDownloads`
+- Téléchargements d'images en pool (ordre journalisé, pas garanti strictement séquentiel quand >1)
+- Extractions multi‑espèces en pool (ordre des logs intercalé possible, ordre des résultats conservé)
+- `1` force le mode strictement séquentiel (diagnostic / environnement contraint)
+
+Override minimal :
+
+```jsonc
+{
+  "parallel": { "maxConcurrentDownloads": 2, "maxConcurrentExtractions": 4 },
+}
+```
+
+Précautions :
+
+- Ne pas pousser ces valeurs trop haut (risque de surcharge I/O / CPU).
+- Garder un ratio extraction ≤ nombre de cœurs physiques pour éviter contention (traitement image).
+- Découverte + téléchargement partagent la même limite : augmenter `maxConcurrentDownloads` accélère potentiellement les deux phases.
+- Les métriques de fin (résumé multi‑espèces + ligne `📊 Extraction multi-espèces:`) reflètent les résultats après parallélisation.
 
 ### Tests et qualité
 
@@ -260,19 +291,20 @@ Basée sur : heading parent (h2–h6) contenant le lien avec classe `has-orange-
 
 ### Performance et robustesse
 
+- Parallélisation limitée implémentée (discover URLs + downloads + extractions) via pool configurable
 - Délai réseau simple (configurable) pour politesse serveur
-- Possibilité future : parallélisation contrôlée (sémaphore)
 - Idempotence systémique : ré-exécutions écrasent proprement
 - Continuité : une espèce en échec n'arrête pas le lot
+- Métriques basiques (succès/échecs + durée moyenne) sur l'extraction multi‑espèces
 
 ### Roadmap / évolutions ciblées
 
-| Idée                                            | Statut   | Note                                |
-| ----------------------------------------------- | -------- | ----------------------------------- |
-| Config centralisée enrichie (formats multiples) | Planifié | Ne pas implémenter sans demande     |
-| Logger structuré injectable                     | Planifié | Garder logs simples pour l'instant  |
-| Parallélisation limitée                         | Planifié | Après validation stabilité actuelle |
-| Collecte métriques consolidées                  | Planifié | Ajout d'un résumé global            |
+| Idée                                            | Statut     | Note                                  |
+| ----------------------------------------------- | ---------- | ------------------------------------- |
+| Config centralisée enrichie (formats multiples) | Planifié   | Ne pas implémenter sans demande       |
+| Logger structuré injectable                     | Planifié   | Garder logs simples pour l'instant    |
+| Parallélisation limitée                         | Implémenté | Pool configurable (downloads/extract) |
+| Collecte métriques consolidées                  | En cours   | Première version simple intégrée      |
 
 ### Bonnes pratiques internes
 

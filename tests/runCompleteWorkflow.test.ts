@@ -9,6 +9,7 @@ import { mkdtempSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import * as os from 'os';
 import * as childProcess from 'child_process';
+import { mergeConfig } from '../src/config/defaultConfig.js';
 
 class MockRunner implements IStepCommandRunner {
   public calls: string[] = [];
@@ -25,8 +26,12 @@ class MockRunner implements IStepCommandRunner {
 let tempRoot: string;
 function setupFilesystem(options: { corruptConsolidated?: boolean } = {}) {
   tempRoot = mkdtempSync(join(os.tmpdir(), 'batwf-'));
-  const imagesDir = join(tempRoot, 'images');
-  const outputDir = join(tempRoot, 'output');
+  // Utiliser les noms de dossiers en fonction des overrides tests actifs
+  const baseline = mergeConfig();
+  const imagesDirName = baseline.paths.imagesDir; // probable images_test
+  const outputDirName = baseline.paths.outputDir; // probable output_test
+  const imagesDir = join(tempRoot, imagesDirName);
+  const outputDir = join(tempRoot, outputDirName);
   fs.mkdirSync(imagesDir);
   fs.mkdirSync(outputDir);
   // créer fichiers attendus
@@ -34,13 +39,25 @@ function setupFilesystem(options: { corruptConsolidated?: boolean } = {}) {
   fs.writeFileSync(join(imagesDir, 'b.png'), '');
   fs.writeFileSync(join(outputDir, 'species-a-distribution.json'), '[]');
   fs.writeFileSync(join(outputDir, 'species-b-distribution.json'), '[]');
-  fs.writeFileSync(join(outputDir, 'generated-species-data.json'), JSON.stringify({ metadata: { totalSpecies: 2, prioritySpecies: 1 } }));
-  fs.writeFileSync(join(outputDir, 'discovered-image-urls.json'), JSON.stringify({ metadata: { totalSpecies: 2, imagesFound: 2, errors: 0 } }));
+  fs.writeFileSync(
+    join(outputDir, 'generated-species-data.json'),
+    JSON.stringify({ metadata: { totalSpecies: 2, prioritySpecies: 1 } })
+  );
+  fs.writeFileSync(
+    join(outputDir, 'discovered-image-urls.json'),
+    JSON.stringify({ metadata: { totalSpecies: 2, imagesFound: 2, errors: 0 } })
+  );
   fs.writeFileSync(join(outputDir, 'bat-distribution-matrix.xlsx'), 'xlsx');
   if (!options.corruptConsolidated) {
-    fs.writeFileSync(join(outputDir, 'consolidated-species-report.json'), JSON.stringify({ summary: { A: { detectedDepartments: 10 }, B: { detectedDepartments: 20 } } }));
+    fs.writeFileSync(
+      join(outputDir, 'consolidated-species-report.json'),
+      JSON.stringify({ summary: { A: { detectedDepartments: 10 }, B: { detectedDepartments: 20 } } })
+    );
   } else {
-    fs.writeFileSync(join(outputDir, 'consolidated-species-report.json'), '{bad json');
+    fs.writeFileSync(
+      join(outputDir, 'consolidated-species-report.json'),
+      '{bad json'
+    );
   }
   // Mocks access/readFile pour pointer vers ces fichiers
   (fsPromises.access as jest.Mock).mockImplementation(async (p: any) => {

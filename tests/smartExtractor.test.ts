@@ -4,7 +4,7 @@ import sharp from 'sharp';
 
 // Mock fs/promises et sharp
 jest.mock('fs/promises', () => ({
-  writeFile: jest.fn(),
+  writeFile: jest.fn(), // Empêche la création réelle de fichiers dans output/
 }));
 
 jest.mock('sharp', () => {
@@ -62,10 +62,13 @@ describe('SmartDepartmentExtractor', () => {
       expect(mockSharpInstance.raw).toHaveBeenCalled();
       expect(mockSharpInstance.toBuffer).toHaveBeenCalled();
 
-      // Un seul fichier de résultats détaillés est écrit
+      // Un seul fichier de résultats détaillés est écrit (mocké, pas de persistance réelle)
       expect(mockWriteFile).toHaveBeenCalledTimes(1);
       const outputCall = mockWriteFile.mock.calls[0][0].toString();
       expect(outputCall).toContain('department-extraction.json');
+      // Aucun autre fichier parasite
+      const callsExtra = mockWriteFile.mock.calls.map(c => c[0].toString());
+      expect(callsExtra.every(p => p.includes('department-extraction'))).toBe(true);
 
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBeGreaterThan(0);

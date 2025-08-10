@@ -68,7 +68,7 @@ export const defaultConfig: DefaultConfig = Object.freeze({
     maxDepartmentRetries: 0,
   },
   network: { requestDelayMs: 1000, timeoutMs: 15000, retryCount: 2 },
-  parallel: { maxConcurrentDownloads: 3, maxConcurrentExtractions: 2 },
+  parallel: { maxConcurrentDownloads: 3, maxConcurrentExtractions: 4 },
   excel: {
     sheetNameMatrix: 'Distribution',
     sheetNameLegend: 'Légende',
@@ -97,7 +97,10 @@ export const defaultConfig: DefaultConfig = Object.freeze({
 export function mergeConfig(
   partial?: DeepPartial<DefaultConfig>
 ): DefaultConfig {
-  if (!partial) return defaultConfig;
+  if (!partial) {
+    const base = applyTestPathOverrides(defaultConfig);
+    return base;
+  }
   // shallow clone via JSON since object is simple (only primitives / plain objects)
   const clone: DefaultConfig = JSON.parse(JSON.stringify(defaultConfig));
   applyMerge(
@@ -105,7 +108,29 @@ export function mergeConfig(
     partial as Record<string, unknown>,
     'root'
   );
-  return Object.freeze(clone);
+  return Object.freeze(applyTestPathOverrides(clone));
+}
+
+function applyTestPathOverrides(cfg: DefaultConfig): DefaultConfig {
+  if (
+    process.env.BATEXTRACT_TEST_OUTPUT_DIR ||
+    process.env.BATEXTRACT_TEST_IMAGES_DIR
+  ) {
+    const clone: DefaultConfig = JSON.parse(JSON.stringify(cfg));
+    const paths = (
+      clone as unknown as {
+        paths: { imagesDir: string; outputDir: string; tempDir: string };
+      }
+    ).paths;
+    if (process.env.BATEXTRACT_TEST_OUTPUT_DIR) {
+      paths.outputDir = process.env.BATEXTRACT_TEST_OUTPUT_DIR;
+    }
+    if (process.env.BATEXTRACT_TEST_IMAGES_DIR) {
+      paths.imagesDir = process.env.BATEXTRACT_TEST_IMAGES_DIR;
+    }
+    return Object.freeze(clone);
+  }
+  return cfg;
 }
 
 function applyMerge(
